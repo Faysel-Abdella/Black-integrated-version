@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ColumnsType } from "antd/es/table";
 import {
   Card,
@@ -18,6 +18,7 @@ import {
 import Sidebar from "../../components/Sidebar";
 import AccountModal from "../../components/AccountModal";
 import DefaultLayout from "../DefaultLayout/DefaultLayout";
+import customFetch from "@/utils/customFetch";
 
 const { Search } = Input;
 
@@ -32,9 +33,50 @@ type TableData = {
   registrationManager: string;
 };
 
+type adminData = {};
+
 export default function Account() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
+  const [adminsList, setAdminsList] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+
+  useEffect(() => {
+    const fetchAdminLists = async () => {
+      setIsFetching(true);
+      const adminsList = await customFetch.get("/api/v1/admins", {
+        headers: {
+          Authorization:
+            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbklkIjoiYWRtaW4iLCJzdWIiOjEsInJvbGUiOiJcYkFETUlOIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTcwNDY5Mzg1OSwiZXhwIjoxNzA3Mjg1ODU5fQ.XeEQec9vVRjBwH3NLQjQBh8SktZJgLy-3KZe03mSapo",
+        },
+      });
+
+      const adminsData = adminsList.data.data;
+      const transformedAdminsList = adminsData.map((admin: AdminType) => ({
+        key: admin.id,
+        id: admin.id,
+        name: admin.name,
+        consumerNumber: admin.phone,
+        lastAccessDate: new Date(admin.lastLoginDate)
+          .toISOString()
+          .split("T")[0],
+        allowIP: admin.allowedIp,
+        department: admin.author.department,
+        registrationManager: admin.author.name,
+      }));
+
+      setAdminsList(transformedAdminsList);
+      setIsFetching(false);
+
+      console.log(transformedAdminsList);
+    };
+
+    try {
+      fetchAdminLists();
+    } catch (error) {
+      console.log("Error when fetching admins list", error);
+    }
+  }, []);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -228,12 +270,18 @@ export default function Account() {
                   <strong>N건</strong>의 게시물이 검색되었습니다
                 </h2>
               </div>
-              <Table
-                bordered
-                columns={tableColumns}
-                dataSource={tableData}
-                onChange={onChange}
-              />
+              {isFetching ? (
+                <div className="flex justify-center items-center h-screen">
+                  <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+                </div>
+              ) : (
+                <Table
+                  bordered
+                  columns={tableColumns}
+                  dataSource={adminsList}
+                  onChange={onChange}
+                />
+              )}
             </Card>
           </Col>
         </Row>
