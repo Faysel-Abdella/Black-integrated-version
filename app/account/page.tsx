@@ -33,11 +33,10 @@ type TableData = {
   registrationManager: string;
 };
 
-type adminData = {};
-
 export default function Account() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
+  const [buttonType, setButtonType] = useState("register");
   const [adminsList, setAdminsList] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
 
@@ -79,6 +78,7 @@ export default function Account() {
   }, []);
 
   const showModal = () => {
+    setButtonType("register");
     setIsModalOpen(true);
   };
 
@@ -92,6 +92,7 @@ export default function Account() {
 
   const handleClickAdmin = (data: any) => {
     setSelectedAdmin(data);
+    setButtonType("changeInfo");
     setIsModalOpen(true);
   };
 
@@ -305,7 +306,7 @@ export default function Account() {
           >
             <img src="/assets/images/backIcon.png" />
           </Button>
-          <AccountModal onCancel={handleCancel} />
+          <AccountModal buttonType={buttonType} onCancel={handleCancel} />
         </div>
       </Modal>
     </DefaultLayout>

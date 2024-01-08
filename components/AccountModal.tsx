@@ -1,11 +1,19 @@
-import { Form, Row, Button, Radio, Input, Col, Flex } from "antd";
+import { Form, Row, Button, Radio, Input, Col, Flex, Modal } from "antd";
+import ConfirmMembership from "./ConfirmMembership";
+import { useState } from "react";
 
 interface AccountModalProps {
   onCancel: () => void;
+  buttonType: string;
 }
 
-export default function AccountModal({ onCancel }: AccountModalProps) {
+export default function AccountModal({
+  onCancel,
+  buttonType,
+}: AccountModalProps) {
   const [form] = Form.useForm();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState("ConfirmMembership");
 
   //   faysel:
 
@@ -41,10 +49,63 @@ export default function AccountModal({ onCancel }: AccountModalProps) {
   //   Please carefully review the Swagger documentation before proceeding with the work.
   //   Thank you."
 
+  const showModal = (type: any) => {
+    setIsModalOpen(true);
+    setModalType(type);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="modal-form form-inline">
       <Form colon={false} layout="horizontal" form={form}>
         <Row gutter={[16, 0]}>
+          {buttonType === "changeInfo" && (
+            <>
+              <Col md={12} />
+              <Col md={12} className="mb-[10px]">
+                <div className="text-right">
+                  <Button
+                    shape="round"
+                    size="small"
+                    style={{
+                      padding: 0,
+                      width: 120,
+                      height: 32,
+                      fontWeight: 400,
+                      marginRight: 10,
+                    }}
+                    className="ant-btn-info"
+                    onClick={() => showModal("ConfirmMembership")}
+                  >
+                    임시비밀번호 발송
+                  </Button>
+                  <Button
+                    shape="round"
+                    size="small"
+                    style={{
+                      padding: 0,
+                      width: 40,
+                      height: 32,
+                      fontWeight: 400,
+                    }}
+                    className="ant-btn-info"
+                    onClick={() => {
+                      console.log("delete button");
+                    }}
+                  >
+                    삭제
+                  </Button>
+                </div>
+              </Col>
+            </>
+          )}
           <Col md={24}>
             <Form.Item
               style={{ marginBottom: 15 }}
@@ -59,6 +120,42 @@ export default function AccountModal({ onCancel }: AccountModalProps) {
               <Input />
             </Form.Item>
           </Col>
+          {buttonType === "register" && (
+            <>
+              <Col md={12}>
+                <Form.Item
+                  style={{ marginBottom: 15 }}
+                  name="password"
+                  label={
+                    <span style={{ textAlign: "left" }}>
+                      비밀번호
+                      <span className="required-asterisk ml-1 text-red-500">
+                        *
+                      </span>
+                    </span>
+                  }
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col md={12}>
+                <Form.Item
+                  style={{ marginBottom: 15 }}
+                  name="checkPassword"
+                  label={
+                    <span style={{ textAlign: "left" }}>
+                      비밀번호 확인
+                      <span className="required-asterisk ml-1 text-red-500">
+                        *
+                      </span>
+                    </span>
+                  }
+                >
+                  <Input />
+                </Form.Item>
+              </Col>
+            </>
+          )}
           <Col md={12}>
             <Form.Item
               style={{ marginBottom: 15 }}
@@ -224,6 +321,21 @@ export default function AccountModal({ onCancel }: AccountModalProps) {
           </Button>
         </Flex>
       </Form>
+      <Modal
+        className={"ConfirmMembership"}
+        title=""
+        footer=""
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        closable={false}
+        width={510}
+        centered
+      >
+        <div className="px-1">
+          <ConfirmMembership onCancel={handleCancel} />
+        </div>
+      </Modal>
     </div>
   );
 }
