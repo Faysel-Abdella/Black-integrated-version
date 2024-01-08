@@ -39,6 +39,9 @@ export default function Account() {
   const [buttonType, setButtonType] = useState("register");
   const [adminsList, setAdminsList] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
+  // Search functionality states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<AdminType[]>([]);
 
   useEffect(() => {
     const fetchAdminLists = async () => {
@@ -94,6 +97,14 @@ export default function Account() {
     setSelectedAdmin(data);
     setButtonType("changeInfo");
     setIsModalOpen(true);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    const filteredAdmins = adminsList.filter((admin: AdminType) =>
+      admin.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setSearchResults(filteredAdmins);
   };
 
   const tableColumns: ColumnsType<TableData> = [
@@ -243,6 +254,7 @@ export default function Account() {
               <Search
                 placeholder="이름을 입력해주세요"
                 style={{ width: 311 }}
+                onChange={(e) => handleSearch(e.target.value)}
               />
             </Space>
           </Col>
@@ -279,7 +291,7 @@ export default function Account() {
                 <Table
                   bordered
                   columns={tableColumns}
-                  dataSource={adminsList}
+                  dataSource={searchQuery !== "" ? searchResults : adminsList}
                   onChange={onChange}
                 />
               )}
