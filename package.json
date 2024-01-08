@@ -12,6 +12,7 @@
     "@ckeditor/ckeditor5-build-classic": "^40.1.0",
     "@ckeditor/ckeditor5-react": "^6.2.0",
     "antd": "^5.11.2",
+    "axios": "^1.4.0",
     "chart.js": "^4.4.0",
     "next": "14.0.3",
     "next-auth": "^4.24.5",
