@@ -57,6 +57,8 @@ export default function AccountModal({
   };
 
   const handleSubmit = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+
     try {
       if (buttonType === "changeInfo") {
         const response = await customFetch.patch(
@@ -72,8 +74,7 @@ export default function AccountModal({
           },
           {
             headers: {
-              Authorization:
-                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbklkIjoiYWRtaW4iLCJzdWIiOjEsInJvbGUiOiJcYkFETUlOIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTcwNDY5Mzg1OSwiZXhwIjoxNzA3Mjg1ODU5fQ.XeEQec9vVRjBwH3NLQjQBh8SktZJgLy-3KZe03mSapo",
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
@@ -98,8 +99,7 @@ export default function AccountModal({
           },
           {
             headers: {
-              Authorization:
-                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbklkIjoiYWRtaW4iLCJzdWIiOjEsInJvbGUiOiJcYkFETUlOIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTcwNDY5Mzg1OSwiZXhwIjoxNzA3Mjg1ODU5fQ.XeEQec9vVRjBwH3NLQjQBh8SktZJgLy-3KZe03mSapo",
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );

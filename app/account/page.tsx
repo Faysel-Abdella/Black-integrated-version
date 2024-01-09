@@ -49,10 +49,10 @@ export default function Account() {
   useEffect(() => {
     const fetchAdminLists = async () => {
       setIsFetching(true);
+      const accessToken = localStorage.getItem("accessToken");
       const adminsList = await customFetch.get("/api/v1/admins", {
         headers: {
-          Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbklkIjoiYWRtaW4iLCJzdWIiOjEsInJvbGUiOiJcYkFETUlOIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTcwNDY5Mzg1OSwiZXhwIjoxNzA3Mjg1ODU5fQ.XeEQec9vVRjBwH3NLQjQBh8SktZJgLy-3KZe03mSapo",
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 

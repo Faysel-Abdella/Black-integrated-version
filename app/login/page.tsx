@@ -1,14 +1,20 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { toast } from "react-toastify";
 import AdminLayout from "../AdminLayout/AdminLayout";
 import { Col, Row, Button, Form, Input, Typography, Space, Modal } from "antd";
 import adminLogo from "../../public/assets/images/adminLogo.png";
 import loginBg from "../../public/assets/images/loginBg.png";
+import customFetch from "@/utils/customFetch";
 
 export default function Home() {
   const { Text, Link } = Typography;
+  const router = useRouter();
+  const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLogging, setIsLogging] = useState(false);
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -19,6 +25,37 @@ export default function Home() {
 
   const handleCancel = () => {
     setIsModalOpen(false);
+  };
+
+  const handleLogin = async (values: any) => {
+    setIsLogging(true);
+    const { email, password } = values;
+    const credentials = `${email}:${password}`;
+    console.log(credentials);
+    const encodedCredentials = btoa(credentials);
+    console.log(encodedCredentials);
+
+    try {
+      const response = await customFetch.post(
+        "/api/v1/auth/admins/login",
+        {},
+        {
+          headers: {
+            Authorization: `Basic ${encodedCredentials}`,
+          },
+        }
+      );
+
+      localStorage.setItem("accessToken", response.data.accessToken);
+      setIsLogging(false);
+      router.push("/");
+    } catch (error: any) {
+      console.log(error);
+      setIsLogging(false);
+      toast.error(error.response.data.message, {
+        autoClose: 3000,
+      });
+    }
   };
 
   // faysel: "It's the API for login."(authorization basic) POST /api/v1/auth/admins/login
@@ -32,8 +69,9 @@ export default function Home() {
             <div className="or">
               <p>or</p>
             </div>
-            <Form layout="vertical">
+            <Form layout="vertical" form={form} onFinish={handleLogin}>
               <Form.Item
+                name="email"
                 label={
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <span>Email</span>
@@ -46,6 +84,7 @@ export default function Home() {
                 <Input placeholder="mail@moty.com" />
               </Form.Item>
               <Form.Item
+                name="password"
                 label={
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <span>Password</span>
@@ -61,9 +100,11 @@ export default function Home() {
                 <Button
                   type="primary"
                   className="mt-[80px] mb-3"
-                  onClick={showModal}
+                  // onClick={handleLogin}
+                  disabled={isLogging}
+                  htmlType="submit"
                 >
-                  Login
+                  {isLogging ? "Logging..." : "Login"}
                 </Button>
                 <Text
                   style={{ fontSize: 16, color: "#FF0000", fontWeight: 400 }}
