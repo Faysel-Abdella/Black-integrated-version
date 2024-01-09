@@ -37,11 +37,14 @@ export default function Account() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [buttonType, setButtonType] = useState("register");
+  const [adminsAllDataList, setAdminsAllDataList] = useState([]);
   const [adminsList, setAdminsList] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   // Search functionality states
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<AdminType[]>([]);
+  const [searchResults, setSearchResults] = useState([]);
+  // Updating admin data
+  const [clickedAdminData, setClickedAdminData] = useState([]);
 
   useEffect(() => {
     const fetchAdminLists = async () => {
@@ -54,6 +57,7 @@ export default function Account() {
       });
 
       const adminsData = adminsList.data.data;
+
       const transformedAdminsList = adminsData.map((admin: AdminType) => ({
         key: admin.id,
         id: admin.id,
@@ -68,9 +72,8 @@ export default function Account() {
       }));
 
       setAdminsList(transformedAdminsList);
+      setAdminsAllDataList(adminsData);
       setIsFetching(false);
-
-      console.log(transformedAdminsList);
     };
 
     try {
@@ -95,6 +98,14 @@ export default function Account() {
 
   const handleClickAdmin = (data: any) => {
     setSelectedAdmin(data);
+    const thisAdminData: any = adminsAllDataList.filter(
+      (admin: AdminType) => admin.id.toString() == data.id.toString()
+    );
+
+    console.log(thisAdminData);
+
+    setClickedAdminData(thisAdminData);
+
     setButtonType("changeInfo");
     setIsModalOpen(true);
   };
@@ -318,7 +329,11 @@ export default function Account() {
           >
             <img src="/assets/images/backIcon.png" />
           </Button>
-          <AccountModal buttonType={buttonType} onCancel={handleCancel} />
+          <AccountModal
+            buttonType={buttonType}
+            onCancel={handleCancel}
+            clickedAdminData={clickedAdminData}
+          />
         </div>
       </Modal>
     </DefaultLayout>

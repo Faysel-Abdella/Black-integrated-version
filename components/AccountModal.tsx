@@ -1,19 +1,132 @@
 import { Form, Row, Button, Radio, Input, Col, Flex, Modal } from "antd";
+import { toast } from "react-toastify";
 import ConfirmMembership from "./ConfirmMembership";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import customFetch from "@/utils/customFetch";
 
 interface AccountModalProps {
   onCancel: () => void;
   buttonType: string;
+  clickedAdminData?: any;
 }
 
 export default function AccountModal({
   onCancel,
   buttonType,
+  clickedAdminData,
 }: AccountModalProps) {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("ConfirmMembership");
+  const [changeInfoAdminData, setChangeInfoAdminData] =
+    useState(clickedAdminData);
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+
+  useEffect(() => {
+    setChangeInfoAdminData(clickedAdminData);
+    form.setFieldsValue({
+      name: buttonType === "changeInfo" ? clickedAdminData[0].name : null,
+      id: buttonType === "changeInfo" ? clickedAdminData[0].id : null,
+      department:
+        buttonType === "changeInfo"
+          ? clickedAdminData[0].author.department
+          : null,
+      phone: buttonType === "changeInfo" ? clickedAdminData[0].phone : null,
+      email: buttonType === "changeInfo" ? clickedAdminData[0].email : null,
+      allowedIp:
+        buttonType === "changeInfo" ? clickedAdminData[0].allowedIp : null,
+      permissions:
+        buttonType === "changeInfo" ? clickedAdminData[0].permissions : null,
+    });
+  }, [clickedAdminData, buttonType, form]);
+
+  const handlePermissionChange = (e: any, permissionName: string) => {
+    const value = e.target.value;
+    let updatedPermissions = [...selectedPermissions];
+
+    // Check if the value already exists in selectedPermissions
+    updatedPermissions = updatedPermissions.filter(
+      (item) => !item.includes(value[0])
+    );
+
+    if (value != "3_Appeal Management") {
+      updatedPermissions.push(value.slice(2));
+    }
+
+    setSelectedPermissions(updatedPermissions);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (buttonType === "changeInfo") {
+        const response = await customFetch.patch(
+          `/api/v1/admins/${changeInfoAdminData[0].id}`,
+          {
+            password: changeInfoAdminData[0].password,
+            name: form.getFieldValue("name"),
+            department: form.getFieldValue("department"),
+            email: form.getFieldValue("email"),
+            phone: form.getFieldValue("phone"),
+            allowedIp: form.getFieldValue("allowedIp"),
+            permissions: selectedPermissions,
+          },
+          {
+            headers: {
+              Authorization:
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbklkIjoiYWRtaW4iLCJzdWIiOjEsInJvbGUiOiJcYkFETUlOIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTcwNDY5Mzg1OSwiZXhwIjoxNzA3Mjg1ODU5fQ.XeEQec9vVRjBwH3NLQjQBh8SktZJgLy-3KZe03mSapo",
+            },
+          }
+        );
+        // Reset all permissions
+        setSelectedPermissions([]);
+        // Clear all fields
+        form.resetFields();
+        // Close the modal
+        closeModal();
+      } else {
+        const response = await customFetch.post(
+          "/api/v1/admins",
+          {
+            loginId: form.getFieldValue("id"),
+            password: form.getFieldValue("password"),
+            name: form.getFieldValue("name"),
+            department: form.getFieldValue("department"),
+            email: form.getFieldValue("email"),
+            phone: form.getFieldValue("phone"),
+            allowedIp: form.getFieldValue("allowedIp"),
+            permissions: selectedPermissions,
+          },
+          {
+            headers: {
+              Authorization:
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbklkIjoiYWRtaW4iLCJzdWIiOjEsInJvbGUiOiJcYkFETUlOIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTcwNDY5Mzg1OSwiZXhwIjoxNzA3Mjg1ODU5fQ.XeEQec9vVRjBwH3NLQjQBh8SktZJgLy-3KZe03mSapo",
+            },
+          }
+        );
+        console.log(response);
+        // Reset all permissions
+        setSelectedPermissions([]);
+        // Clear all fields
+        form.resetFields();
+        // Close the modal
+        closeModal();
+      }
+    } catch (error: any) {
+      console.error(error);
+      if (
+        Array.isArray(error.response.data.message) &&
+        error.response.data.message[0]
+      ) {
+        toast.error(error.response.data.message[0], {
+          autoClose: 4000,
+        });
+      } else {
+        toast.error(error.response.data.message, {
+          autoClose: 4000,
+        });
+      }
+    }
+  };
 
   //   faysel:
 
@@ -52,6 +165,10 @@ export default function AccountModal({
   const showModal = (type: any) => {
     setIsModalOpen(true);
     setModalType(type);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(true);
   };
 
   const handleOk = () => {
@@ -117,7 +234,7 @@ export default function AccountModal({
                 </span>
               }
             >
-              <Input />
+              <Input name="id" />
             </Form.Item>
           </Col>
           {buttonType === "register" && (
@@ -126,6 +243,11 @@ export default function AccountModal({
                 <Form.Item
                   style={{ marginBottom: 15 }}
                   name="password"
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
                   label={
                     <span style={{ textAlign: "left" }}>
                       비밀번호
@@ -150,6 +272,11 @@ export default function AccountModal({
                       </span>
                     </span>
                   }
+                  rules={[
+                    {
+                      required: true,
+                    },
+                  ]}
                 >
                   <Input />
                 </Form.Item>
@@ -166,8 +293,13 @@ export default function AccountModal({
                   <span className="required-asterisk ml-1 text-red-500">*</span>
                 </span>
               }
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
             >
-              <Input />
+              <Input name="name" />
             </Form.Item>
           </Col>
           <Col md={12}>
@@ -180,8 +312,13 @@ export default function AccountModal({
                   <span className="required-asterisk ml-1 text-red-500">*</span>
                 </span>
               }
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
             >
-              <Input />
+              <Input name="department" />
             </Form.Item>
           </Col>
           <Col md={12}>
@@ -194,8 +331,13 @@ export default function AccountModal({
                   <span className="required-asterisk ml-1 text-red-500">*</span>
                 </span>
               }
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
             >
-              <Input />
+              <Input name="phone" />
             </Form.Item>
           </Col>
           <Col md={12}>
@@ -208,23 +350,34 @@ export default function AccountModal({
                   <span className="required-asterisk ml-1 text-red-500">*</span>
                 </span>
               }
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
             >
-              <Input />
+              <Input name="email" required={true} />
             </Form.Item>
           </Col>
           <Col md={24}>
             <Form.Item
               style={{ marginBottom: 15 }}
-              name="ip"
+              name="allowedIp"
               label={<span style={{ textAlign: "left" }}>허용 IP</span>}
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
             >
-              <Input />
+              <Input name="allowedIp" required />
             </Form.Item>
           </Col>
           <Col md={24}>
             <Form.Item
               style={{ marginBottom: 15 }}
-              name="settings"
+              // name="settings"
+              name="permissions"
               label={<span style={{ textAlign: "left" }}>권한 설정</span>}
               className="input-group"
             >
@@ -240,9 +393,11 @@ export default function AccountModal({
               label={<span style={{ textAlign: "left" }}>홈</span>}
               className="input-group"
             >
-              <Radio.Group>
-                <Radio value="horizontal1">대시보드</Radio>
-                <Radio value="horizontal2">종합지표</Radio>
+              <Radio.Group onChange={(e) => handlePermissionChange(e, "home")}>
+                {/* dashboard */}
+                <Radio value="1_dashboard">대시보드</Radio>
+                {/* summary */}
+                <Radio value="1_summary">종합지표</Radio>
               </Radio.Group>
             </Form.Item>
           </Col>
@@ -253,10 +408,15 @@ export default function AccountModal({
               label={<span style={{ textAlign: "left" }}>회원관리</span>}
               className="input-group"
             >
-              <Radio.Group>
-                <Radio value="horizontal3">회원 관리</Radio>
-                <Radio value="horizontal4">회원 제재</Radio>
-                <Radio value="horizontal5">등록 관리</Radio>
+              <Radio.Group
+                onChange={(e) => handlePermissionChange(e, "memberManagement")}
+              >
+                {/* user_management */}
+                <Radio value="2_user_management">회원 관리</Radio>
+                {/* user_ban */}
+                <Radio value="2_user_ban">회원 제재</Radio>
+                {/* user_update  */}
+                <Radio value="2_user_update">등록 관리</Radio>
               </Radio.Group>
             </Form.Item>
           </Col>
@@ -267,9 +427,17 @@ export default function AccountModal({
               label={<span style={{ textAlign: "left" }}>블랙리스트 관리</span>}
               className="input-group"
             >
-              <Radio.Group>
-                <Radio value="horizontal6">승인요청 관리</Radio>
-                <Radio value="horizontal7">이의신청 관리</Radio>
+              <Radio.Group
+                onChange={(e) =>
+                  handlePermissionChange(e, "consumerManagement")
+                }
+              >
+                {/* black_registration_approval */}
+                <Radio value="3_black_registration_approval">
+                  승인요청 관리
+                </Radio>
+                {/* Appeal Management */}
+                <Radio value="3_Appeal Management">이의신청 관리</Radio>
               </Radio.Group>
             </Form.Item>
           </Col>
@@ -280,10 +448,17 @@ export default function AccountModal({
               label={<span style={{ textAlign: "left" }}>계정 관리</span>}
               className="input-group"
             >
-              <Radio.Group>
-                <Radio value="horizontal0">계정관리</Radio>
-                <Radio value="horizontal11">비밀번호 불일치 관리</Radio>
-                <Radio value="horizontal22">등록 관리</Radio>
+              <Radio.Group
+                onChange={(e) => handlePermissionChange(e, "accountManagement")}
+              >
+                {/* admin_management */}
+                <Radio value="4_admin_management">계정관리</Radio>
+                {/* admin_password_mismatch */}
+                <Radio value="4_admin_password_mismatch">
+                  비밀번호 불일치 관리
+                </Radio>
+                {/* admin_create */}
+                <Radio value="4_admin_create">등록 관리</Radio>
               </Radio.Group>
             </Form.Item>
           </Col>
@@ -293,9 +468,13 @@ export default function AccountModal({
               label={<span style={{ textAlign: "left" }}>공지 관리</span>}
               className="input-group"
             >
-              <Radio.Group>
-                <Radio value="horizontal33">FAQ 관리</Radio>
-                <Radio value="horizontal44">1 : 1 문의하기</Radio>
+              <Radio.Group
+                onChange={(e) => handlePermissionChange(e, "noticeManagement")}
+              >
+                {/* faq_management */}
+                <Radio value="5_faq_management">FAQ 관리</Radio>
+                {/* inquiry_management  */}
+                <Radio value="5_inquiry_management">1 : 1 문의하기</Radio>
               </Radio.Group>
             </Form.Item>
           </Col>
@@ -309,6 +488,7 @@ export default function AccountModal({
           <Button
             style={{ padding: 0, width: 148, height: 42, fontWeight: 400 }}
             className="ant-btn ant-btn-info"
+            onClick={handleSubmit}
           >
             등록
           </Button>
