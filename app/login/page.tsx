@@ -33,7 +33,7 @@ export default function Home() {
     const credentials = `${email}:${password}`;
     console.log(credentials);
     const encodedCredentials = btoa(credentials);
-    console.log(encodedCredentials);
+    // console.log(encodedCredentials);
 
     try {
       const response = await customFetch.post(
@@ -46,9 +46,9 @@ export default function Home() {
         }
       );
 
-      console.log(response);
+      console.log("This is response", response);
 
-      localStorage.setItem("accessToken", response.data.accessToken);
+      // localStorage.setItem("accessToken", response.data.accessToken);
       setIsLogging(false);
       router.push("/");
     } catch (error: any) {
