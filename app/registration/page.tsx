@@ -174,6 +174,30 @@ export default function Page() {
   const onChangeDate = (date: any, dateString: any) => {
     console.log(date, dateString);
   };
+
+  // faysel2:
+  // This is the API for displaying the blacklist.
+  // The Table tag must include data related to the blacklist.
+  // If the blacklist grows, pagination should be implemented.
+  // On this page's interface, there are options for date input, status setting, and search terms at the top, and these should be used to facilitate searching the list.
+  // Similar to what you implemented on the account page, when lines 93 and 103 are clicked, the data for the respective member from /api/v1/admins/blacks should be passed to the modal, and the inputs inside the modal should be filled with the appropriate data.
+  // For more details, please refer to the Swagger documentation and ask Jin if you have any questions. Thank you.
+  // GET /api/v1/admins/blacks
+
+  // "When this button is clicked,
+  //   <Button
+  //   style={{ padding: 0, width: 144, height: 61, fontWeight: 400 }}
+  //   type="primary"
+  //   shape="round"
+  //   onClick={() => showModal("registration")}
+  //   >
+  //   Register
+  //   </Button>
+  //   it will open a modal for registering a new black consumer.
+  //   You should be able to register a new black consumer through this modal.
+  //   The corresponding API for this is POST /api/v1/admins/blacks.
+  //  Please check the parameters of the API in the Swagger documentation. Thank you."
+
   return (
     <DefaultLayout>
       <Row justify="space-between" align="middle" className="mb-[21px]">

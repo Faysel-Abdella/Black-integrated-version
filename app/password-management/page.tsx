@@ -146,6 +146,21 @@ export default function PasswordManagement() {
   const onChangeDate = (date: any, dateString: any) => {
     console.log(date, dateString);
   };
+
+  // faysel2:
+  // This is a page displaying a list of sanctioned administrators.
+  // The list data of sanctioned administrators needs to be inserted into a table tag.
+  // When this button is clicked,
+  //   <Button
+  //   style={{ padding: 0, width: 148, height: 42, fontWeight: 400 }}
+  //   className="ant-btn ant-btn-info"
+  //   >
+  //   등록
+  //   </Button>
+  // you should be able to carry the ID of the user corresponding to the list and have the capability to delete it."
+
+  // GET /api/v1/admins/ban
+  // DELETE /api/v1/admins/ban/{id}
   return (
     <DefaultLayout>
       <Row
