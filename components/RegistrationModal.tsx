@@ -14,6 +14,10 @@ interface MembershipProps {
   onCancel: () => void;
 }
 
+// faysel2:
+// <Button className="ant-btn ant-btn-info">등록</Button>
+// POST /api/v1/admins/blacks
+
 export default function Membership({ onCancel }: MembershipProps) {
   const [form] = Form.useForm();
   const { TextArea } = Input;

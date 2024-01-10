@@ -224,47 +224,8 @@ export default function MembershipManagement() {
     console.log(date, dateString);
   };
 
-  //   faysel:
-  //   "This is the API for displaying the list of sanctioned administrators.
-  //   The Table tag should contain data about the list of sanctioned administrators.
-  //   If the administrator list becomes large, pagination should be implemented.
-
-  //   code line
-
-  //   <Search
-  //   placeholder="Please enter a search term"
-  //   style={{ width: 258 }}
-  //   className="custom-search-icon"
-  //   />
-
-  //   When a search is performed in this section, it should yield search results.
-  //   The implementation is similar to the list display in 'admin-site / app / account / page.tsx'.
-  //   Please thoroughly check the Swagger documentation and proceed with the work.
-  //   Thank you."
-  //   GET /api/v1/admins/ban
-
-  //   "In this section:
-  //   code line 90 ~ 103
-  //   {
-  //     title: "해제",
-  //     dataIndex: "clear",
-  //     render(value, record, index) {
-  //     return (
-  //     <button
-  //     onClick={() => showModal("clear")}
-  //     className="rounded-full text-sm leading-[18px] bg-[#A3A6AB] px-[14px] py-[7px] text-white"
-  //      >
-  //      해제하기
-  //      </button>
-  //    );
-  //    },
-  //    },
-
-  //   When clicking the button,
-  //   the corresponding ID needs to be passed to the <MembershipManagementModal/> tag.
-  //   This is necessary because, within the <MembershipManagementModal/>,
-  //   the API for lifting the sanction (or unblocking) must be executed,
-  //   which is the DELETE /api/v1/admins/ban/{id} API."
+  // faysel2: * Jin is preparing the data. The membership-management page is also the same.
+  // I left a confusing comment on the membership page at first, and I'm sorry
 
   return (
     <div className="main-dashboard">

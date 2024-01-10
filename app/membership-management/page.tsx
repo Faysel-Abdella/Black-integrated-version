@@ -175,7 +175,7 @@ export default function Membership() {
   const onChangeDate = (date: any, dateString: any) => {
     console.log(date, dateString);
   };
-
+  // * Jin is preparing the data.
   // faysel:
   // "This is the API for displaying the list of members.
   // The Table tag needs to contain data about the member list.
