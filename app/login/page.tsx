@@ -48,15 +48,18 @@ export default function Home() {
 
       console.log("This is response", response);
 
-      // localStorage.setItem("accessToken", response.data.accessToken);
+      if (response.data) {
+        // Access the data property
+        // localStorage.setItem("accessToken", response.data.accessToken);
+      }
       setIsLogging(false);
       router.push("/");
     } catch (error: any) {
       console.log(error);
       setIsLogging(false);
-      toast.error(error.response.data.message, {
-        autoClose: 3000,
-      });
+      // toast.error(error.response.data.message, {
+      //   autoClose: 3000,
+      // });
     }
   };
 
