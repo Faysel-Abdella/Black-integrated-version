@@ -70,7 +70,7 @@ export default function MembershipManagement() {
     const fetchAdminLists = async () => {
       setIsFetching(true);
       const accessToken = localStorage.getItem("accessToken");
-      const adminsList = await customFetch.get("/api/v1/admins", {
+      const adminsList = await customFetch.get("/api/v1/admins/ban", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -78,22 +78,22 @@ export default function MembershipManagement() {
 
       const adminsData = adminsList.data.data;
 
-      // CHANGE THE FOLLOWING DATA
+      const transformedAdminsBanList = adminsData.map((admin: any) => ({
+        key: admin.id < 9 ? `0${admin.id}` : admin.id,
+        id: admin.admin.id,
+        name: admin.admin.name,
+        phoneNumber: admin.admin.phone,
+        sanctionPeriod: admin.bannedDate,
+        // reason,  ??
+        // manager, ??
+        // clear,  ??
 
-      const transformedAdminsList = adminsData.map((admin: AdminType) => ({
-        key: admin.id,
-        id: admin.id,
-        name: admin.name,
-        consumerNumber: admin.phone,
-        lastAccessDate: new Date(admin.lastLoginDate)
-          .toISOString()
-          .split("T")[0],
-        allowIP: admin.allowedIp,
-        department: admin.author.department,
-        registrationManager: admin.author.name,
+        // lastAccessDate: new Date(admin.lastLoginDate)
+        //   .toISOString()
+        //   .split("T")[0],
       }));
 
-      setAdminsList(transformedAdminsList);
+      setAdminsList(transformedAdminsBanList);
       setAdminsAllDataList(adminsData);
       setIsFetching(false);
     };
