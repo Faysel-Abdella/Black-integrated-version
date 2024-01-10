@@ -46,6 +46,8 @@ export default function Home() {
         }
       );
 
+      console.log(response);
+
       localStorage.setItem("accessToken", response.data.accessToken);
       setIsLogging(false);
       router.push("/");
