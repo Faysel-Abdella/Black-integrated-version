@@ -24,6 +24,8 @@ export default function MembershipModal() {
     setIsModalOpen(false);
   };
 
+  // ################### The api (/api/v1/admins/users) is not ready ##########
+
   // faysel:
   // "This is the API for modifying member information.
   // It allows changes to be made to the password, email, and phone number.

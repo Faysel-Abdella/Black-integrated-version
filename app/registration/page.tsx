@@ -111,7 +111,7 @@ export default function Page() {
 
   const tableData: TableData[] = [
     {
-      key: 1,
+      key: 1, // YES
       approvalDate: "2023-08-05",
       situation: "노출",
       registrationId: "Fdpd100",
@@ -174,6 +174,8 @@ export default function Page() {
   const onChangeDate = (date: any, dateString: any) => {
     console.log(date, dateString);
   };
+
+  // ##################### There is a mismatch between the response if the /api/v1/admins/blacks and the expected data ####################
 
   // faysel2:
   // This is the API for displaying the blacklist.

@@ -38,9 +38,9 @@ export default function HistoryModal() {
   const data = [
     {
       key: "1",
-      type: "청소",
+      type: "청소", // YES
       selectNum: "3",
-      reason: "2023.09.01",
+      reason: "2023.09.01", // YES
     },
     {
       key: "2",
@@ -64,6 +64,8 @@ export default function HistoryModal() {
   const onChange = (pagination: any, filters: any, sorter: any, extra: any) => {
     console.log("params", pagination, filters, sorter, extra);
   };
+
+  // #################### There is a mismatch between the expected data and the repsonse
 
   // faysel2:
   // This is the API for retrieving and registering types of damages.

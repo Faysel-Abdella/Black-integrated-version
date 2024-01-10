@@ -60,6 +60,7 @@ export default function Home() {
     }
   };
 
+  // ################ DONE / 완전한 ############## //
   // faysel: "It's the API for login."(authorization basic) POST /api/v1/auth/admins/login
   return (
     <AdminLayout>
