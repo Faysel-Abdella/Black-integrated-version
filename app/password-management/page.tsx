@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DefaultLayout from "../DefaultLayout/DefaultLayout";
 import {
   Card,
@@ -14,11 +14,13 @@ import {
   Flex,
   Modal,
 } from "antd";
+import { toast } from "react-toastify";
 import { LeftOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
 const { Search } = Input;
+import customFetch from "@/utils/customFetch";
 
-type TableData = {
+type TableadminsList = {
   key: any;
   id: string;
   name: string;
@@ -29,8 +31,72 @@ type TableData = {
 
 export default function PasswordManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [adminsList, setAdminsList] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  // Search functionality states
+  // Updating admin data
+  const [clickedAdminId, setClickedAdminId] = useState([]);
+
+  const fetchAdminLists = async () => {
+    setIsFetching(true);
+    const accessToken = localStorage.getItem("accessToken");
+    const adminsList = await customFetch.get("/api/v1/admins/ban", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const adminsData = adminsList.data.data;
+
+    const transformedAdminsList = adminsData.map((admin: any) => ({
+      key: admin.id,
+      name: admin.admin.name,
+      id: admin.admin.id,
+      department: admin.admin.department,
+      sanctionDate: new Date(admin.bannedDate).toISOString().split("T")[0],
+      situation: "제재 해지",
+    }));
+
+    setAdminsList(transformedAdminsList);
+    setIsFetching(false);
+  };
+
+  useEffect(() => {
+    try {
+      fetchAdminLists();
+    } catch (error) {
+      console.log("Error when fetching admins list", error);
+    }
+  }, []);
+
+  const handleDelete = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+
+    try {
+      const response = await customFetch.delete(
+        `/api/v1/admins/ban/${clickedAdminId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      closeModal();
+      toast.success("제재가 해제되었습니다.", { autoClose: 3000 });
+    } catch (error) {
+      console.log(error);
+    }
+
+    fetchAdminLists();
+  };
+
   const showModal = () => {
     setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   const handleOk = () => {
@@ -41,7 +107,7 @@ export default function PasswordManagement() {
     setIsModalOpen(false);
   };
 
-  const tableColumns: ColumnsType<TableData> = [
+  const tableColumns: ColumnsType<any> = [
     {
       title: "번호",
       dataIndex: "number",
@@ -71,7 +137,10 @@ export default function PasswordManagement() {
       render(value, record, index) {
         return (
           <span
-            onClick={showModal}
+            onClick={() => {
+              showModal();
+              setClickedAdminId(record.id);
+            }}
             role="button"
             className="text-[#28A7E1] underline-offset-2 underline"
           >
@@ -161,6 +230,7 @@ export default function PasswordManagement() {
 
   // GET /api/v1/admins/ban
   // DELETE /api/v1/admins/ban/{id}
+
   return (
     <DefaultLayout>
       <Row
@@ -172,13 +242,19 @@ export default function PasswordManagement() {
         <Col span={24}>
           <Card title="" bodyStyle={{ padding: "78px 85px 95px 84px" }}>
             <Col span={20}>
-              <Table
-                pagination={false}
-                bordered
-                columns={tableColumns}
-                dataSource={data}
-                onChange={onChange}
-              />
+              {isFetching ? (
+                <div className="flex justify-center items-center h-screen">
+                  <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+                </div>
+              ) : (
+                <Table
+                  // pagination={false}
+                  bordered
+                  columns={tableColumns}
+                  dataSource={adminsList}
+                  onChange={onChange}
+                />
+              )}
             </Col>
           </Card>
         </Col>
@@ -209,6 +285,7 @@ export default function PasswordManagement() {
             <Button
               style={{ padding: 0, width: 148, height: 42, fontWeight: 400 }}
               className="ant-btn ant-btn-info"
+              onClick={handleDelete}
             >
               등록
             </Button>
