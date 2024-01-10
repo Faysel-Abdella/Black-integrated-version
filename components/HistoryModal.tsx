@@ -64,6 +64,16 @@ export default function HistoryModal() {
   const onChange = (pagination: any, filters: any, sorter: any, extra: any) => {
     console.log("params", pagination, filters, sorter, extra);
   };
+
+  // faysel2:
+  // This is the API for retrieving and registering types of damages.
+  // In the table tag, data regarding the list of damage types must be included.
+  // You should enter the type of damage in the input named 'note', and upon pressing the button, the type of damage will be registered.
+  // For more details, please refer to the Swagger documentation and ask Jin if you have any questions.
+  // Thank you."
+  // GET /api/v1/admins/blacks/damagetypes
+  // POST /api/v1/admins/blacks/damagetypes
+
   return (
     <div className="modal-form form-inline">
       <Form colon={false} layout="horizontal" form={form}>
