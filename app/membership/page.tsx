@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import Sidebar from "../../components/Sidebar";
 import MembershipManagementModal from "../../components/MembershipManagementModal";
@@ -19,6 +19,7 @@ import {
 import { LeftOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
 import BlockRegisterModal from "@/components/BlockRegisterModal";
+import customFetch from "@/utils/customFetch";
 const { Search } = Input;
 
 type TableData = {
@@ -35,6 +36,15 @@ type TableData = {
 export default function MembershipManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("clear");
+  const [adminsAllDataList, setAdminsAllDataList] = useState([]);
+  const [adminsList, setAdminsList] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  // Search functionality states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  // Updating admin data
+  const [clickedAdminId, setClickedAdminId] = useState("");
+
   const showModal = (type: any) => {
     setIsModalOpen(true);
     setModalType(type);
@@ -47,6 +57,53 @@ export default function MembershipManagement() {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    const filteredAdmins = adminsList.filter((admin: AdminType) =>
+      admin.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setSearchResults(filteredAdmins);
+  };
+
+  useEffect(() => {
+    const fetchAdminLists = async () => {
+      setIsFetching(true);
+      const accessToken = localStorage.getItem("accessToken");
+      const adminsList = await customFetch.get("/api/v1/admins", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const adminsData = adminsList.data.data;
+
+      // CHANGE THE FOLLOWING DATA
+
+      const transformedAdminsList = adminsData.map((admin: AdminType) => ({
+        key: admin.id,
+        id: admin.id,
+        name: admin.name,
+        consumerNumber: admin.phone,
+        lastAccessDate: new Date(admin.lastLoginDate)
+          .toISOString()
+          .split("T")[0],
+        allowIP: admin.allowedIp,
+        department: admin.author.department,
+        registrationManager: admin.author.name,
+      }));
+
+      setAdminsList(transformedAdminsList);
+      setAdminsAllDataList(adminsData);
+      setIsFetching(false);
+    };
+
+    try {
+      fetchAdminLists();
+    } catch (error) {
+      console.log("Error when fetching admins list", error);
+    }
+  }, []);
 
   const tableColumns: ColumnsType<TableData> = [
     {
@@ -93,7 +150,10 @@ export default function MembershipManagement() {
       render(value, record, index) {
         return (
           <button
-            onClick={() => showModal("clear")}
+            onClick={() => {
+              showModal("clear");
+              setClickedAdminId(record.id);
+            }}
             className="rounded-full text-sm leading-[18px] bg-[#A3A6AB] px-[14px] py-[7px] text-white"
           >
             해제하기
@@ -106,7 +166,7 @@ export default function MembershipManagement() {
   const tableData: TableData[] = [
     {
       key: 1,
-      id: "Fdpd100",
+      id: "1",
       name: "이중재",
       phoneNumber: "010-0416-3114",
       sanctionPeriod: "2023-01-08",
@@ -116,7 +176,7 @@ export default function MembershipManagement() {
     },
     {
       key: 2,
-      id: "Fdpd100",
+      id: "2",
       name: "이중재",
       phoneNumber: "010-0416-3114",
       sanctionPeriod: "2023-01-08",
@@ -126,7 +186,7 @@ export default function MembershipManagement() {
     },
     {
       key: 3,
-      id: "Fdpd100",
+      id: "3",
       name: "이중재",
       phoneNumber: "010-0416-3114",
       sanctionPeriod: "2023-01-08",
@@ -136,7 +196,7 @@ export default function MembershipManagement() {
     },
     {
       key: 4,
-      id: "Fdpd100",
+      id: "4",
       name: "이중재",
       phoneNumber: "010-0416-3114",
       sanctionPeriod: "2023-01-08",
@@ -146,7 +206,7 @@ export default function MembershipManagement() {
     },
     {
       key: 5,
-      id: "Fdpd100",
+      id: "5",
       name: "이중재",
       phoneNumber: "010-0416-3114",
       sanctionPeriod: "2023-01-08",
@@ -234,6 +294,7 @@ export default function MembershipManagement() {
                   placeholder="검색어를 입력해주세요"
                   style={{ width: 258 }}
                   className="custom-search-icon"
+                  onChange={(e) => handleSearch(e.target.value)}
                 />
               </Space>
             </Col>
@@ -296,7 +357,7 @@ export default function MembershipManagement() {
                 <img src="/assets/images/backIcon.png" />
               </Button>
               {modalType === "clear" ? (
-                <MembershipManagementModal />
+                <MembershipManagementModal clickedAdminId={clickedAdminId} />
               ) : (
                 <BlockRegisterModal />
               )}

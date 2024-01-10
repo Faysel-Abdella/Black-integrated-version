@@ -1,6 +1,16 @@
+import customFetch from "@/utils/customFetch";
 import { Form, Row, Button, Radio, Input, Col, Flex } from "antd";
+import { error } from "console";
 
-export default function MembershipManagementModal() {
+type MembershipManagementModalProps = {
+  clickedAdminId?: string;
+};
+
+export default function MembershipManagementModal(
+  props: MembershipManagementModalProps
+) {
+  const { clickedAdminId } = props;
+  const adminId = Number(clickedAdminId);
   const [form] = Form.useForm();
   const { TextArea } = Input;
 
@@ -10,6 +20,24 @@ export default function MembershipManagementModal() {
   //   Please carefully review the Swagger documentation before proceeding with the work.
   //   Thank you."
   //   DELETE /api/v1/admins/ban/{id}
+
+  const handleUnblock = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    try {
+      const response = await customFetch.delete(
+        `/api/v1/admins/ban/${adminId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="modal-form form-inline">
@@ -24,6 +52,7 @@ export default function MembershipManagementModal() {
           <Button
             style={{ padding: 0, width: 148, height: 42, fontWeight: 400 }}
             className="ant-btn ant-btn-info"
+            onClick={handleUnblock}
           >
             변경
           </Button>
