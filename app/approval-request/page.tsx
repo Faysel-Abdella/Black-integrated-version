@@ -156,6 +156,27 @@ export default function PasswordManagement() {
   const onChangeDate = (date: any, dateString: any) => {
     console.log(date, dateString);
   };
+
+  // faysel3:
+  // This is the API for retrieving the list of black consumer approval requests.
+  // You should fetch the data and insert it into the Table tag.
+  // When you click on code lines 65 to 81, a modal will open.
+  // When the modal is open, the data from the list should be appropriately entered into the inputs.
+  // This tag is located below. <ApprovalModal />
+  // GET /api/v1/admins/blacks/approval-request
+
+  // When you click on code lines 88 to 95, a modal for approval will open.
+  // Inside this modal, you need to make a PATCH request to '/api/v1/admins/blacks/approval/{id}' using the id from the list.
+  // This API is for approving the registration of black consumers.
+  // This tag is located below. <RequestConfirmation onCancel={handleCancel} />
+
+  // And when you click on code lines 96 to 102, a modal for rejection will open.
+  // nside this modal, you need to insert the id from the list and, if there is a reason for rejection, include it as well in a PATCH request to '/api/v1/admins/blacks/reject/{id}'.
+  // This API is for rejecting the registration of black consumers
+  // This tag is located below. <RequestRejection onCancel={handleCancel} />
+
+  // For more details, please refer to the Swagger documentation."
+
   return (
     <DefaultLayout>
       <Row gutter={[54, 40]} className="flex-1" align={"middle"}>

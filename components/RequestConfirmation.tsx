@@ -7,6 +7,11 @@ interface RequestConfirmationProps {
 export default function RequestConfirmation({
   onCancel,
 }: RequestConfirmationProps) {
+  // faysel3:
+  // PATCH request to '/api/v1/admins/blacks/approval/{id}
+  // This API is for approving the registration of black consumers.
+  // For more details, please refer to the Swagger documentation."
+
   return (
     <>
       <p className="text-[20px] mb-12 text-center">

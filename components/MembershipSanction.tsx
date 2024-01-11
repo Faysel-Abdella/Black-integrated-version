@@ -9,6 +9,11 @@ export default function MembershipSanction({
 }: MembershipSanctionProps) {
   const [form] = Form.useForm();
   const { TextArea } = Input;
+
+  // faysel3:
+  // POST /api/v1/admins/users/ban/{id}
+  // For more details, please refer to the Swagger documentation."
+
   return (
     <div className="modal-form form-inline">
       <Form colon={false} layout="horizontal" form={form}>

@@ -7,6 +7,11 @@ interface RejectmMembershipProps {
 export default function RejectmMembership({
   onCancel,
 }: RejectmMembershipProps) {
+  // faysel3:
+  // PATCH /api/v1/admins/users/phone-email/{id}
+
+  // For more details, please refer to the Swagger documentation."
+
   return (
     <>
       <p className="text-[20px] mb-12 text-center font-bold">

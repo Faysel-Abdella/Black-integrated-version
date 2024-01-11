@@ -10,6 +10,9 @@ export default function ApprovalModal() {
   const [form] = Form.useForm();
   const { TextArea } = Input;
 
+  // faysel3:
+  // When the modal is open, the data from the list should be appropriately entered into the inputs."
+
   return (
     <div className="modal-form">
       <Form colon={false} layout="horizontal" form={form}>

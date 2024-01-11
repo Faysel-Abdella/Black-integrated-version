@@ -7,6 +7,12 @@ interface MembershipProps {
 export default function Membership({ onCancel }: MembershipProps) {
   const [form] = Form.useForm();
   const { TextArea } = Input;
+
+  // faysel3:
+  // PATCH request to '/api/v1/admins/blacks/reject/{id}
+  // This API is for rejecting the registration of black consumers.
+  // For more details, please refer to the Swagger documentation."
+
   return (
     <div className="modal-form form-inline">
       <p className="text-[20px] mb-4">

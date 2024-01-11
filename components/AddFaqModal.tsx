@@ -6,6 +6,12 @@ interface AccountModalProps {
 
 export default function AccountModal({ onCancel }: AccountModalProps) {
   const [form] = Form.useForm();
+
+  // faysel3:
+  // This is the API for registering a FAQ.
+  // POST /api/v1/admins/posts/faq
+  // For more details, please refer to the Swagger documentation."
+
   return (
     <div className="modal-form form-inline">
       <Form colon={false} layout="horizontal" form={form}>
