@@ -9,6 +9,11 @@ export default function MembershipUnblock({
 }: MembershipUnblockProps) {
   const [form] = Form.useForm();
   const { TextArea } = Input;
+
+  // faysel3:
+  // DELETE /api/v1/admins/users/ban/{id}
+  // For more details, please refer to the Swagger documentation."
+
   return (
     <div className="modal-form form-inline">
       <p className="text-[20px] mb-4">차단을 해제하시겠습니까?</p>

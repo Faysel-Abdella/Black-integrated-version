@@ -34,6 +34,35 @@ export default function MembershipModal() {
   // The relevant information should be retrieved as props from the member list and inserted into the value fields."
   // PATCH /api/v1/admins/users/{id}
 
+  // faysel3:
+  // I didn't delete the original text to avoid any conflicts and instead added it below.
+  // The API I mentioned above has changed to 'PATCH /api/v1/admins/users/phone-email/{id}'.
+  // This tag is located below. <RejectmMembership onCancel={handleCancel} />
+  // I previously stated on code line 31 that it's possible to change the password, email, and phone number, but let me correct that.
+  // You can change either the email or phone number.
+  // If you send the corresponding id and email, the email will be changed, and if you send the corresponding id and phone number, the phone number will be changed.
+  // Please contact Jin for any data-related inquiries.
+
+  // <Space size={5}>
+  // <Input placeholder="010-4012-1146" disabled />
+  //   <Button
+  //     size="small"
+  //     className="ant-btn-info"
+  //     style={{ fontWeight: 400 }}
+  //     onClick={() => showModal("ConfirmMembership")} -> This part also needs to be changed to 'RejectMembership', just like the email.
+  //   >
+  //     변경
+  //   </Button>
+  // </Space>
+
+  // This tag is located below. <MembershipUnblock onCancel={handleCancel} />
+  // DELETE /api/v1/admins/users/ban/{id}
+
+  // This tag is located below. <MembershipSanction onCancel={handleCancel} />
+  // POST /api/v1/admins/users/ban/{id}
+
+  // For more details, please refer to the Swagger documentation."
+
   return (
     <div className="modal-form">
       <Form colon={false} layout="horizontal" form={form}>

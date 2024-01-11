@@ -40,6 +40,10 @@ export default function AccountModal({
     });
   }, [clickedAdminData, buttonType, form]);
 
+  useEffect(() => {
+    console.log(clickedAdminData);
+  }, []);
+
   const handlePermissionChange = (e: any, permissionName: string) => {
     const value = e.target.value;
     let updatedPermissions = [...selectedPermissions];
@@ -163,6 +167,26 @@ export default function AccountModal({
 
   //   Please carefully review the Swagger documentation before proceeding with the work.
   //   Thank you."
+
+  // faysel3:
+  // dear faysel,
+  // "It seems that the implementation of radio buttons has not been done.
+  // If there are radio buttons corresponding to 'permissions' in the received data, they should be activated. Also, the radio buttons should not be limited to one selection per line; instead, all of them should be selectable.
+
+  // Within the received 'permissions' data, if 'dashboard' exists, then the '대시보드' radio button should be activated, if 'summary' exists, then the '종합지표' radio button should be activated, and similarly for the following:
+  // 'user_management' -> '회원 관리'
+  // 'user_ban' -> '회원 제재'
+  // 'black_registration_approval' -> '승인요청 관리'
+  // 'admin_management' -> '계정관리'
+  // 'admin_password_mismatch' -> '비밀번호 불일치 관리'
+  // 'faq_management' -> 'FAQ관리'
+  // 'inquiry_management' -> '1:1 문의하기'
+
+  // Those not in the 'permissions' array should remain deactivated. However, if any of the listed terms are in the array, the corresponding button should be activated.
+  // Additionally, you can remove 'Registration Management' '등록 관리' and 'Objection Management' '이의신청 관리' as they were not mentioned."
+  // This translation clearly explains the required implementation of radio buttons based on 'permissions' data, specifying which buttons to activate and noting that the unmentioned buttons can be removed.
+  // I always wish you happiness.
+  // Thank you.
 
   const showModal = (type: any) => {
     setIsModalOpen(true);
