@@ -112,15 +112,15 @@ export default function Membership() {
 
   const tableData: TableData[] = [
     {
-      key: 1,
-      id: "Fdpd100",
-      name: "이중재",
-      phoneNumber: "010-0416-3114",
-      joinDate: "2023-01-08",
-      accountStatus: "정상",
-      subscriptionType: "아이디",
-      views: 32,
-      numOfRegistrations: 32,
+      key: 1, // YES
+      id: "Fdpd100", // YES
+      name: "이중재", // YES
+      phoneNumber: "010-0416-3114", // YES
+      joinDate: "2023-01-08", // YES (Created at)
+      accountStatus: "정상", // YES
+      subscriptionType: "아이디", // YES (This is fixed)
+      views: 32, // YES
+      numOfRegistrations: 32, // YES (blacks.length (data.length))
     },
     {
       key: 2,
@@ -175,7 +175,9 @@ export default function Membership() {
   const onChangeDate = (date: any, dateString: any) => {
     console.log(date, dateString);
   };
-  // ################### The api (/api/v1/admins/users) is not ready ##########
+
+  // ################ There is a mismatch b/n the expected data and a response (2 fields are missed) #############
+
   // * Jin is preparing the data.
   // faysel:
   // "This is the API for displaying the list of members.

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Row, Button, Radio, Input, Col, Flex } from "antd";
 import Image from "next/image";
 import Sample1 from "../public/assets/images/smaple-1.png";
@@ -6,12 +6,32 @@ import Sample2 from "../public/assets/images/smaple-2.png";
 import Sample3 from "../public/assets/images/smaple-3.png";
 import Sample4 from "../public/assets/images/smaple-4.png";
 
-export default function ApprovalModal() {
+export default function ApprovalModal({
+  clickedViewDetails,
+}: {
+  clickedViewDetails: any;
+}) {
   const [form] = Form.useForm();
   const { TextArea } = Input;
 
+  // ################ DONE / 완전한 ############## //
+
   // faysel3:
   // When the modal is open, the data from the list should be appropriately entered into the inputs."
+
+  useEffect(() => {
+    if (clickedViewDetails) {
+      form.setFieldsValue({
+        name: clickedViewDetails[0].consumerName,
+        phone: clickedViewDetails[0].consumerNumber,
+        birth: clickedViewDetails[0].consumerDOB,
+        dateOfDamage: new Date(clickedViewDetails[0].damageDate)
+          .toISOString()
+          .split("T")[0],
+        damageDetails: clickedViewDetails[0].damageContent,
+      });
+    }
+  }, [clickedViewDetails]);
 
   return (
     <div className="modal-form">
@@ -22,7 +42,7 @@ export default function ApprovalModal() {
               style={{ marginBottom: 13 }}
               labelCol={{ span: 3 }}
               wrapperCol={{ span: 20 }}
-              name="note"
+              name="name"
               label={
                 <span style={{ textAlign: "left" }}>
                   블랙컨슈머
@@ -31,7 +51,7 @@ export default function ApprovalModal() {
                 </span>
               }
             >
-              <Input style={{ marginLeft: 20 }} />
+              <Input style={{ marginLeft: 20 }} name="name" />
             </Form.Item>
           </Col>
           <Col md={24}>
@@ -39,7 +59,7 @@ export default function ApprovalModal() {
               style={{ marginBottom: 13 }}
               labelCol={{ span: 3 }}
               wrapperCol={{ span: 20 }}
-              name="note"
+              name="phone"
               label={
                 <span style={{ textAlign: "left" }}>
                   블랙컨슈머
@@ -48,7 +68,7 @@ export default function ApprovalModal() {
                 </span>
               }
             >
-              <Input style={{ marginLeft: 20 }} />
+              <Input style={{ marginLeft: 20 }} name="phone" />
             </Form.Item>
           </Col>
           <Col md={24}>
@@ -56,7 +76,7 @@ export default function ApprovalModal() {
               style={{ marginBottom: 13 }}
               labelCol={{ span: 3 }}
               wrapperCol={{ span: 20 }}
-              name="note"
+              name="birth"
               label={
                 <span style={{ textAlign: "left" }}>
                   블랙컨슈머
@@ -65,7 +85,7 @@ export default function ApprovalModal() {
                 </span>
               }
             >
-              <Input style={{ marginLeft: 20 }} />
+              <Input style={{ marginLeft: 20 }} name="birth" />
             </Form.Item>
           </Col>
           <Col md={24}>
@@ -73,7 +93,7 @@ export default function ApprovalModal() {
               style={{ marginBottom: 13 }}
               labelCol={{ span: 3 }}
               wrapperCol={{ span: 20 }}
-              name="note"
+              name="dateOfDamage"
               label={
                 <span style={{ textAlign: "left" }}>
                   피해발생일
@@ -81,7 +101,7 @@ export default function ApprovalModal() {
                 </span>
               }
             >
-              <Input style={{ marginLeft: 20 }} />
+              <Input style={{ marginLeft: 20 }} name="dateOfDamage" />
             </Form.Item>
           </Col>
 
@@ -90,7 +110,7 @@ export default function ApprovalModal() {
               style={{ marginBottom: 13 }}
               labelCol={{ span: 3 }}
               wrapperCol={{ span: 20 }}
-              name="note"
+              name="damageDetails"
               label={
                 <span style={{ textAlign: "left", marginRight: 5 }}>
                   피해 내용
@@ -102,6 +122,7 @@ export default function ApprovalModal() {
                 style={{ marginLeft: 20, resize: "none" }}
                 rows={4}
                 className="h-52"
+                name="damageDetails"
               />
             </Form.Item>
           </Col>

@@ -39,7 +39,7 @@ export default function HistoryModal() {
     {
       key: "1",
       type: "청소", // YES
-      selectNum: "3",
+      selectNum: "3", // YES (selectedCount)
       reason: "2023.09.01", // YES
     },
     {
@@ -65,7 +65,7 @@ export default function HistoryModal() {
     console.log("params", pagination, filters, sorter, extra);
   };
 
-  // #################### There is a mismatch between the expected data and the repsonse
+  // #################### In progress (Ready to go)
 
   // faysel2:
   // This is the API for retrieving and registering types of damages.

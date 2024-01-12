@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DefaultLayout from "../DefaultLayout/DefaultLayout";
 import RequestConfirmation from "../../components/RequestConfirmation";
 import RequestRejection from "../../components/RequestRejection";
@@ -7,6 +7,7 @@ import ApprovalModal from "../../components/ApprovalModal";
 import { Card, Col, Row, Table, Button, Space, Modal, Tag } from "antd";
 import { LeftOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
+import customFetch from "@/utils/customFetch";
 const { Column } = Table;
 
 type TableData = {
@@ -21,6 +22,61 @@ type TableData = {
 export default function PasswordManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("activate");
+  const [approvalRequestsList, setApprovalRequestsList] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  const [clickedViewDetails, setClickedViewDetails] = useState<any>([]);
+
+  const fetchApprovalRequests: () => void = async () => {
+    setIsFetching(true);
+    const accessToken = localStorage.getItem("accessToken");
+    const response = await customFetch.get(
+      "/api/v1/admins/blacks/approval-request",
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    const requestsData = response.data.data;
+
+    const transformedAdminsList = requestsData.map(
+      (request: any, index: any) => ({
+        key: index + 1 < 9 ? `0${index + 1}` : `${index}`,
+        approvalDate: request.approvedDate
+          ? new Date(request.approvedDate).toISOString().split("T")[0]
+          : new Date("01-01-2024").toISOString().split("T")[0],
+        registrantId: request.user.loginId,
+        consumerName: request.user.name,
+        consumerNumber: request.user.phone,
+        consumerDOB: request.birth,
+        damageDate: request.damageDate,
+        damageContent: request.damageContent,
+        id: request.id,
+      })
+    );
+
+    setApprovalRequestsList(transformedAdminsList);
+    setIsFetching(false);
+  };
+
+  useEffect(() => {
+    try {
+      fetchApprovalRequests();
+    } catch (error) {
+      console.log("Error when fetching approval requests", error);
+    }
+  }, []);
+
+  const handleViewDetails = (data: any) => {
+    const thisAdminData = approvalRequestsList.filter(
+      (admin: any) => admin.id.toString() == data.id.toString()
+    );
+
+    setClickedViewDetails(thisAdminData);
+    showModal("approval");
+  };
+
   const showModal = (type: any) => {
     setIsModalOpen(true);
     setModalType(type);
@@ -71,8 +127,11 @@ export default function PasswordManagement() {
             <Tag
               style={{ width: 75, height: 32, textAlign: "center" }}
               className="cursor-pointer"
-              onClick={() => showModal("approval")}
+              onClick={() => {
+                handleViewDetails(record);
+              }}
             >
+              {/* View details */}
               상세보기
             </Tag>
           </Space>
@@ -89,15 +148,24 @@ export default function PasswordManagement() {
               style={{ width: 75, height: 32, textAlign: "center" }}
               className="cursor-pointer !px-[25px]"
               color="#4A4E57"
-              onClick={() => showModal("activate")}
+              onClick={() => {
+                handleViewDetails(record);
+                showModal("activate");
+              }}
             >
+              {/* Approval */}
               승인
             </Tag>
             <Tag
               style={{ width: 75, height: 32, textAlign: "center" }}
               className="cursor-pointer !px-[25px]"
-              onClick={() => showModal("deactivate")}
+              onClick={() => {
+                handleViewDetails(record);
+
+                showModal("deactivate");
+              }}
             >
+              {/* refusal/reject */}
               거부
             </Tag>
           </Space>
@@ -109,11 +177,11 @@ export default function PasswordManagement() {
   const data: TableData[] = [
     {
       key: 1,
-      approvalDate: "2023-08-05",
-      registrantId: "Fdpd100",
-      consumerName: "이중재",
-      consumerNumber: "010-4012-1146",
-      consumerDOB: "901024",
+      approvalDate: "2023-08-05", // YES (approvedDate)
+      registrantId: "Fdpd100", // YES (user.loginId)
+      consumerName: "이중재", // YES (user.name)
+      consumerNumber: "010-4012-1146", // YES (user.phone)
+      consumerDOB: "901024", // YES (birth)
     },
     {
       key: 2,
@@ -157,6 +225,8 @@ export default function PasswordManagement() {
     console.log(date, dateString);
   };
 
+  // ################ DONE / 완전한 ############## //
+
   // faysel3:
   // This is the API for retrieving the list of black consumer approval requests.
   // You should fetch the data and insert it into the Table tag.
@@ -171,7 +241,7 @@ export default function PasswordManagement() {
   // This tag is located below. <RequestConfirmation onCancel={handleCancel} />
 
   // And when you click on code lines 96 to 102, a modal for rejection will open.
-  // nside this modal, you need to insert the id from the list and, if there is a reason for rejection, include it as well in a PATCH request to '/api/v1/admins/blacks/reject/{id}'.
+  // Inside this modal, you need to insert the id from the list and, if there is a reason for rejection, include it as well in a PATCH request to '/api/v1/admins/blacks/reject/{id}'.
   // This API is for rejecting the registration of black consumers
   // This tag is located below. <RequestRejection onCancel={handleCancel} />
 
@@ -188,12 +258,18 @@ export default function PasswordManagement() {
                 검색되었습니다
               </h2>
             </div>
-            <Table
-              bordered
-              dataSource={data}
-              onChange={onChange}
-              columns={tableColumns}
-            />
+            {isFetching ? (
+              <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+              </div>
+            ) : (
+              <Table
+                bordered
+                dataSource={approvalRequestsList}
+                onChange={onChange}
+                columns={tableColumns}
+              />
+            )}
           </Card>
         </Col>
       </Row>
@@ -224,11 +300,19 @@ export default function PasswordManagement() {
             <img src="/assets/images/backIcon.png" />
           </Button>
           {modalType === "activate" ? (
-            <RequestConfirmation onCancel={handleCancel} />
+            <RequestConfirmation
+              onCancel={handleCancel}
+              fetchApprovalRequests={fetchApprovalRequests}
+              clickedRequestId={clickedViewDetails}
+            />
           ) : modalType === "approval" ? (
-            <ApprovalModal />
+            <ApprovalModal clickedViewDetails={clickedViewDetails} />
           ) : (
-            <RequestRejection onCancel={handleCancel} />
+            <RequestRejection
+              onCancel={handleCancel}
+              clickedRequestId={clickedViewDetails}
+              fetchApprovalRequests={fetchApprovalRequests}
+            />
           )}
         </div>
       </Modal>

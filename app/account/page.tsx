@@ -46,36 +46,34 @@ export default function Account() {
   // Updating admin data
   const [clickedAdminData, setClickedAdminData] = useState([]);
 
+  const fetchAdminLists = async () => {
+    setIsFetching(true);
+    const accessToken = localStorage.getItem("accessToken");
+    const adminsList = await customFetch.get("/api/v1/admins", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const adminsData = adminsList.data.data;
+
+    const transformedAdminsList = adminsData.map((admin: AdminType) => ({
+      key: admin.id,
+      id: admin.id,
+      name: admin.name,
+      consumerNumber: admin.phone,
+      lastAccessDate: new Date(admin.lastLoginDate).toISOString().split("T")[0],
+      allowIP: admin.allowedIp,
+      department: admin.author.department,
+      registrationManager: admin.author.name,
+    }));
+
+    setAdminsList(transformedAdminsList);
+    setAdminsAllDataList(adminsData);
+    setIsFetching(false);
+  };
+
   useEffect(() => {
-    const fetchAdminLists = async () => {
-      setIsFetching(true);
-      const accessToken = localStorage.getItem("accessToken");
-      const adminsList = await customFetch.get("/api/v1/admins", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      const adminsData = adminsList.data.data;
-
-      const transformedAdminsList = adminsData.map((admin: AdminType) => ({
-        key: admin.id,
-        id: admin.id,
-        name: admin.name,
-        consumerNumber: admin.phone,
-        lastAccessDate: new Date(admin.lastLoginDate)
-          .toISOString()
-          .split("T")[0],
-        allowIP: admin.allowedIp,
-        department: admin.author.department,
-        registrationManager: admin.author.name,
-      }));
-
-      setAdminsList(transformedAdminsList);
-      setAdminsAllDataList(adminsData);
-      setIsFetching(false);
-    };
-
     try {
       fetchAdminLists();
     } catch (error) {

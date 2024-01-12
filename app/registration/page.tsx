@@ -112,14 +112,14 @@ export default function Page() {
   const tableData: TableData[] = [
     {
       key: 1, // YES
-      approvalDate: "2023-08-05",
-      situation: "노출",
-      registrationId: "Fdpd100",
-      consumerName: "이중재",
-      consumerNumber: "010-4012-1146",
-      consumerDOB: "901024",
-      cumulativeViews: 32,
-      manager: "이중재",
+      approvalDate: "2023-08-05", // YES (approvedDate)
+      situation: "노출", // YES (postStatus)
+      registrationId: "Fdpd100", // YES
+      consumerName: "이중재", // YES
+      consumerNumber: "010-4012-1146", // YES
+      consumerDOB: "901024", // YES
+      cumulativeViews: 32, // YES (viewCount)
+      manager: "이중재", // YES (approvedBy)
     },
     {
       key: 2,
@@ -175,7 +175,7 @@ export default function Page() {
     console.log(date, dateString);
   };
 
-  // ##################### There is a mismatch between the response if the /api/v1/admins/blacks and the expected data ####################
+  // ##################### In progress (Ready to go) ####################
 
   // faysel2:
   // This is the API for displaying the blacklist.
