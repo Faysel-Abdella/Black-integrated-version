@@ -1,7 +1,8 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { LeftOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
+
 import {
   Card,
   Col,
@@ -16,9 +17,11 @@ import {
   Modal,
 } from "antd";
 
+import moment from "moment";
 import ExcelModal from "@/components/ExcelModal";
 import DefaultLayout from "../DefaultLayout/DefaultLayout";
 import MembershipModal from "../../components/MembershipModal";
+import customFetch from "@/utils/customFetch";
 
 const { Search } = Input;
 
@@ -37,6 +40,65 @@ type TableData = {
 export default function Membership() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("user");
+  const [membersAllDataList, setMembersAllDataList] = useState([]);
+  const [membersList, setMembersList] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  // Search functionality states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  // Updating admin data
+  const [clickedMemberData, setClickedMemberData] = useState([]);
+
+  const fetchMembersLists = async () => {
+    setIsFetching(true);
+    const accessToken = localStorage.getItem("accessToken");
+    const membersList = await customFetch.get("/api/v1/admins/users", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const membersData = membersList.data.data;
+
+    const transformedMembersList = membersData.map(
+      (member: any, index: number) => ({
+        key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+        id: member.id,
+        name: member.name,
+        phoneNumber: member.phone,
+        joinDate: new Date(member.createdAt).toISOString().split("T")[0],
+        accountStatus: member.accountStatus.toString(),
+        subscriptionType: "아이디",
+        views: member.blacksViewCount,
+        numOfRegistrations: membersData.length,
+      })
+    );
+
+    setMembersList(transformedMembersList);
+    setMembersAllDataList(membersData);
+    setIsFetching(false);
+  };
+
+  useEffect(() => {
+    try {
+      fetchMembersLists();
+    } catch (error) {
+      console.log("Error when fetching admins list", error);
+    }
+  }, []);
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    const filteredMembers = membersList.filter((member: any) =>
+      member.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setSearchResults(filteredMembers);
+  };
+
+  const onChangeDateSearch = (date) => {
+    console.log(date);
+  };
+
   const showModal = (type: any) => {
     setIsModalOpen(true);
     setModalType(type);
@@ -172,11 +234,11 @@ export default function Membership() {
     console.log("params", pagination, filters, sorter, extra);
   };
 
-  const onChangeDate = (date: any, dateString: any) => {
+  const search = (date: any, dateString: any) => {
     console.log(date, dateString);
   };
 
-  // ################ There is a mismatch b/n the expected data and a response (2 fields are missed) #############
+  // ################ DONE Except the date search / Mr. Jin please add different multiple dates to test this. All date comes from databse are the same date #############
 
   // * Jin is preparing the data.
   // faysel:
@@ -266,12 +328,12 @@ export default function Membership() {
             <Space className="date-range" size="small">
               <DatePicker
                 className="h-[41px] border-none"
-                onChange={onChangeDate}
+                onChange={(value) => onChangeDateSearch(value)}
               />
               <p className="m-0">~</p>
               <DatePicker
                 className="h-[41px] border-none"
-                onChange={onChangeDate}
+                onChange={(value) => onChangeDateSearch(value)}
               />
             </Space>
           </Space>
@@ -324,6 +386,7 @@ export default function Membership() {
                 placeholder="검색어를 입력해주세요"
                 style={{ width: 258 }}
                 className="custom-search-icon"
+                onChange={(e) => handleSearch(e.target.value)}
               />
             </Space>
           </Space>
@@ -338,12 +401,18 @@ export default function Membership() {
                 검색되었습니다
               </h2>
             </div>
-            <Table
-              bordered
-              columns={tableColumns}
-              dataSource={tableData}
-              onChange={onChange}
-            />
+            {isFetching ? (
+              <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+              </div>
+            ) : (
+              <Table
+                bordered
+                columns={tableColumns}
+                dataSource={searchQuery !== "" ? searchResults : membersList}
+                onChange={onChange}
+              />
+            )}
           </Card>
         </Col>
       </Row>
