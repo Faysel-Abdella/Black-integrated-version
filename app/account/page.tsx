@@ -100,8 +100,6 @@ export default function Account() {
       (admin: AdminType) => admin.id.toString() == data.id.toString()
     );
 
-    console.log(thisAdminData);
-
     setClickedAdminData(thisAdminData);
 
     setButtonType("changeInfo");

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DefaultLayout from "../DefaultLayout/DefaultLayout";
 import RegistrationModal from "../../components/RegistrationModal";
 import HistoryModal from "../../components/HistoryModal";
@@ -18,6 +18,7 @@ import {
 } from "antd";
 import { LeftOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
+import customFetch from "@/utils/customFetch";
 const { Search } = Input;
 
 type TableData = {
@@ -35,6 +36,75 @@ type TableData = {
 export default function Page() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("registration");
+  const [isForRegister, setIsForRegister] = useState(false);
+  const [blacksAllDataList, setBlacksAllDataList] = useState([]);
+  const [blacksList, setBlacksList] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  // Search functionality states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  // Updating admin data
+  const [clickedBlackListData, setClickedBlackListData] = useState([]);
+
+  const fetchBlackLists = async () => {
+    setIsFetching(true);
+    const accessToken = localStorage.getItem("accessToken");
+    const blacksList = await customFetch.get("/api/v1/admins/blacks", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const blacksData = blacksList.data.data;
+
+    const transformedBlacksList = blacksData.map(
+      (admin: any, index: number) => ({
+        key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+        approvalDate: new Date(admin.approvedDate).toISOString().split("T")[0],
+        situation: admin.postStatus,
+        registrationId: admin.id,
+        consumerName: admin.name,
+        consumerNumber: admin.phone,
+        consumerDOB: admin.birth,
+        cumulativeViews: admin.viewCount,
+        manager: admin.approvedBy,
+        id: admin.id,
+        damageContent: admin.damageContent,
+        damageType: admin.damageType.name,
+      })
+    );
+
+    setBlacksList(transformedBlacksList);
+    setBlacksAllDataList(blacksData);
+    setIsFetching(false);
+  };
+
+  useEffect(() => {
+    try {
+      fetchBlackLists();
+    } catch (error) {
+      console.log("Error when fetching admins list", error);
+    }
+  }, []);
+
+  const handleClickAdmin = (data: any) => {
+    const thisBlackListData: any = blacksList.filter(
+      (admin: any) => admin.id.toString() == data.registrationId.toString()
+    );
+
+    setClickedBlackListData(thisBlackListData);
+    setIsForRegister(false);
+    showModal("registration");
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    const filteredAdmins = blacksList.filter((admin: any) =>
+      admin.consumerName.toLowerCase().includes(value.toLowerCase())
+    );
+    setSearchResults(filteredAdmins);
+  };
+
   const showModal = (type: any) => {
     setIsModalOpen(true);
     setModalType(type);
@@ -95,7 +165,9 @@ export default function Page() {
       render(value, record, index) {
         return (
           <button
-            onClick={() => showModal("registration")}
+            onClick={() => {
+              handleClickAdmin(record);
+            }}
             className="rounded-full text-sm leading-[18px] bg-[#A3A6AB] px-[14px] py-[7px] text-white"
           >
             상세보기
@@ -175,7 +247,7 @@ export default function Page() {
     console.log(date, dateString);
   };
 
-  // ##################### In progress (Ready to go) ####################
+  // ################ DONE Except the date search / Mr. Jin please add different multiple dates to test this. All date comes from databse are the same date #############
 
   // faysel2:
   // This is the API for displaying the blacklist.
@@ -263,6 +335,7 @@ export default function Page() {
                 ]}
               />
               <Search
+                onChange={(e) => handleSearch(e.target.value)}
                 placeholder="검색어를 입력해주세요"
                 style={{ width: 258 }}
                 className="custom-search-icon"
@@ -284,7 +357,10 @@ export default function Page() {
               style={{ padding: 0, width: 144, height: 61, fontWeight: 400 }}
               type="primary"
               shape="round"
-              onClick={() => showModal("registration")}
+              onClick={() => {
+                setIsForRegister(true);
+                showModal("registration");
+              }}
             >
               등록
             </Button>
@@ -300,12 +376,18 @@ export default function Page() {
                 검색되었습니다
               </h2>
             </div>
-            <Table
-              bordered
-              columns={tableColumns}
-              dataSource={tableData}
-              onChange={onChange}
-            />
+            {isFetching ? (
+              <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+              </div>
+            ) : (
+              <Table
+                bordered
+                columns={tableColumns}
+                dataSource={searchQuery !== "" ? searchResults : blacksList}
+                onChange={onChange}
+              />
+            )}
           </Card>
         </Col>
       </Row>
@@ -334,7 +416,12 @@ export default function Page() {
             <img src="/assets/images/backIcon.png" />
           </Button>
           {modalType === "registration" ? (
-            <RegistrationModal onCancel={handleCancel} />
+            <RegistrationModal
+              onCancel={handleCancel}
+              clickedBlackListData={clickedBlackListData}
+              fetchBlackLists={fetchBlackLists}
+              isForRegister={isForRegister}
+            />
           ) : (
             <HistoryModal />
           )}

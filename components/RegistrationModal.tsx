@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+
 import {
   Form,
   Row,
@@ -9,18 +11,75 @@ import {
   Space,
   Select,
 } from "antd";
+import { toast } from "react-toastify";
+
+import customFetch from "@/utils/customFetch";
 
 interface MembershipProps {
   onCancel: () => void;
+  clickedBlackListData?: any;
+  fetchBlackLists?: () => void;
+  isForRegister?: boolean;
 }
+
+// ################ DONE But there is internal server error (Waiting for Jin to fix it)
 
 // faysel2:
 // <Button className="ant-btn ant-btn-info">등록</Button>
 // POST /api/v1/admins/blacks
 
-export default function Membership({ onCancel }: MembershipProps) {
+export default function Membership({
+  onCancel,
+  clickedBlackListData,
+  fetchBlackLists,
+  isForRegister,
+}: MembershipProps) {
   const [form] = Form.useForm();
   const { TextArea } = Input;
+
+  useEffect(() => {
+    if (!isForRegister) {
+      form.setFieldsValue({
+        name: clickedBlackListData[0].consumerName,
+        phone: clickedBlackListData[0].consumerNumber,
+        birth: clickedBlackListData[0].consumerDOB,
+        type: clickedBlackListData[0].damageType,
+        date: clickedBlackListData[0].approvalDate,
+        description: clickedBlackListData[0].damageContent,
+      });
+    } else {
+      form.resetFields();
+    }
+  });
+
+  const handleSubmit = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+
+    try {
+      const response = await customFetch.post(
+        `/api/v1/admins/blacks`,
+        {
+          name: form.getFieldValue("name"),
+          phone: form.getFieldValue("phone"),
+          birth: form.getFieldValue("birth"),
+          damageDate: form.getFieldValue("date"),
+          damageContent: form.getFieldValue("description"),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      onCancel();
+      form.resetFields();
+      toast.success("완료", { autoClose: 3500 });
+      fetchBlackLists!();
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="modal-form form-inline">
       <Form colon={false} layout="horizontal" form={form}>
@@ -120,7 +179,7 @@ export default function Membership({ onCancel }: MembershipProps) {
             <Form.Item
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 16 }}
-              name="date"
+              name="dateInput"
               label={
                 <span style={{ marginLeft: 8, textAlign: "left" }}>
                   피해발생일
@@ -131,7 +190,9 @@ export default function Membership({ onCancel }: MembershipProps) {
             >
               <Space>
                 <div className="flex">
-                  <Input />
+                  <Form.Item name="date">
+                    <Input />
+                  </Form.Item>
                   <Button
                     size="small"
                     className="ant-btn-info ml-2 font-normal"
@@ -173,7 +234,9 @@ export default function Membership({ onCancel }: MembershipProps) {
           </Col>
         </Row>
         <Flex gap="middle" align="center" justify="center" className="mt-10">
-          <Button className="ant-btn ant-btn-info">등록</Button>
+          <Button onClick={handleSubmit} className="ant-btn ant-btn-info">
+            등록
+          </Button>
           <Button className="ant-btn ant-btn-info" onClick={onCancel}>
             취소
           </Button>
