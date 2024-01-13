@@ -247,7 +247,7 @@ export default function Page() {
     console.log(date, dateString);
   };
 
-  // ################ DONE Except the date search / Mr. Jin please add different multiple dates to test this. All date comes from databse are the same date #############
+  // ################ DONE Except the date search / Mr. Jin please add different multiple dates to test this. All date comes from database are the same date #############
 
   // faysel2:
   // This is the API for displaying the blacklist.

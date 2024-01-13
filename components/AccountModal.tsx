@@ -22,6 +22,8 @@ export default function AccountModal({
     useState(clickedAdminData);
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
 
+  console.log();
+
   useEffect(() => {
     setChangeInfoAdminData(clickedAdminData);
     form.setFieldsValue({
@@ -444,7 +446,7 @@ export default function AccountModal({
                 {/* user_ban */}
                 <Radio value="2_user_ban">회원 제재</Radio>
                 {/* user_update  */}
-                <Radio value="2_user_update">등록 관리</Radio>
+                {/* <Radio value="2_user_update">등록 관리</Radio> */}
               </Radio.Group>
             </Form.Item>
           </Col>
@@ -465,7 +467,7 @@ export default function AccountModal({
                   승인요청 관리
                 </Radio>
                 {/* Appeal Management */}
-                <Radio value="3_Appeal Management">이의신청 관리</Radio>
+                {/* <Radio value="3_Appeal Management">이의신청 관리</Radio> */}
               </Radio.Group>
             </Form.Item>
           </Col>
@@ -486,7 +488,7 @@ export default function AccountModal({
                   비밀번호 불일치 관리
                 </Radio>
                 {/* admin_create */}
-                <Radio value="4_admin_create">등록 관리</Radio>
+                {/* <Radio value="4_admin_create">등록 관리</Radio> */}
               </Radio.Group>
             </Form.Item>
           </Col>

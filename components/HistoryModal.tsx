@@ -1,5 +1,9 @@
+import { useEffect, useState } from "react";
+
 import { Form, Row, Button, Radio, Input, Col, Flex, Space, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
+import customFetch from "@/utils/customFetch";
+import { toast } from "react-toastify";
 
 type TableData = {
   key: any;
@@ -9,6 +13,69 @@ type TableData = {
 };
 
 export default function HistoryModal() {
+  const [damageTypes, setDamageTypes] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+
+  const fetchAdminLists = async () => {
+    setIsFetching(true);
+    const accessToken = localStorage.getItem("accessToken");
+    const typesList = await customFetch.get(
+      "/api/v1/admins/blacks/damagetypes",
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    const damagesData = typesList.data.reverse();
+
+    const transformedTypesList = damagesData.map(
+      (type: any, index: number) => ({
+        key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+        type: type.name,
+        selectNum: type.selectedCount,
+        reason: new Date(type.createdAt).toISOString().split("T")[0],
+      })
+    );
+
+    setDamageTypes(transformedTypesList);
+    setIsFetching(false);
+  };
+
+  useEffect(() => {
+    try {
+      fetchAdminLists();
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  const handleAddNewDamageType = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+
+    const name = form.getFieldValue("name");
+
+    try {
+      const response = await customFetch.post(
+        "/api/v1/admins/blacks/damagetypes",
+        {
+          name: name,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      fetchAdminLists();
+      toast.success("완료", { autoClose: 3000 });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const [form] = Form.useForm();
   const columns: ColumnsType<TableData> = [
     {
@@ -65,7 +132,7 @@ export default function HistoryModal() {
     console.log("params", pagination, filters, sorter, extra);
   };
 
-  // #################### In progress (Ready to go)
+  // ################ DONE / 완전한 ############## //
 
   // faysel2:
   // This is the API for retrieving and registering types of damages.
@@ -84,14 +151,18 @@ export default function HistoryModal() {
             <Form.Item
               labelCol={{ span: 3 }}
               wrapperCol={{ span: 21 }}
-              name="note"
+              name="name"
               label="유형명"
               className="m-0 custom-label-margin"
             >
               <Space style={{ display: "block" }}>
                 <div style={{ display: "flex" }}>
-                  <Input />
-                  <Button size="small" className="ant-btn-info ml-2">
+                  <Input name="name" />
+                  <Button
+                    onClick={handleAddNewDamageType}
+                    size="small"
+                    className="ant-btn-info ml-2"
+                  >
                     추가
                   </Button>
                 </div>
@@ -99,13 +170,19 @@ export default function HistoryModal() {
             </Form.Item>
           </Col>
           <Col md={24} className="mt-12">
-            <Table
-              pagination={false}
-              bordered
-              columns={columns}
-              dataSource={data}
-              onChange={onChange}
-            />
+            {isFetching ? (
+              <div className="flex justify-center items-center h-24">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-purple-500"></div>
+              </div>
+            ) : (
+              <Table
+                // pagination={false}
+                bordered
+                columns={columns}
+                dataSource={damageTypes}
+                onChange={onChange}
+              />
+            )}
           </Col>
         </Row>
       </Form>
