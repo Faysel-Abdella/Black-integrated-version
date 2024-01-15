@@ -115,6 +115,28 @@ export default function Contact() {
   const onChangeDate = (date: any, dateString: any) => {
     console.log(date, dateString);
   };
+
+  // faysel4:
+  // GET /api/v1/admins/post/inquiries
+  // This API is for fetching the list of 1:1 inquiries.
+  // You need to retrieve the data and insert it into the Table tag.
+  // Pagination should be implemented if there is a large amount of data.
+  // As you can see at the top of the page, the posts in the list should be searchable based on the date, status, and search terms.
+
+  // code line 40 ~ 46
+  // {
+  //   title: "제목",
+  //   dataIndex: "title",
+  //   render: (text: any, recode: any) => (
+  //     <a onClick={showModal}>{recode.title}</a>
+  //   ),
+  // },
+  // // PATCH /api/v1/admins/post/inquiries/{id}
+  // When you click on the title in the list, the information about that list should be appropriately displayed in a modal.
+  // Additionally, within the modal, you should be able to register a response to the user's question.
+
+  // For more details, please refer to the Swagger documentation."
+
   return (
     <DefaultLayout>
       <Row justify="space-between" align="middle" className="mb-[21px]">
