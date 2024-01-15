@@ -116,6 +116,8 @@ export default function Contact() {
     console.log(date, dateString);
   };
 
+  // ############################### Waiting for Jin to add dummy data ##################
+
   // faysel4:
   // GET /api/v1/admins/post/inquiries
   // This API is for fetching the list of 1:1 inquiries.

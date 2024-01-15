@@ -36,18 +36,22 @@ type TableData = {
 export default function MembershipManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("clear");
-  const [adminsAllDataList, setAdminsAllDataList] = useState([]);
-  const [adminsList, setAdminsList] = useState([]);
+  const [membersAllDataList, setMembersAllDataList] = useState([]);
+  const [membersList, setMembersList] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   // Search functionality states
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   // Updating admin data
-  const [clickedAdminId, setClickedAdminId] = useState("");
+  const [clickedMemberId, setClickedMemberId] = useState("");
 
   const showModal = (type: any) => {
     setIsModalOpen(true);
     setModalType(type);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   const handleOk = () => {
@@ -60,46 +64,49 @@ export default function MembershipManagement() {
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
-    const filteredAdmins = adminsList.filter((admin: AdminType) =>
+    const filteredMembers = membersList.filter((admin: AdminType) =>
       admin.name.toLowerCase().includes(value.toLowerCase())
     );
-    setSearchResults(filteredAdmins);
+    setSearchResults(filteredMembers);
+  };
+
+  const fetchMemberLists = async () => {
+    setIsFetching(true);
+    const accessToken = localStorage.getItem("accessToken");
+    const adminsList = await customFetch.get("/api/v1/admins/users/ban", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const membersData = adminsList.data.data;
+
+    const transformedMembersBanList = membersData.map(
+      (member: any, index: number) => ({
+        key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+        id: member.id,
+        name: member.user.name,
+        phoneNumber: member.user.phone,
+        sanctionPeriod: member.period,
+        reason: member.reason,
+        manager: member.authorName,
+        clear: 32,
+      })
+    );
+
+    setMembersList(transformedMembersBanList);
+    setMembersAllDataList(membersData);
+    setIsFetching(false);
+  };
+
+  const clearMemberFromBan = (record: any) => {
+    showModal("clear");
+    setClickedMemberId(record.id);
   };
 
   useEffect(() => {
-    const fetchAdminLists = async () => {
-      setIsFetching(true);
-      const accessToken = localStorage.getItem("accessToken");
-      const adminsList = await customFetch.get("/api/v1/admins/ban", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      const adminsData = adminsList.data.data;
-
-      const transformedAdminsBanList = adminsData.map((admin: any) => ({
-        key: admin.id < 9 ? `0${admin.id}` : admin.id,
-        id: admin.admin.id,
-        name: admin.admin.name,
-        phoneNumber: admin.admin.phone,
-        sanctionPeriod: admin.bannedDate,
-        // reason,  ??
-        // manager, ??
-        // clear,  ??
-
-        // lastAccessDate: new Date(admin.lastLoginDate)
-        //   .toISOString()
-        //   .split("T")[0],
-      }));
-
-      setAdminsList(transformedAdminsBanList);
-      setAdminsAllDataList(adminsData);
-      setIsFetching(false);
-    };
-
     try {
-      fetchAdminLists();
+      fetchMemberLists();
     } catch (error) {
       console.log("Error when fetching admins list", error);
     }
@@ -151,8 +158,7 @@ export default function MembershipManagement() {
         return (
           <button
             onClick={() => {
-              showModal("clear");
-              setClickedAdminId(record.id);
+              clearMemberFromBan(record);
             }}
             className="rounded-full text-sm leading-[18px] bg-[#A3A6AB] px-[14px] py-[7px] text-white"
           >
@@ -165,13 +171,13 @@ export default function MembershipManagement() {
 
   const tableData: TableData[] = [
     {
-      key: 1,
-      id: "1",
-      name: "이중재",
-      phoneNumber: "010-0416-3114",
-      sanctionPeriod: "2023-01-08",
-      reason: "정상",
-      manager: "아이디",
+      key: 1, // YES
+      id: "1", // YES
+      name: "이중재", // YES(user.name)
+      phoneNumber: "010-0416-3114", // YES
+      sanctionPeriod: "2023-01-08", //(period)
+      reason: "정상", // YES
+      manager: "아이디", // YES(authorName)
       clear: 32,
     },
     {
@@ -224,6 +230,8 @@ export default function MembershipManagement() {
     console.log(date, dateString);
   };
 
+  // ################ DONE /완전한 ############## //
+
   // faysel4:
   // GET /api/v1/admins/users/ban
   // This API is for fetching the list of sanctioned members.
@@ -253,11 +261,6 @@ export default function MembershipManagement() {
   // When this button is pressed, a modal for lifting sanctions should appear, and you should be able to lift the sanctions for the corresponding item in the list
 
   // For more details, please refer to the Swagger documentation."
-
-  // ################## The API is not available (Jin is preparing the data)  #########################
-
-  // faysel2: * Jin is preparing the data. The membership-management page is also the same.
-  // I left a confusing comment on the membership page at first, and I'm sorry
 
   return (
     <div className="main-dashboard">
@@ -317,12 +320,20 @@ export default function MembershipManagement() {
                     검색되었습니다
                   </h2>
                 </div>
-                <Table
-                  bordered
-                  columns={tableColumns}
-                  dataSource={tableData}
-                  onChange={onChange}
-                />
+                {isFetching ? (
+                  <div className="flex justify-center items-center h-screen">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+                  </div>
+                ) : (
+                  <Table
+                    bordered
+                    columns={tableColumns}
+                    dataSource={
+                      searchQuery !== "" ? searchResults : membersList
+                    }
+                    onChange={onChange}
+                  />
+                )}
               </Card>
             </Col>
           </Row>
@@ -350,7 +361,11 @@ export default function MembershipManagement() {
                 <img src="/assets/images/backIcon.png" />
               </Button>
               {modalType === "clear" ? (
-                <MembershipManagementModal clickedAdminId={clickedAdminId} />
+                <MembershipManagementModal
+                  clickedMemberId={clickedMemberId}
+                  fetchMemberLists={fetchMemberLists}
+                  closeModal={closeModal}
+                />
               ) : (
                 <BlockRegisterModal />
               )}

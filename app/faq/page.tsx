@@ -99,6 +99,8 @@ export default function Faq() {
     console.log(date, dateString);
   };
 
+  // ############################### Waiting for Jin to add dummy data ##################
+
   // faysel4:
   // GET /api/v1/admins/post/faqs
   // This is the API for fetching the FAQ list.

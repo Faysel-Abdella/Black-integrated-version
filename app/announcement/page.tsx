@@ -113,6 +113,7 @@ export default function Announcement() {
   };
 
   // ***** You need to use a text editor. *****
+  // ############################### Waiting for Jin to add dummy data ##################
   // faysel4:
   // GET /api/v1/admins/post/notices
   // "This is the API for fetching the list of announcements.
