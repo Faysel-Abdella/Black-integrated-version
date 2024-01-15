@@ -59,10 +59,10 @@ export default function TermOfUse() {
   ];
   const data = [
     {
-      key: "1",
-      title: "이용약관 (23.08.30)",
-      admin: "이중재",
-      date: "2023.08.23 14:11:21",
+      key: "1", // YES
+      title: "이용약관 (23.08.30)", // YES
+      admin: "이중재", // YES
+      date: "2023.08.23 14:11:21", // YES
     },
     {
       key: "2",

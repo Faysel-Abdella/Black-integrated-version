@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DefaultLayout from "../DefaultLayout/DefaultLayout";
 import PrivacyEditor from "../../components/PrivacyEditor";
 import {
@@ -17,6 +17,7 @@ import {
 } from "antd";
 import { LeftOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
+import customFetch from "@/utils/customFetch";
 
 const { Search } = Input;
 
@@ -33,6 +34,73 @@ type TableData = {
 export default function Announcement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [extraFilter, setExtraFilter] = useState(true);
+
+  const [noticesAllDataList, setNoticesAllDataList] = useState([]);
+  const [noticesList, setNoticesList] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  // Search functionality states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  // Updating notice data
+  const [clickedNoticeData, setClickedNoticeData] = useState([]);
+
+  const fetchNoticesLists = async () => {
+    setIsFetching(true);
+    const accessToken = localStorage.getItem("accessToken");
+    const noticesList = await customFetch.get("/api/v1/admins/post/notices", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const noticesData = noticesList.data.data;
+
+    const transformedNoticesList = noticesData.map(
+      (notice: any, index: number) => ({
+        key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+        exposeDate: `${
+          new Date(notice.startDateTime).toISOString().split("T")[0]
+        } ~ ${new Date(notice.endDateTime).toISOString().split("T")[0]}`,
+        title: notice.title,
+        status: notice.status,
+        clickNum: notice.clickCount,
+        registerDate: new Date(notice.createdAt).toISOString().split("T")[0],
+        admin: notice.authorName,
+        // non-included in the table fields
+        content: notice.content,
+        file: notice.file,
+      })
+    );
+
+    setNoticesList(transformedNoticesList);
+    setNoticesAllDataList(noticesData);
+    setIsFetching(false);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    const filteredNotices = noticesList.filter((notice: any) =>
+      notice.title.toLowerCase().includes(value.toLowerCase())
+    );
+    setSearchResults(filteredNotices);
+  };
+
+  const handleClickNotice = (data: any) => {
+    const thisNoticeData: any = noticesAllDataList.filter(
+      (notice: any) => notice.key.toString() == data.key.toString()
+    );
+
+    setClickedNoticeData(thisNoticeData);
+  };
+
+  useEffect(() => {
+    try {
+      fetchNoticesLists();
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -77,13 +145,13 @@ export default function Announcement() {
   ];
   const data = [
     {
-      key: "1",
-      exposeDate: "2023.08.23 ~ 2023.09.01",
-      title: "나노의 서재 이벤트",
-      status: "진행",
-      clickNum: 10,
-      registerDate: "2023.08.23",
-      admin: "이중재",
+      key: "1", // YES
+      exposeDate: "2023.08.23 ~ 2023.09.01", // YES
+      title: "나노의 서재 이벤트", // YES
+      status: "진행", // YES
+      clickNum: 10, // YES
+      registerDate: "2023.08.23", // YES
+      admin: "이중재", // YES
     },
     {
       key: "2",
@@ -204,6 +272,7 @@ export default function Announcement() {
                 검색어
               </label>
               <Search
+                onChange={(e) => handleSearch(e.target.value)}
                 placeholder="검색어를 입력해주세요"
                 style={{ width: 398 }}
                 className="custom-search-icon"
@@ -237,12 +306,18 @@ export default function Announcement() {
                 검색되었습니다
               </h2>
             </div>
-            <Table
-              bordered
-              columns={columns}
-              dataSource={data}
-              onChange={onChange}
-            />
+            {isFetching ? (
+              <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+              </div>
+            ) : (
+              <Table
+                bordered
+                columns={columns}
+                dataSource={searchQuery !== "" ? searchResults : noticesList}
+                onChange={onChange}
+              />
+            )}
           </Card>
         </Col>
       </Row>
