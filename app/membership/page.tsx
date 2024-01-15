@@ -224,6 +224,36 @@ export default function MembershipManagement() {
     console.log(date, dateString);
   };
 
+  // faysel4:
+  // GET /api/v1/admins/users/ban
+  // This API is for fetching the list of sanctioned members.
+  // You need to retrieve the data and insert it into the Table tag.
+  // Pagination should be implemented if there is a large amount of data.
+  // As you can see at the top of the page, the posts in the list should be searchable based on search terms.
+
+  // code line 148 ~ 163
+  // {
+  //   title: "해제",
+  //   dataIndex: "clear",
+  //   render(value, record, index) {
+  //     return (
+  //       <button
+  //         onClick={() => {
+  //           showModal("clear");
+  //           setClickedAdminId(record.id);
+  //         }}
+  //         className="rounded-full text-sm leading-[18px] bg-[#A3A6AB] px-[14px] py-[7px] text-white"
+  //       >
+  //         해제하기
+  //       </button>
+  //     );
+  //   },
+  // },
+  // DELETE /api/v1/admins/users/ban/{id}
+  // When this button is pressed, a modal for lifting sanctions should appear, and you should be able to lift the sanctions for the corresponding item in the list
+
+  // For more details, please refer to the Swagger documentation."
+
   // ################## The API is not available (Jin is preparing the data)  #########################
 
   // faysel2: * Jin is preparing the data. The membership-management page is also the same.

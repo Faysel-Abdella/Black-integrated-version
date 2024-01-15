@@ -98,6 +98,43 @@ export default function Faq() {
   const onChangeDate = (date: any, dateString: any) => {
     console.log(date, dateString);
   };
+
+  // faysel4:
+  // GET /api/v1/admins/post/faqs
+  // This is the API for fetching the FAQ list.
+  // You need to retrieve the data and insert it into the Table tag.
+  // Pagination should be implemented if there is a large amount of data.
+  // As you can see at the top of the page, the posts in the list should be searchable based on the date, status, and search terms.
+
+  // POST /api/v1/admins/post/faqs
+  // Below code,
+  // <Button
+  // style={{
+  //   padding: 0,
+  //   width: 144,
+  //   height: 61,
+  //   fontWeight: 700,
+  //   }}
+  //   type="primary"
+  //   shape="round"
+  //   className="min-w-[120px]"
+  //   onClick={() => showModal()}
+  //   >
+  //   등록
+  //   </Button>
+  // When this button is pressed, it should be possible to register a new FAQ.
+
+  // code line 39 ~ 42
+
+  // {
+  //   title: "FAQ 타이틀",
+  //   dataIndex: "faqTitle",
+  // },
+  // PATCH /api/v1/admins/post/faqs/{id}
+  // Just like with other lists, when you click on the title of a post, the information for that particular post should appear in a modal, allowing for modifications.
+
+  // For more details, please refer to the Swagger documentation."
+
   return (
     <DefaultLayout>
       <Row justify="space-between" align="middle" className="mb-[21px]">
