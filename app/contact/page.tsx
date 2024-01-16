@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Col,
@@ -16,10 +16,83 @@ import {
 
 import DefaultLayout from "../DefaultLayout/DefaultLayout";
 import ContactModal from "@/components/ContactModal";
+import customFetch from "@/utils/customFetch";
 
 const { Search } = Input;
 
 export default function Contact() {
+  const [queriesAllDataList, setQueriesAllDataList] = useState([]);
+  const [queriesList, setQueriesList] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  // Search functionality states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  // Updating admin data
+  const [clickedQueryData, setClickedQueryData] = useState([]);
+
+  const fetchQueryLists = async () => {
+    setIsFetching(true);
+    const accessToken = localStorage.getItem("accessToken");
+    const queriesList = await customFetch.get("/api/v1/admins/post/inquiries", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const queriesData = queriesList.data.data;
+
+    const transformedQueriesList = queriesData.map(
+      (query: any, index: number) => ({
+        key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+        title: query.title,
+        id: query.id,
+        name: query.author.name,
+        phone: query.phone,
+        registrationDate: query.createdAt
+          ? new Date(query.createdAt).toISOString().split("T")[0]
+          : "-",
+        admin: query.adminName ? query.adminName : "-",
+        processingDate: query.processingDate
+          ? new Date(query.completionDate).toISOString().split("T")[0]
+          : "-",
+        status: query.status,
+        // fields that are not part of the table
+        answerContent: query.answerContent ? query.answerContent : "-",
+        email: query.email,
+        authorEmail: query.author.email,
+      })
+    );
+
+    setQueriesList(transformedQueriesList);
+    setQueriesAllDataList(queriesData);
+    setIsFetching(false);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    const filteredQueries = queriesList.filter((query: any) =>
+      query.title.toLowerCase().includes(value.toLowerCase())
+    );
+    setSearchResults(filteredQueries);
+  };
+
+  const handleClickQuery = (data: any) => {
+    const thisQueryData: any = queriesAllDataList.filter(
+      (query: any) => query.id.toString() == data.id.toString()
+    );
+
+    setClickedQueryData(thisQueryData);
+    showModal();
+  };
+
+  useEffect(() => {
+    try {
+      fetchQueryLists();
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
     setIsModalOpen(true);
@@ -40,8 +113,8 @@ export default function Contact() {
     {
       title: "제목",
       dataIndex: "title",
-      render: (text: any, recode: any) => (
-        <a onClick={showModal}>{recode.title}</a>
+      render: (text: any, record: any) => (
+        <a onClick={() => handleClickQuery(record)}>{record.title}</a>
       ),
     },
     {
@@ -75,15 +148,15 @@ export default function Contact() {
   ];
   const data = [
     {
-      key: "1",
-      title: "인증번호 초과",
-      id: "Fd123",
-      name: "천지인",
-      phone: "010-1234-1234",
-      registrationDate: "2023.08.21 14:11:21",
-      admin: "이중재",
-      processingDate: "2023.08.23 14:11:21",
-      status: "답변완료",
+      key: "1", // YES
+      title: "인증번호 초과", // YES(title)
+      id: "Fd123", // YES(id)
+      name: "천지인", // YES (authorName)
+      phone: "010-1234-1234", // YES(phone)
+      registrationDate: "2023.08.21 14:11:21", // YES (createdAt)
+      admin: "이중재", // YES (authorName)
+      processingDate: "2023.08.23 14:11:21", // YES (completionDate)
+      status: "답변완료", // YES (status)
     },
     {
       key: "2",
@@ -116,7 +189,7 @@ export default function Contact() {
     console.log(date, dateString);
   };
 
-  // ############################### Waiting for Jin to add dummy data ##################
+  // ################ DONE / 완전한 ############## //
 
   // faysel4:
   // GET /api/v1/admins/post/inquiries
@@ -192,6 +265,7 @@ export default function Contact() {
                 검색어
               </label>
               <Search
+                onChange={(e) => handleSearch(e.target.value)}
                 placeholder="검색어를 입력해주세요"
                 style={{ width: 398 }}
                 className="custom-search-icon"
@@ -209,12 +283,18 @@ export default function Contact() {
                 검색되었습니다
               </h2>
             </div>
-            <Table
-              bordered
-              columns={columns}
-              dataSource={data}
-              onChange={onChange}
-            />
+            {isFetching ? (
+              <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+              </div>
+            ) : (
+              <Table
+                bordered
+                columns={columns}
+                dataSource={searchQuery !== "" ? searchResults : queriesList}
+                onChange={onChange}
+              />
+            )}
           </Card>
         </Col>
       </Row>
@@ -236,7 +316,11 @@ export default function Contact() {
           >
             <img src="/assets/images/backIcon.png" />
           </Button>
-          <ContactModal onCancel={handleCancel} />
+          <ContactModal
+            onCancel={handleCancel}
+            clickedQueryData={clickedQueryData}
+            fetchQueryLists={fetchQueryLists}
+          />
         </div>
       </Modal>
     </DefaultLayout>

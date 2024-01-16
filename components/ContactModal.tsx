@@ -1,12 +1,71 @@
+import customFetch from "@/utils/customFetch";
 import { Form, Row, Button, Input, Col, Flex } from "antd";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 interface ContactModalProps {
   onCancel: () => void;
+  clickedQueryData: any;
+  fetchQueryLists: () => void;
 }
 
-export default function ContactModal({ onCancel }: ContactModalProps) {
+export default function ContactModal({
+  onCancel,
+  clickedQueryData,
+  fetchQueryLists,
+}: ContactModalProps) {
   const [form] = Form.useForm();
   const { TextArea } = Input;
+
+  const [queryId, setQueryId] = useState(0);
+
+  useEffect(() => {
+    form.setFieldsValue({
+      status: clickedQueryData[0].status,
+      id: clickedQueryData[0].id,
+      name: clickedQueryData[0].author.name,
+      phone: clickedQueryData[0].phone,
+      createdAt: new Date(clickedQueryData[0].createdAt)
+        .toISOString()
+        .split("T")[0],
+      email: clickedQueryData[0].email,
+      title: clickedQueryData[0].title,
+      contact: clickedQueryData[0].author.email,
+      answer: clickedQueryData[0].answerContent
+        ? clickedQueryData[0].answerContent
+        : "--",
+    });
+    setQueryId(clickedQueryData[0].id);
+  }, [clickedQueryData]);
+
+  const handleGiveAnswer = async () => {
+    const answerContent = form.getFieldValue("answer");
+
+    const accessToken = localStorage.getItem("accessToken");
+
+    console.log(answerContent);
+
+    try {
+      const response = await customFetch.patch(
+        `/api/v1/admins/post/inquiries/${queryId}`,
+        {
+          answerContent: answerContent,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      console.log(response);
+      onCancel();
+      toast.success("완료", { autoClose: 3500 });
+      fetchQueryLists();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="modal-form form-inline">
       <Form colon={false} layout="horizontal" form={form}>
@@ -131,6 +190,7 @@ export default function ContactModal({ onCancel }: ContactModalProps) {
           className="mt-[20px] mb-[35px]"
         >
           <Button
+            onClick={handleGiveAnswer}
             style={{ padding: 0, width: 148, height: 42, fontWeight: 400 }}
             className="ant-btn ant-btn-info"
           >
