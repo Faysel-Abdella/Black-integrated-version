@@ -88,7 +88,7 @@ export default function AccountModal({
     }
   };
 
-  // ################ DONE /완전한 -- Except making the Radio button active if the based on the faq state ############## //
+  // ################ DONE /완전한 -- Except making the Radio button active based on the faq state ############## //
 
   // faysel3:
   // This is the API for registering a FAQ.

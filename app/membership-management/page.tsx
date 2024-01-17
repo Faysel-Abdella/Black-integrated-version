@@ -67,7 +67,7 @@ export default function Membership() {
         name: member.name,
         phoneNumber: member.phone,
         joinDate: new Date(member.createdAt).toISOString().split("T")[0],
-        accountStatus: member.accountStatus.toString(),
+        accountStatus: member.isActive.toString(),
         subscriptionType: "아이디",
         views: member.blacksViewCount,
         numOfRegistrations: membersData.length,
@@ -93,6 +93,16 @@ export default function Membership() {
       member.name.toLowerCase().includes(value.toLowerCase())
     );
     setSearchResults(filteredMembers);
+  };
+
+  const handleClickMember = (data: any) => {
+    console.log(data);
+    const thisMemberData: any = membersList.filter(
+      (member: any) => member.id.toString() == data.id.toString()
+    );
+
+    setClickedMemberData(thisMemberData);
+    showModal("user");
   };
 
   const onChangeDateSearch = (date) => {
@@ -126,7 +136,7 @@ export default function Membership() {
       render(value, record, index) {
         return (
           <span
-            onClick={() => showModal("user")}
+            onClick={() => handleClickMember(record)}
             className="text-[#28A7E1] underline-offset-2 underline cursor-pointer"
           >
             {value}
@@ -434,7 +444,11 @@ export default function Membership() {
           >
             <img src="/assets/images/backIcon.png" />
           </Button>
-          {modalType === "user" ? <MembershipModal /> : <ExcelModal />}
+          {modalType === "user" ? (
+            <MembershipModal clickedMemberData={clickedMemberData} />
+          ) : (
+            <ExcelModal />
+          )}
         </div>
       </Modal>
     </DefaultLayout>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Col, Row, Button, Space, Input, Modal } from "antd";
 
 import ConfirmMembership from "./ConfirmMembership";
@@ -7,10 +7,17 @@ import RejectmMembership from "./RejectmMembership";
 import MembershipSanction from "./MembershipSanction";
 import MembershipUnblock from "./MembershipUnblock";
 
-export default function MembershipModal() {
+export default function MembershipModal({
+  clickedMemberData,
+}: {
+  clickedMemberData?: any;
+}) {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("ConfirmMembership");
+  // useEffect(() => {
+  // console.log(clickedMemberData);
+  // }, []);
   const showModal = (type: any) => {
     setIsModalOpen(true);
     setModalType(type);
@@ -84,7 +91,9 @@ export default function MembershipModal() {
                   <label htmlFor="">닉네임</label>
                 </Col>
                 <Col md={19}>
-                  <Input placeholder="부평부평" disabled />
+                  <Form.Item name="nickName">
+                    <Input placeholder="부평부평" disabled />
+                  </Form.Item>
                 </Col>
               </Row>
             </Col>
@@ -94,7 +103,9 @@ export default function MembershipModal() {
                   <label htmlFor="">ID</label>
                 </Col>
                 <Col md={16}>
-                  <Input placeholder="fdpd100" disabled />
+                  <Form.Item name="id">
+                    <Input placeholder="fdpd100" disabled />
+                  </Form.Item>
                 </Col>
               </Row>
             </Col>
@@ -104,7 +115,9 @@ export default function MembershipModal() {
                   <label htmlFor="">이름</label>
                 </Col>
                 <Col md={19}>
-                  <Input placeholder="이중재" disabled />
+                  <Form.Item name="name">
+                    <Input placeholder="이중재" disabled />
+                  </Form.Item>
                 </Col>
               </Row>
             </Col>
@@ -115,7 +128,9 @@ export default function MembershipModal() {
                 </Col>
                 <Col md={16}>
                   <Space size={5}>
-                    <Input placeholder="010-4012-1146" disabled />
+                    <Form.Item name="phone">
+                      <Input placeholder="010-4012-1146" disabled />
+                    </Form.Item>
                     <Button
                       size="small"
                       className="ant-btn-info"
@@ -135,7 +150,9 @@ export default function MembershipModal() {
                 </Col>
                 <Col md={19}>
                   <Space size={5}>
+                    {/* <Form.Item name="email"> */}
                     <Input placeholder="fdpd100@naver.com" disabled />
+                    {/* </Form.Item> */}
                     <Button
                       size="small"
                       className="ant-btn-info"
@@ -175,6 +192,7 @@ export default function MembershipModal() {
                   <label htmlFor="">가입일</label>
                 </Col>
                 <Col md={16}>
+                  {/* <Form.Item></Form.Item> */}
                   <Input placeholder="2023-08-04" disabled />
                 </Col>
               </Row>
