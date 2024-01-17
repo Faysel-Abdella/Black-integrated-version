@@ -245,7 +245,7 @@ export default function PasswordManagement() {
           <Card title="" bodyStyle={{ padding: "78px 85px 95px 84px" }}>
             <Col span={20}>
               {isFetching ? (
-                <div className="flex justify-center items-center h-screen">
+                <div className="flex justify-center items-center h-[100%]">
                   <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
                 </div>
               ) : (

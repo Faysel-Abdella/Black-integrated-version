@@ -108,7 +108,7 @@ export default function Faq() {
     {
       title: "FAQ 타이틀",
       dataIndex: "faqTitle",
-      render: (value, record, index) => (
+      render: (value: any, record: any, index: number) => (
         <a onClick={() => handleClickFaq(record)}>{value}</a>
       ),
     },
@@ -300,7 +300,7 @@ export default function Faq() {
               </h2>
             </div>
             {isFetching ? (
-              <div className="flex justify-center items-center h-screen">
+              <div className="flex justify-center items-center h-[100%]">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
               </div>
             ) : (

@@ -187,8 +187,8 @@ export default function Announcement() {
     console.log(date, dateString);
   };
 
-  // ***** You need to use a text editor. *****
   // ################ DONE /완전한 ############## //
+  // ***** You need to use a text editor. *****
 
   // faysel4:
 
@@ -319,7 +319,7 @@ export default function Announcement() {
               </h2>
             </div>
             {isFetching ? (
-              <div className="flex justify-center items-center h-screen">
+              <div className="flex justify-center items-center h-[100%]">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
               </div>
             ) : (
@@ -351,10 +351,11 @@ export default function Announcement() {
             <img src="/assets/images/backIcon.png" />
           </Button>
           <PrivacyEditor
+            usedOnPage="announcement"
             extraFilter={extraFilter}
             buttonType={buttonType}
-            clickedNoticeData={clickedNoticeData}
-            fetchNoticesLists={fetchNoticesLists}
+            clickedData={clickedNoticeData}
+            fetchDataLists={fetchNoticesLists}
             handleCancel={handleCancel}
             isFetching={isFetching}
           />

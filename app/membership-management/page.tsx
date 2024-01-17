@@ -238,7 +238,7 @@ export default function Membership() {
     console.log(date, dateString);
   };
 
-  // ################ DONE Except the date search / Mr. Jin please add different multiple dates to test this. All date comes from databse are the same date #############
+  // ################ DONE/완전한 -- Except the date search  #############
 
   // * Jin is preparing the data.
   // faysel:
@@ -402,7 +402,7 @@ export default function Membership() {
               </h2>
             </div>
             {isFetching ? (
-              <div className="flex justify-center items-center h-screen">
+              <div className="flex justify-center items-center h-[100%]">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
               </div>
             ) : (

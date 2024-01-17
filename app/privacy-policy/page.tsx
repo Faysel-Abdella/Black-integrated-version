@@ -1,11 +1,12 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DefaultLayout from "../DefaultLayout/DefaultLayout";
 import PrivacyEditor from "../../components/PrivacyEditor";
 import { Card, Col, Row, Table, Button, Modal } from "antd";
 import { LeftOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
 import Sidebar from "../../components/Sidebar";
+import customFetch from "@/utils/customFetch";
 
 type TableData = {
   key: any;
@@ -16,6 +17,58 @@ type TableData = {
 
 export default function PrivacyPolicy() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [buttonType, setButtonType] = useState("");
+
+  const [privaciesList, setPrivaciesList] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  // Updating privacy data
+  const [clickedPrivacyData, setClickedPrivacyData] = useState([]);
+
+  const fetchPrivacyLists = async () => {
+    setIsFetching(true);
+    const accessToken = localStorage.getItem("accessToken");
+    const privaciesList = await customFetch.get(
+      "/api/v1/admins/post/privacy-policies",
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    const privaciesData = privaciesList.data.data;
+
+    const transformedPrivaciesList = privaciesData.map(
+      (privacy: any, index: number) => ({
+        key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+        title: privacy.title,
+        admin: privacy.authorName,
+        date: new Date(privacy.createdAt).toISOString().split("T")[0],
+        // Non-included in tha table fields
+
+        id: privacy.id,
+        content: privacy.content,
+      })
+    );
+
+    setPrivaciesList(transformedPrivaciesList);
+    setIsFetching(false);
+  };
+
+  useEffect(() => {
+    fetchPrivacyLists();
+  }, []);
+
+  const handleClickPrivacy = (data: any) => {
+    const thisPrivacyData: any = privaciesList.filter(
+      (privacy: any) => privacy.id.toString() == data.id.toString()
+    );
+
+    setClickedPrivacyData(thisPrivacyData);
+    setButtonType("modification");
+    showModal();
+  };
+
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -38,7 +91,9 @@ export default function PrivacyPolicy() {
     {
       title: "제목",
       dataIndex: "title",
-      render: (value, recode, index) => <a onClick={showModal}>{value}</a>,
+      render: (value, record, index) => (
+        <a onClick={() => handleClickPrivacy(record)}>{value}</a>
+      ),
     },
     {
       title: "관리자",
@@ -51,10 +106,10 @@ export default function PrivacyPolicy() {
   ];
   const data = [
     {
-      key: "1",
-      title: "개인정보 처리방침 v0.3",
-      admin: "이중재",
-      date: "2023.08.23 14:11:21",
+      key: "1", // YES
+      title: "개인정보 처리방침 v0.3", // YES
+      admin: "이중재", // YES
+      date: "2023.08.23 14:11:21", // YES
     },
     {
       key: "2",
@@ -72,6 +127,8 @@ export default function PrivacyPolicy() {
   const onChange = (pagination: any, filters: any, sorter: any, extra: any) => {
     console.log("params", pagination, filters, sorter, extra);
   };
+
+  // ################ DONE /완전한 ############## //
 
   // ***** You need to use a text editor. *****
   // faysel4:
@@ -125,7 +182,10 @@ export default function PrivacyPolicy() {
               type="primary"
               shape="round"
               className="min-w-[120px]"
-              onClick={() => showModal()}
+              onClick={() => {
+                setButtonType("register");
+                showModal();
+              }}
             >
               등록
             </Button>
@@ -135,12 +195,18 @@ export default function PrivacyPolicy() {
           <Col span={24}>
             <Card title="" className="pt-[53px] pl-[33px]">
               <Col md={18}>
-                <Table
-                  bordered
-                  columns={columns}
-                  dataSource={data}
-                  onChange={onChange}
-                />
+                {isFetching ? (
+                  <div className="flex justify-center items-center h-[100%]">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+                  </div>
+                ) : (
+                  <Table
+                    bordered
+                    columns={columns}
+                    dataSource={privaciesList}
+                    onChange={onChange}
+                  />
+                )}
               </Col>
             </Card>
           </Col>
@@ -164,7 +230,14 @@ export default function PrivacyPolicy() {
           >
             <img src="/assets/images/backIcon.png" />
           </Button>
-          <PrivacyEditor />
+          <PrivacyEditor
+            usedOnPage="privacyPolicy"
+            buttonType={buttonType}
+            clickedData={clickedPrivacyData}
+            handleCancel={handleCancel}
+            fetchDataLists={fetchPrivacyLists}
+            isFetching={isFetching}
+          />
         </div>
       </Modal>
     </DefaultLayout>

@@ -6,19 +6,16 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 type EditorProps = {
   onChange?: (data: string) => void;
   buttonType: string;
-  clickedNoticeContent: any;
+  clickedDataContent: any;
 };
 
-const Editor = ({
-  onChange,
-  buttonType,
-  clickedNoticeContent,
-}: EditorProps) => {
+const Editor = ({ onChange, buttonType, clickedDataContent }: EditorProps) => {
   const [editorData, setEditorData] = useState("");
 
   useEffect(() => {
-    setEditorData(buttonType === "modification" ? clickedNoticeContent : "");
-  }, [buttonType, clickedNoticeContent]);
+    setEditorData(buttonType === "modification" ? clickedDataContent : "");
+    console.log("This is from Editor", clickedDataContent);
+  }, [buttonType, clickedDataContent]);
 
   const handleEditorChange = (event: any, editor: any) => {
     const data = editor.getData();

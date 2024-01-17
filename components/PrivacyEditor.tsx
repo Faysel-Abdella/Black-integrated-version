@@ -11,44 +11,67 @@ import { toast } from "react-toastify";
 import customFetch from "@/utils/customFetch";
 
 export default function PrivacyEditor({
+  usedOnPage,
   extraFilter,
   buttonType,
-  clickedNoticeData,
-  fetchNoticesLists,
+  clickedData,
+  fetchDataLists,
   handleCancel,
   isFetching,
 }: {
+  usedOnPage: string;
   extraFilter?: boolean;
   buttonType?: any;
-  clickedNoticeData?: any;
-  fetchNoticesLists?: () => void;
+  clickedData?: any;
+  fetchDataLists?: () => void;
   handleCancel: () => void;
-  isFetching: boolean;
+  isFetching?: boolean;
 }) {
   const [form] = Form.useForm();
   const Editor = dynamic(() => import("./CKEditor"), { ssr: false });
 
   let editorText = "";
 
-  useEffect(() => {
-    if (buttonType! === "modification") {
+  const firstFilling = () => {
+    if (buttonType! === "modification" && usedOnPage === "announcement") {
       form.setFieldsValue({
-        title: clickedNoticeData[0].title,
-        startDateTime: new Date(clickedNoticeData[0].startDateTime)
+        title: clickedData[0].title,
+        startDateTime: new Date(clickedData[0].startDateTime)
           .toISOString()
           .split("T")[0],
-        endDateTime: new Date(clickedNoticeData[0].endDateTime)
+        endDateTime: new Date(clickedData[0].endDateTime)
           .toISOString()
           .split("T")[0],
-        content: clickedNoticeData[0].content,
+        content: clickedData[0].content,
       });
-    } else {
-      form.resetFields();
+    } else if (
+      buttonType! === "modification" &&
+      usedOnPage === "privacyPolicy"
+    ) {
+      console.log(clickedData[0]);
+      form.setFieldsValue({
+        title: clickedData[0].title,
+        content: clickedData[0].content,
+      });
+    } else if (
+      // buttonType! === "modification" &&
+      usedOnPage === "term"
+    ) {
     }
-  }, [clickedNoticeData, buttonType, extraFilter]);
+  };
 
   useEffect(() => {
-    form.resetFields();
+    firstFilling();
+    if (buttonType == "register") {
+      form.resetFields();
+    }
+  }, [clickedData, buttonType, extraFilter]);
+
+  useEffect(() => {
+    firstFilling();
+    if (buttonType == "register") {
+      form.resetFields();
+    }
   }, []);
 
   const handleEditorChange = (data: string) => {
@@ -56,80 +79,138 @@ export default function PrivacyEditor({
   };
 
   const handleCorrection = async () => {
-    console.log(editorText);
-    if (
-      !form.getFieldValue("title") ||
-      !form.getFieldValue("startDateTime") ||
-      !form.getFieldValue("endDateTime") ||
-      !editorText
-    ) {
-      return toast.error("Please fill all inputs", { autoClose: 4000 });
-    }
-    const title = form.getFieldValue("title");
-    const startDateTime = new Date(
-      form.getFieldValue("startDateTime")
-    ).toISOString();
-    const endDateTime = new Date(
-      form.getFieldValue("endDateTime")
-    ).toISOString();
-    const content = editorText;
-
-    const accessToken = localStorage.getItem("accessToken");
-
-    if (buttonType! === "modification") {
-      const id = clickedNoticeData[0].id;
-      try {
-        const response = await customFetch.patch(
-          `/api/v1/admins/post/notices/${id}`,
-          {
-            title: title,
-            startDateTime: startDateTime,
-            endDateTime: endDateTime,
-            content: content,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        handleCancel();
-        form.resetFields();
-        toast.success("완료", { autoClose: 3500 });
-        fetchNoticesLists!();
-      } catch (error: any) {
-        toast.success("The date must be in the yyyy-mm-dd format", {
-          autoClose: 3500,
-        });
-        console.log(error);
+    if (usedOnPage === "announcement") {
+      if (
+        !form.getFieldValue("title") ||
+        !form.getFieldValue("startDateTime") ||
+        !form.getFieldValue("endDateTime") ||
+        !editorText
+      ) {
+        return toast.error("Please fill all inputs", { autoClose: 4000 });
       }
-    } else {
-      try {
-        const response = await customFetch.post(
-          `/api/v1/admins/post/notices`,
-          {
-            title: title,
-            startDateTime: startDateTime,
-            endDateTime: endDateTime,
-            content: content,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
+      const title = form.getFieldValue("title");
+      const startDateTime = new Date(
+        form.getFieldValue("startDateTime")
+      ).toISOString();
+      const endDateTime = new Date(
+        form.getFieldValue("endDateTime")
+      ).toISOString();
+      const content = editorText;
 
-        handleCancel();
-        form.resetFields();
-        toast.success("완료", { autoClose: 3500 });
-        fetchNoticesLists!();
-      } catch (error: any) {
-        toast.success("The date must be in the yyyy-mm-dd format", {
-          autoClose: 3500,
-        });
-        console.log(error);
+      const accessToken = localStorage.getItem("accessToken");
+
+      if (buttonType! === "modification") {
+        const id = clickedData[0].id;
+        try {
+          const response = await customFetch.patch(
+            `/api/v1/admins/post/notices/${id}`,
+            {
+              title: title,
+              startDateTime: startDateTime,
+              endDateTime: endDateTime,
+              content: content,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+
+          handleCancel();
+          form.resetFields();
+          editorText = "";
+          toast.success("완료", { autoClose: 3500 });
+          fetchDataLists!();
+        } catch (error: any) {
+          toast.success("The date must be in the yyyy-mm-dd format", {
+            autoClose: 3500,
+          });
+          console.log(error);
+        }
+      } else {
+        try {
+          const response = await customFetch.post(
+            `/api/v1/admins/post/notices`,
+            {
+              title: title,
+              startDateTime: startDateTime,
+              endDateTime: endDateTime,
+              content: content,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+
+          handleCancel();
+          form.resetFields();
+          editorText = "";
+          toast.success("완료", { autoClose: 3500 });
+          fetchDataLists!();
+        } catch (error: any) {
+          toast.success("The date must be in the yyyy-mm-dd format", {
+            autoClose: 3500,
+          });
+          console.log(error);
+        }
+      }
+    } else if (usedOnPage === "privacyPolicy") {
+      if (!form.getFieldValue("title") || !editorText) {
+        return toast.error("Please fill all inputs", { autoClose: 4000 });
+      }
+      const title = form.getFieldValue("title");
+      const content = editorText;
+
+      const accessToken = localStorage.getItem("accessToken");
+
+      if (buttonType! === "modification") {
+        const id = clickedData[0].id;
+        try {
+          const response = await customFetch.patch(
+            `/api/v1/admins/post/privacy-policies/${id}`,
+            {
+              title: title,
+              content: content,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+
+          handleCancel();
+          form.resetFields();
+          toast.success("완료", { autoClose: 3500 });
+          fetchDataLists!();
+        } catch (error: any) {
+          console.log(error);
+        }
+      } else {
+        try {
+          const response = await customFetch.post(
+            `/api/v1/admins/post/privacy-policies`,
+            {
+              title: title,
+              content: content,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+
+          handleCancel();
+          form.resetFields();
+          toast.success("완료", { autoClose: 3500 });
+          fetchDataLists!();
+        } catch (error: any) {
+          console.log(error);
+        }
       }
     }
   };
@@ -226,7 +307,15 @@ export default function PrivacyEditor({
                 // editor={ClassicEditor}
                 onChange={handleEditorChange}
                 buttonType={buttonType}
-                clickedNoticeContent={clickedNoticeData[0].content}
+                clickedDataContent={
+                  clickedData
+                    ? clickedData[0]
+                      ? clickedData[0].content
+                        ? clickedData[0].content
+                        : " "
+                      : " "
+                    : " "
+                }
               />
             </Form.Item>
           </Col>
