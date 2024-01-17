@@ -165,14 +165,14 @@ const table2Columns: ColumnsType<Table2Data> = [
         },
       },
       {
-        title: "위생",
+        title: "실내흡연",
         dataIndex: "hygiene",
         render(value, record, index) {
           return <span>{record.hygiene.toString().padStart(2, "0")}</span>;
         },
       },
       {
-        title: "돈안내고 튐",
+        title: "주변 이웃과 다툼",
         dataIndex: "paidAndRun",
         render(value, record, index) {
           return <span>{record.paidAndRun.toString().padStart(2, "0")}</span>;
