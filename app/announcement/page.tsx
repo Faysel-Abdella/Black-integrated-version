@@ -188,17 +188,16 @@ export default function Announcement() {
   };
 
   // ***** You need to use a text editor. *****
-  // ############################### In progress....  ##################
+  // ################ DONE /완전한 ############## //
+
   // faysel4:
 
-  // ############################### GET is done ##################
   // GET /api/v1/admins/post/notices
   // "This is the API for fetching the list of announcements.
   // You need to retrieve the data and insert it into the Table tag.
   // Pagination should be implemented if there is a large amount of data.
   // As you can see at the top of the page, the posts in the list should be searchable based on the date, status, and search terms."
 
-  // ############################### In progress....  ##################
   // POST /api/v1/admins/post/notices
   // Below code,
   //   <Button
@@ -217,7 +216,6 @@ export default function Announcement() {
   //  </Button>
   // When this button is pressed, it should be possible to register a new announcement.
 
-  // ############################### In progress....  ##################
   // code line 57 ~ 59
   //
   //  {

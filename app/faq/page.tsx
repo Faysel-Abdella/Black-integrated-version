@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DefaultLayout from "../DefaultLayout/DefaultLayout";
 import AddFaqModal from "../../components/AddFaqModal";
 import {
@@ -16,10 +16,79 @@ import {
   Modal,
 } from "antd";
 import { LeftOutlined } from "@ant-design/icons";
+import customFetch from "@/utils/customFetch";
+
 const { Search } = Input;
 
 export default function Faq() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [buttonType, setButtonType] = useState("");
+
+  const [faqsAllDataList, setFaqsAllDataList] = useState([]);
+  const [faqsList, setFaqsList] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  // Search functionality states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  // Updating faq data
+  const [clickedFaqData, setClickedFaqData] = useState([]);
+
+  const fetchFaqLists = async () => {
+    setIsFetching(true);
+    const accessToken = localStorage.getItem("accessToken");
+    const faqsList = await customFetch.get("/api/v1/admins/post/faqs", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const faqsData = faqsList.data.data;
+
+    const transformedFaqsList = faqsData.map((faq: any, index: number) => ({
+      key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+      faqTitle: faq.title,
+      title: faq.content,
+      clickNum: faq.clickCount,
+      registerDate: new Date(faq.createdAt).toISOString().split("T")[0],
+      admin: faq.authorName,
+      // Non-included in tha table fields
+
+      id: faq.id,
+      status: faq.status,
+    }));
+
+    setFaqsList(transformedFaqsList);
+    setFaqsAllDataList(faqsData);
+    setIsFetching(false);
+  };
+
+  useEffect(() => {
+    try {
+      fetchFaqLists();
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    const filteredFaqs = faqsList.filter((faq: any) =>
+      faq.faqTitle.toLowerCase().includes(value.toLowerCase())
+    );
+    setSearchResults(filteredFaqs);
+  };
+
+  const handleClickFaq = (data: any) => {
+    const thisFaqData: any = faqsAllDataList.filter(
+      (faq: any) => faq.id.toString() == data.id.toString()
+    );
+
+    setClickedFaqData(thisFaqData);
+    setButtonType("modification");
+    showModal();
+  };
+
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -39,6 +108,9 @@ export default function Faq() {
     {
       title: "FAQ 타이틀",
       dataIndex: "faqTitle",
+      render: (value, record, index) => (
+        <a onClick={() => handleClickFaq(record)}>{value}</a>
+      ),
     },
     {
       title: "제목",
@@ -59,12 +131,12 @@ export default function Faq() {
   ];
   const data = [
     {
-      key: "1",
-      faqTitle: "조회 문의",
-      title: "사용",
-      clickNum: 5,
-      registerDate: "2023.08.23",
-      admin: "이중재",
+      key: "1", // YES
+      faqTitle: "조회 문의", // YES
+      title: "사용", //content
+      clickNum: 5, // YES (clickCount)
+      registerDate: "2023.08.23", // YES (createdAt)
+      admin: "이중재", // YES (authorName)
     },
     {
       key: "2",
@@ -99,7 +171,7 @@ export default function Faq() {
     console.log(date, dateString);
   };
 
-  // ############################### Waiting for Jin to add dummy data ##################
+  // ################ DONE /완전한 ############## //
 
   // faysel4:
   // GET /api/v1/admins/post/faqs
@@ -190,6 +262,7 @@ export default function Faq() {
                 검색어
               </label>
               <Search
+                onChange={(e) => handleSearch(e.target.value)}
                 placeholder="검색어를 입력해주세요"
                 style={{ width: 398 }}
                 className="custom-search-icon"
@@ -208,7 +281,10 @@ export default function Faq() {
             type="primary"
             shape="round"
             className="min-w-[120px]"
-            onClick={() => showModal()}
+            onClick={() => {
+              setButtonType("register");
+              showModal();
+            }}
           >
             등록
           </Button>
@@ -223,12 +299,18 @@ export default function Faq() {
                 검색되었습니다
               </h2>
             </div>
-            <Table
-              bordered
-              columns={columns}
-              dataSource={data}
-              onChange={onChange}
-            />
+            {isFetching ? (
+              <div className="flex justify-center items-center h-screen">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+              </div>
+            ) : (
+              <Table
+                bordered
+                columns={columns}
+                dataSource={searchQuery !== "" ? searchResults : faqsList}
+                onChange={onChange}
+              />
+            )}
           </Card>
         </Col>
       </Row>
@@ -249,7 +331,12 @@ export default function Faq() {
           >
             <img src="/assets/images/backIcon.png" />
           </Button>
-          <AddFaqModal onCancel={handleCancel} />
+          <AddFaqModal
+            onCancel={handleCancel}
+            buttonType={buttonType}
+            clickedFaqData={clickedFaqData}
+            fetchFaqLists={fetchFaqLists}
+          />
         </div>
       </Modal>
     </DefaultLayout>

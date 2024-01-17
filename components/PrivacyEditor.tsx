@@ -63,7 +63,7 @@ export default function PrivacyEditor({
       !form.getFieldValue("endDateTime") ||
       !editorText
     ) {
-      return toast.success("Please fill all inputs", { autoClose: 4000 });
+      return toast.error("Please fill all inputs", { autoClose: 4000 });
     }
     const title = form.getFieldValue("title");
     const startDateTime = new Date(

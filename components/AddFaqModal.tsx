@@ -1,11 +1,94 @@
+import { useEffect, useState } from "react";
+
 import { Form, Row, Button, Radio, Input, Col, Flex } from "antd";
+import customFetch from "@/utils/customFetch";
+import { toast } from "react-toastify";
 
 interface AccountModalProps {
   onCancel: () => void;
+  buttonType: string;
+  clickedFaqData: any;
+  fetchFaqLists: () => void;
 }
 
-export default function AccountModal({ onCancel }: AccountModalProps) {
+export default function AccountModal({
+  onCancel,
+  buttonType,
+  clickedFaqData,
+  fetchFaqLists,
+}: AccountModalProps) {
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    if (buttonType === "modification") {
+      form.setFieldsValue({
+        title: clickedFaqData[0].title,
+        content: clickedFaqData[0].content,
+        status: clickedFaqData[0].status,
+      });
+    } else {
+      form.resetFields();
+    }
+  }, [buttonType]);
+
+  const handleAddFaq = async () => {
+    const title = form.getFieldValue("title");
+    const content = form.getFieldValue("content");
+    const status = form.getFieldValue("status");
+
+    if (!title || !content || !status) {
+      return toast.error("Please fill all inputs", { autoClose: 4000 });
+    }
+
+    const accessToken = localStorage.getItem("accessToken");
+
+    if (buttonType === "modification") {
+      const id = clickedFaqData[0].id;
+      try {
+        const response = await customFetch.patch(
+          `/api/v1/admins/post/faqs/${id}`,
+          {
+            title: title,
+            content: content,
+            status: status,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        onCancel();
+        fetchFaqLists();
+        toast.success("완료", { autoClose: 4000 });
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        const response = await customFetch.post(
+          `/api/v1/admins/post/faqs`,
+          {
+            title: title,
+            content: content,
+            status: status,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        onCancel();
+        fetchFaqLists();
+        toast.success("완료", { autoClose: 4000 });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  // ################ DONE /완전한 -- Except making the Radio button active if the based on the faq state ############## //
 
   // faysel3:
   // This is the API for registering a FAQ.
@@ -21,7 +104,7 @@ export default function AccountModal({ onCancel }: AccountModalProps) {
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 20 }}
               style={{ marginBottom: 11 }}
-              name="note"
+              name="title"
               label={
                 <span style={{ textAlign: "left" }}>
                   FAQ 타이틀
@@ -37,7 +120,7 @@ export default function AccountModal({ onCancel }: AccountModalProps) {
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 20 }}
               style={{ marginBottom: 11 }}
-              name="note"
+              name="content"
               label={
                 <span style={{ textAlign: "left" }}>
                   FAQ 내용
@@ -52,7 +135,7 @@ export default function AccountModal({ onCancel }: AccountModalProps) {
             <Form.Item
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 20 }}
-              name="note"
+              name="status"
               label={
                 <span style={{ textAlign: "left" }}>
                   상태
@@ -62,8 +145,10 @@ export default function AccountModal({ onCancel }: AccountModalProps) {
               className="input-group"
             >
               <Radio.Group>
-                <Radio value="horizontal1">사용</Radio>
-                <Radio value="미사용">종합지표</Radio>
+                <Radio checked value="USED">
+                  사용
+                </Radio>
+                <Radio value="UNUSED">종합지표</Radio>
               </Radio.Group>
             </Form.Item>
           </Col>
@@ -75,6 +160,7 @@ export default function AccountModal({ onCancel }: AccountModalProps) {
           justify="center"
         >
           <Button
+            onClick={handleAddFaq}
             style={{ padding: 0, width: 148, height: 42, fontWeight: 400 }}
             className="ant-btn ant-btn-info"
           >
