@@ -34,6 +34,7 @@ type TableData = {
 export default function Announcement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [extraFilter, setExtraFilter] = useState(true);
+  const [buttonType, setButtonType] = useState("");
 
   const [noticesAllDataList, setNoticesAllDataList] = useState([]);
   const [noticesList, setNoticesList] = useState([]);
@@ -67,8 +68,9 @@ export default function Announcement() {
         registerDate: new Date(notice.createdAt).toISOString().split("T")[0],
         admin: notice.authorName,
         // non-included in the table fields
+        id: notice.id,
         content: notice.content,
-        file: notice.file,
+        files: notice.files,
       })
     );
 
@@ -87,10 +89,12 @@ export default function Announcement() {
 
   const handleClickNotice = (data: any) => {
     const thisNoticeData: any = noticesAllDataList.filter(
-      (notice: any) => notice.key.toString() == data.key.toString()
+      (notice: any) => notice.id.toString() == data.id.toString()
     );
 
     setClickedNoticeData(thisNoticeData);
+    setButtonType("modification");
+    showModal();
   };
 
   useEffect(() => {
@@ -105,13 +109,14 @@ export default function Announcement() {
     setIsModalOpen(true);
   };
 
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
   const handleOk = () => {
     setIsModalOpen(false);
   };
 
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
   const columns: ColumnsType<TableData> = [
     {
       title: "번호",
@@ -124,7 +129,9 @@ export default function Announcement() {
     {
       title: "제목",
       dataIndex: "title",
-      render: (value, recode, index) => <a onClick={showModal}>{value}</a>,
+      render: (value, record, index) => (
+        <a onClick={() => handleClickNotice(record)}>{value}</a>
+      ),
     },
     {
       title: "상태",
@@ -295,7 +302,10 @@ export default function Announcement() {
             type="primary"
             shape="round"
             className="min-w-[120px]"
-            onClick={showModal}
+            onClick={() => {
+              setButtonType("register");
+              showModal();
+            }}
           >
             등록
           </Button>
@@ -342,7 +352,14 @@ export default function Announcement() {
           >
             <img src="/assets/images/backIcon.png" />
           </Button>
-          <PrivacyEditor extraFilter={extraFilter} />
+          <PrivacyEditor
+            extraFilter={extraFilter}
+            buttonType={buttonType}
+            clickedNoticeData={clickedNoticeData}
+            fetchNoticesLists={fetchNoticesLists}
+            handleCancel={handleCancel}
+            isFetching={isFetching}
+          />
         </div>
       </Modal>
     </DefaultLayout>
