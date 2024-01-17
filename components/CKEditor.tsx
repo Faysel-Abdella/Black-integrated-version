@@ -14,7 +14,6 @@ const Editor = ({ onChange, buttonType, clickedDataContent }: EditorProps) => {
 
   useEffect(() => {
     setEditorData(buttonType === "modification" ? clickedDataContent : "");
-    console.log("This is from Editor", clickedDataContent);
   }, [buttonType, clickedDataContent]);
 
   const handleEditorChange = (event: any, editor: any) => {

@@ -238,7 +238,7 @@ export default function Membership() {
     console.log(date, dateString);
   };
 
-  // ################ DONE/완전한 -- Except the date search  #############
+  // ################ DONE/완전한 -- Except the search by date  #############
 
   // * Jin is preparing the data.
   // faysel:

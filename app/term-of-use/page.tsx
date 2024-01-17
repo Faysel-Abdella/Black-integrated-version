@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DefaultLayout from "../DefaultLayout/DefaultLayout";
 import PrivacyEditor from "../../components/PrivacyEditor";
 import {
@@ -17,6 +17,7 @@ import {
 } from "antd";
 import { LeftOutlined } from "@ant-design/icons";
 import { ColumnsType } from "antd/es/table";
+import customFetch from "@/utils/customFetch";
 
 type TableData = {
   key: any;
@@ -27,6 +28,54 @@ type TableData = {
 
 export default function TermOfUse() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [buttonType, setButtonType] = useState("");
+
+  const [termsList, setTermsList] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+  // Updating privacy data
+  const [clickedTermData, setClickedTermData] = useState([]);
+
+  const fetchTermLists = async () => {
+    setIsFetching(true);
+    const accessToken = localStorage.getItem("accessToken");
+    const termsList = await customFetch.get("/api/v1/admins/post/terms", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const termsData = termsList.data.data;
+
+    const transformedTermsList = termsData.map((term: any, index: number) => ({
+      key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+      title: term.title,
+      admin: term.authorName,
+      date: new Date(term.createdAt).toISOString().split("T")[0],
+      // Non-included in tha table fields
+
+      id: term.id,
+      content: term.content,
+    }));
+
+    setTermsList(transformedTermsList);
+    setIsFetching(false);
+  };
+
+  useEffect(() => {
+    fetchTermLists();
+  }, []);
+
+  const handleClickTerm = (data: any) => {
+    const thisTermData: any = termsList.filter(
+      (privacy: any) => privacy.id.toString() == data.id.toString()
+    );
+
+    setClickedTermData(thisTermData);
+    setButtonType("modification");
+    showModal();
+  };
+
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -46,7 +95,9 @@ export default function TermOfUse() {
     {
       title: "제목",
       dataIndex: "title",
-      render: (value, recode, index) => <a onClick={showModal}>{value}</a>,
+      render: (value, record, index) => (
+        <a onClick={() => handleClickTerm(record)}>{value}</a>
+      ),
     },
     {
       title: "관리자",
@@ -133,7 +184,10 @@ export default function TermOfUse() {
               type="primary"
               shape="round"
               className="min-w-[120px]"
-              onClick={() => showModal()}
+              onClick={() => {
+                setButtonType("register");
+                showModal();
+              }}
             >
               등록
             </Button>
@@ -143,12 +197,18 @@ export default function TermOfUse() {
           <Col span={24}>
             <Card title="" className="pt-[53px] pl-[33px]">
               <Col md={18}>
-                <Table
-                  bordered
-                  columns={columns}
-                  dataSource={data}
-                  onChange={onChange}
-                />
+                {isFetching ? (
+                  <div className="flex justify-center items-center h-[100%]">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+                  </div>
+                ) : (
+                  <Table
+                    bordered
+                    columns={columns}
+                    dataSource={termsList}
+                    onChange={onChange}
+                  />
+                )}
               </Col>
             </Card>
           </Col>
@@ -171,7 +231,14 @@ export default function TermOfUse() {
           >
             <img src="/assets/images/backIcon.png" />
           </Button>
-          <PrivacyEditor />
+          <PrivacyEditor
+            usedOnPage="term"
+            buttonType={buttonType}
+            clickedData={clickedTermData}
+            handleCancel={handleCancel}
+            fetchDataLists={fetchTermLists}
+            isFetching={isFetching}
+          />
         </div>
       </Modal>
     </DefaultLayout>

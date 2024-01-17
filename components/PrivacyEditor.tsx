@@ -48,15 +48,15 @@ export default function PrivacyEditor({
       buttonType! === "modification" &&
       usedOnPage === "privacyPolicy"
     ) {
-      console.log(clickedData[0]);
       form.setFieldsValue({
         title: clickedData[0].title,
         content: clickedData[0].content,
       });
-    } else if (
-      // buttonType! === "modification" &&
-      usedOnPage === "term"
-    ) {
+    } else if (buttonType! === "modification" && usedOnPage === "term") {
+      form.setFieldsValue({
+        title: clickedData[0].title,
+        content: clickedData[0].content,
+      });
     }
   };
 
@@ -184,6 +184,7 @@ export default function PrivacyEditor({
 
           handleCancel();
           form.resetFields();
+          editorText = "";
           toast.success("완료", { autoClose: 3500 });
           fetchDataLists!();
         } catch (error: any) {
@@ -206,6 +207,64 @@ export default function PrivacyEditor({
 
           handleCancel();
           form.resetFields();
+          editorText = "";
+          toast.success("완료", { autoClose: 3500 });
+          fetchDataLists!();
+        } catch (error: any) {
+          console.log(error);
+        }
+      }
+    } else if (usedOnPage === "term") {
+      if (!form.getFieldValue("title") || !editorText) {
+        return toast.error("Please fill all inputs", { autoClose: 4000 });
+      }
+      const title = form.getFieldValue("title");
+      const content = editorText;
+
+      const accessToken = localStorage.getItem("accessToken");
+
+      if (buttonType! === "modification") {
+        const id = clickedData[0].id;
+        try {
+          const response = await customFetch.patch(
+            `/api/v1/admins/post/terms/${id}`,
+            {
+              title: title,
+              content: content,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+
+          handleCancel();
+          form.resetFields();
+          editorText = "";
+          toast.success("완료", { autoClose: 3500 });
+          fetchDataLists!();
+        } catch (error: any) {
+          console.log(error);
+        }
+      } else {
+        try {
+          const response = await customFetch.post(
+            `/api/v1/admins/post/terms`,
+            {
+              title: title,
+              content: content,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+
+          handleCancel();
+          form.resetFields();
+          editorText = "";
           toast.success("완료", { autoClose: 3500 });
           fetchDataLists!();
         } catch (error: any) {
