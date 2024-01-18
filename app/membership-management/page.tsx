@@ -71,6 +71,16 @@ export default function Membership() {
         subscriptionType: "아이디",
         views: member.blacksViewCount,
         numOfRegistrations: membersData.length,
+        // non-include in table fields
+        email: member.email,
+        loginId: member.loginId,
+        gosiwonName: member.gosiwonName,
+        gosiwonAddress: member.gosiwonAddress,
+        releaseReason: member.releaseReason ? member.releaseReason : "---",
+        lastLoginDate: member.lastLoginDate
+          ? new Date(member.lastLoginDate).toISOString().split("T")[0]
+          : "---",
+        blacks: member.blacks ? member.blacks : "---",
       })
     );
 
@@ -96,7 +106,6 @@ export default function Membership() {
   };
 
   const handleClickMember = (data: any) => {
-    console.log(data);
     const thisMemberData: any = membersList.filter(
       (member: any) => member.id.toString() == data.id.toString()
     );
@@ -119,6 +128,10 @@ export default function Membership() {
   };
 
   const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const closeParentModal = () => {
     setIsModalOpen(false);
   };
 
@@ -426,6 +439,7 @@ export default function Membership() {
           </Card>
         </Col>
       </Row>
+
       <Modal
         className={modalType === "user" ? "custom-modal" : ""}
         title=""
@@ -445,7 +459,11 @@ export default function Membership() {
             <img src="/assets/images/backIcon.png" />
           </Button>
           {modalType === "user" ? (
-            <MembershipModal clickedMemberData={clickedMemberData} />
+            <MembershipModal
+              clickedMemberData={clickedMemberData}
+              fetchMembersLists={fetchMembersLists}
+              closeParentModal={closeParentModal}
+            />
           ) : (
             <ExcelModal />
           )}

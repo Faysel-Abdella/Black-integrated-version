@@ -28,6 +28,10 @@ export default function MembershipManagementModal(
   //   Thank you."
   //   DELETE /api/v1/admins/users/ban/{id}
 
+  useEffect(() => {
+    form.resetFields();
+  }, [clickedMemberId]);
+
   const handleUnblock = async () => {
     const accessToken = localStorage.getItem("accessToken");
     try {

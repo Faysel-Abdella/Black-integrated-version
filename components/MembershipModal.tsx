@@ -9,15 +9,43 @@ import MembershipUnblock from "./MembershipUnblock";
 
 export default function MembershipModal({
   clickedMemberData,
+  fetchMembersLists,
+  closeParentModal,
 }: {
   clickedMemberData?: any;
+  fetchMembersLists?: () => void;
+  closeParentModal: () => void;
 }) {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("ConfirmMembership");
-  // useEffect(() => {
-  // console.log(clickedMemberData);
-  // }, []);
+
+  const setFirstValue = () => {
+    form.setFieldsValue({
+      subscriptionType: clickedMemberData[0].subscriptionType,
+      nickName: clickedMemberData[0].name,
+      id: clickedMemberData[0].id,
+      name: clickedMemberData[0].name,
+      phone: clickedMemberData[0].phoneNumber,
+      email: clickedMemberData[0].email,
+      joinDate: clickedMemberData[0].joinDate,
+      lastLoginDate: clickedMemberData[0].lastLoginDate,
+      situation: clickedMemberData[0].accountStatus,
+      releaseReason: clickedMemberData[0].releaseReason,
+      agreement: clickedMemberData[0].agreement
+        ? clickedMemberData[0].agreement
+        : "---",
+    });
+  };
+
+  useEffect(() => {
+    setFirstValue();
+  }, [clickedMemberData]);
+
+  useEffect(() => {
+    setFirstValue();
+  }, []);
+
   const showModal = (type: any) => {
     setIsModalOpen(true);
     setModalType(type);
@@ -31,7 +59,7 @@ export default function MembershipModal({
     setIsModalOpen(false);
   };
 
-  // ################### The api (/api/v1/admins/users) is not ready ##########
+  // ################### In progress ##########
 
   // faysel:
   // "This is the API for modifying member information.
@@ -51,7 +79,7 @@ export default function MembershipModal({
   // Please contact Jin for any data-related inquiries.
 
   // <Space size={5}>
-  // <Input placeholder="010-4012-1146" disabled />
+  // <Input placeholder="010-4012-1146" readOnly />
   //   <Button
   //     size="small"
   //     className="ant-btn-info"
@@ -81,7 +109,9 @@ export default function MembershipModal({
                   <label htmlFor="">가입 유형</label>
                 </Col>
                 <Col md={16}>
-                  <Input placeholder="자체 기입" disabled />
+                  <Form.Item name="subscriptionType">
+                    <Input placeholder="자체 기입" readOnly />
+                  </Form.Item>
                 </Col>
               </Row>
             </Col>
@@ -92,7 +122,7 @@ export default function MembershipModal({
                 </Col>
                 <Col md={19}>
                   <Form.Item name="nickName">
-                    <Input placeholder="부평부평" disabled />
+                    <Input placeholder="부평부평" readOnly />
                   </Form.Item>
                 </Col>
               </Row>
@@ -104,7 +134,7 @@ export default function MembershipModal({
                 </Col>
                 <Col md={16}>
                   <Form.Item name="id">
-                    <Input placeholder="fdpd100" disabled />
+                    <Input placeholder="fdpd100" readOnly />
                   </Form.Item>
                 </Col>
               </Row>
@@ -116,7 +146,7 @@ export default function MembershipModal({
                 </Col>
                 <Col md={19}>
                   <Form.Item name="name">
-                    <Input placeholder="이중재" disabled />
+                    <Input placeholder="이중재" readOnly />
                   </Form.Item>
                 </Col>
               </Row>
@@ -127,9 +157,9 @@ export default function MembershipModal({
                   <label htmlFor="">휴대폰번호</label>
                 </Col>
                 <Col md={16}>
-                  <Space size={5}>
+                  <Space size={5} className="self-start items-start">
                     <Form.Item name="phone">
-                      <Input placeholder="010-4012-1146" disabled />
+                      <Input placeholder="010-4012-1146" />
                     </Form.Item>
                     <Button
                       size="small"
@@ -149,10 +179,10 @@ export default function MembershipModal({
                   <label htmlFor="">이메일</label>
                 </Col>
                 <Col md={19}>
-                  <Space size={5}>
-                    {/* <Form.Item name="email"> */}
-                    <Input placeholder="fdpd100@naver.com" disabled />
-                    {/* </Form.Item> */}
+                  <Space size={5} className="self-start items-start">
+                    <Form.Item name="email">
+                      <Input placeholder="fdpd100@naver.com" />
+                    </Form.Item>
                     <Button
                       size="small"
                       className="ant-btn-info"
@@ -192,8 +222,9 @@ export default function MembershipModal({
                   <label htmlFor="">가입일</label>
                 </Col>
                 <Col md={16}>
-                  {/* <Form.Item></Form.Item> */}
-                  <Input placeholder="2023-08-04" disabled />
+                  <Form.Item name="joinDate">
+                    <Input placeholder="2023-08-04" readOnly />
+                  </Form.Item>
                 </Col>
               </Row>
             </Col>
@@ -206,7 +237,12 @@ export default function MembershipModal({
                   </label>
                 </Col>
                 <Col md={19}>
-                  <Input placeholder="2023-08-11  ㅣ  11 : 21 : 31" disabled />
+                  <Form.Item name="lastLoginDate">
+                    <Input
+                      placeholder="2023-08-11  ㅣ  11 : 21 : 31"
+                      readOnly
+                    />
+                  </Form.Item>
                 </Col>
               </Row>
             </Col>
@@ -220,8 +256,10 @@ export default function MembershipModal({
                   </label>
                 </Col>
                 <Col md={16}>
-                  <Space size={5}>
-                    <Input placeholder="동의" />
+                  <Space size={5} className="items-start self-start">
+                    <Form.Item name="agreement">
+                      <Input placeholder="동의" />
+                    </Form.Item>
                     <Button size="small" className="ant-btn-info">
                       변경
                     </Button>
@@ -235,11 +273,13 @@ export default function MembershipModal({
                   <label htmlFor="">상태</label>
                 </Col>
                 <Col md={20}>
-                  <Input
-                    style={{ width: "102%" }}
-                    placeholder="정상"
-                    disabled
-                  />
+                  <Form.Item name="situation">
+                    <Input
+                      style={{ width: "102%" }}
+                      placeholder="정상"
+                      readOnly
+                    />
+                  </Form.Item>
                   <Button
                     style={{
                       padding: 0,
@@ -266,7 +306,9 @@ export default function MembershipModal({
                   <label htmlFor="">사유</label>
                 </Col>
                 <Col md={20}>
-                  <Input style={{ width: "102%" }} placeholder="----" />
+                  <Form.Item name="releaseReason">
+                    <Input style={{ width: "102%" }} placeholder="----" />
+                  </Form.Item>
                   <Button
                     style={{
                       padding: 0,
@@ -326,13 +368,33 @@ export default function MembershipModal({
             </Button>
           )}
           {modalType === "ConfirmMembership" ? (
-            <ConfirmMembership onCancel={handleCancel} />
+            <ConfirmMembership
+              onCancel={handleCancel}
+              memberId={clickedMemberData[0].id}
+              updatedPhone={form.getFieldValue("phone")}
+              fetchMembersLists={fetchMembersLists!}
+            />
           ) : modalType === "MembershipSanction" ? (
-            <MembershipSanction onCancel={handleCancel} />
+            <MembershipSanction
+              onCancel={handleCancel}
+              closeParentModal={closeParentModal}
+              memberId={clickedMemberData[0].id}
+              fetchMembersLists={fetchMembersLists!}
+            />
           ) : modalType === "MembershipUnblock" ? (
-            <MembershipUnblock onCancel={handleCancel} />
+            <MembershipUnblock
+              onCancel={handleCancel}
+              closeParentModal={closeParentModal}
+              memberId={clickedMemberData[0].id}
+              fetchMembersLists={fetchMembersLists!}
+            />
           ) : (
-            <RejectmMembership onCancel={handleCancel} />
+            <RejectmMembership
+              onCancel={handleCancel}
+              memberId={clickedMemberData[0].id}
+              updatedEmail={form.getFieldValue("email")}
+              fetchMembersLists={fetchMembersLists!}
+            />
           )}
         </div>
       </Modal>

@@ -1,14 +1,62 @@
+import customFetch from "@/utils/customFetch";
 import { Form, Row, Button, Radio, Input, Col, Flex } from "antd";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 interface MembershipSanctionProps {
   onCancel: () => void;
+  closeParentModal: () => void;
+  memberId: string | number;
+  fetchMembersLists: () => void;
 }
 
 export default function MembershipSanction({
   onCancel,
+  closeParentModal,
+  memberId,
+  fetchMembersLists,
 }: MembershipSanctionProps) {
   const [form] = Form.useForm();
   const { TextArea } = Input;
+
+  const id = memberId;
+
+  useEffect(() => {
+    form.resetFields();
+  }, []);
+
+  const handlePostBan = async () => {
+    const reason = form.getFieldValue("reason");
+    const period = form.getFieldValue("period");
+    if (!reason) {
+      return toast.error("Please insert the reason", { autoClose: 4000 });
+    }
+    const accessToken = localStorage.getItem("accessToken");
+
+    try {
+      const response = await customFetch.post(
+        `/api/v1/admins/users/ban/${id}`,
+        {
+          reason: reason,
+          period: period,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      onCancel();
+      closeParentModal();
+      form.resetFields();
+      toast.success("완료", { autoClose: 3500 });
+      fetchMembersLists();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // ################ DONE / 완전한 ############## //
 
   // faysel3:
   // POST /api/v1/admins/users/ban/{id}
@@ -22,7 +70,7 @@ export default function MembershipSanction({
             <Form.Item
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 20 }}
-              name="date"
+              name="period"
               label="제재기간"
               className="input-group custom-label-margin"
             >
@@ -47,6 +95,7 @@ export default function MembershipSanction({
         </Row>
         <Flex gap="middle" align="center" justify="center">
           <Button
+            onClick={handlePostBan}
             style={{ padding: 0, width: 148, height: 42 }}
             className="ant-btn ant-btn-info"
           >

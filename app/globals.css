@@ -2,6 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
-
+.custom-modal .ant-modal-content {
+  height: 100%;
+}
