@@ -192,6 +192,10 @@ export default function AccountModal({
   // I always wish you happiness.
   // Thank you.
 
+  // faysel5:
+  // DELETE /api/v1/admins/{id}
+  // This is an API for deleting a specific user.
+
   const showModal = (type: any) => {
     setIsModalOpen(true);
     setModalType(type);

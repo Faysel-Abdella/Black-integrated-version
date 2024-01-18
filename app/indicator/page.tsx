@@ -36,6 +36,23 @@ export default function Indicator() {
   const onChangeDate = (date: any, dateString: any) => {
     console.log(date, dateString);
   };
+
+  // faysel5:
+  // GET /api/v1/admins/indicator/register
+  // 회원가입 = registerCount, 리스트 조회 수 = blackSumViewCount, 리스트 등록 수 = blackCount
+  // This is the API for the registration status of this week.
+  // The dummy data is for reference purposes.
+  // For TOTAL, you should insert the data found within the 'sum' in the data fetched from /api/v1/admins/indicator/register.
+
+  // GET /api/v1/admins/indicator/blacks
+  // 요청 = totalCount, 승인 = approvedCount, 거절 = rejectedCount
+  // "먹튀", "실내흡연", "주변 이웃과 다툼", "기타" are located within damageTypes in the received data.
+  // 기타 = other
+  //
+  // This is an API for the status and count of blacklisted entities, as well as the count by type of registration.
+  // The dummy data is for reference purposes.
+
+  // Please carefully review the Swagger documentation before proceeding with the work.
   return (
     <DefaultLayout>
       <Row justify="space-between" align="middle" className="mb-[50px]">
