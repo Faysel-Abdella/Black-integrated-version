@@ -227,6 +227,16 @@ export default function Home() {
   const onChange = (pagination: any, filters: any, sorter: any, extra: any) => {
     console.log("params", pagination, filters, sorter, extra);
   };
+
+  // faysel5:
+  // GET /api/v1/admins/dashboard/register
+  // This is the API for this week's registration status.
+  // You should integrate the data with the <LineChart /> tag to ensure that the graph is drawn correctly.
+
+  // GET /api/v1/admins/dashboard/blacks/approval-request
+  // This is the API for requesting approval of the blacklist.
+
+  // Please carefully review the Swagger documentation before proceeding with the work.
   return (
     <div className="main-dashboard">
       <Sidebar />
