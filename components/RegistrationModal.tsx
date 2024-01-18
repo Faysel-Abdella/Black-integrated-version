@@ -55,22 +55,56 @@ export default function Membership({
   const handleSubmit = async () => {
     const accessToken = localStorage.getItem("accessToken");
 
+    console.log(form.getFieldValue("name"));
+    console.log(form.getFieldValue("phone"));
+    console.log(form.getFieldValue("birth"));
+    console.log(form.getFieldValue("date"));
+    console.log(form.getFieldValue("description"));
+    console.log(form.getFieldValue("damageType"));
+
     try {
-      const response = await customFetch.post(
-        `/api/v1/admins/blacks`,
-        {
-          name: form.getFieldValue("name"),
-          phone: form.getFieldValue("phone"),
-          birth: form.getFieldValue("birth"),
-          damageDate: form.getFieldValue("date"),
-          damageContent: form.getFieldValue("description"),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
+      if (isForRegister) {
+        const response = await customFetch.post(
+          `/api/v1/admins/blacks`,
+          {
+            name: form.getFieldValue("name"),
+            phone: form.getFieldValue("phone"),
+            birth: form.getFieldValue("birth"),
+            damageDate: form.getFieldValue("date"),
+            damageContent: form.getFieldValue("description"),
+            damageTypeId: form.getFieldValue("damageType"),
+            files: form.getFieldValue("files"),
           },
-        }
-      );
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        console.log(response);
+      } else {
+        const response = await customFetch.patch(
+          `/api/v1/admins/blacks/${clickedBlackListData[0].id}`,
+          {
+            name: form.getFieldValue("name"),
+            phone: form.getFieldValue("phone"),
+            birth: form.getFieldValue("birth"),
+            damageDate: form.getFieldValue("date"),
+            damageContent: form.getFieldValue("description"),
+            damageTypeId: form.getFieldValue("damageType"),
+            files: form.getFieldValue("files"),
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        console.log(response);
+      }
+
       onCancel();
       form.resetFields();
       toast.success("완료", { autoClose: 3500 });
@@ -155,7 +189,7 @@ export default function Membership({
               className="custom-label-margin"
               labelCol={{ span: 8 }}
               wrapperCol={{ span: 16 }}
-              name="type"
+              name="damageType"
               label={
                 <span style={{ textAlign: "left" }}>
                   피해 유형
@@ -218,7 +252,7 @@ export default function Membership({
             <Form.Item
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 20 }}
-              name="picture"
+              name="files"
               label="사진첨부"
               className="m-0"
             >

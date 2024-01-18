@@ -17,6 +17,8 @@ export default function RejectmMembership({
   updatedEmail,
   fetchMembersLists,
 }: RejectmMembershipProps) {
+  // ################ DONE / 완전한 ############## //
+
   // faysel3:
   // PATCH /api/v1/admins/users/phone-email/{id}
 

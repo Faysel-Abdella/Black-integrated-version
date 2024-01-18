@@ -132,6 +132,8 @@ export default function TermOfUse() {
     console.log("params", pagination, filters, sorter, extra);
   };
 
+  // ################ DONE / 완전한 ############## //
+
   // ***** You need to use a text editor. *****
   // faysel4:
   // GET /api/v1/admins/post/terms

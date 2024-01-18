@@ -10,6 +10,8 @@ interface ConfirmMembershipProps {
   fetchMembersLists?: () => void;
 }
 
+// ################ DONE / 완전한 ############## //
+
 export default function ConfirmMembership({
   onCancel,
   memberId,

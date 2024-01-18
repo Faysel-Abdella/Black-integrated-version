@@ -59,7 +59,7 @@ export default function MembershipModal({
     setIsModalOpen(false);
   };
 
-  // ################### In progress ##########
+  // ################ DONE / 완전한 ############## //
 
   // faysel:
   // "This is the API for modifying member information.
