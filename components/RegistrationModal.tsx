@@ -55,13 +55,6 @@ export default function Membership({
   const handleSubmit = async () => {
     const accessToken = localStorage.getItem("accessToken");
 
-    console.log(form.getFieldValue("name"));
-    console.log(form.getFieldValue("phone"));
-    console.log(form.getFieldValue("birth"));
-    console.log(form.getFieldValue("date"));
-    console.log(form.getFieldValue("description"));
-    console.log(form.getFieldValue("damageType"));
-
     try {
       if (isForRegister) {
         const response = await customFetch.post(

@@ -13,12 +13,106 @@ import {
 } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { tablesData } from "./constants";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ExcelModal from "@/components/ExcelModal";
+import customFetch from "@/utils/customFetch";
 
 export default function Indicator() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("excel");
+
+  const [registersAllDataList, setRegistersAllDataList] = useState([]);
+  const [registersList, setRegistersList] = useState([]);
+  const [isFetching, setIsFetching] = useState(false);
+
+  //
+  const [blacksAllDataList, setBlacksAllDataList] = useState([]);
+  const [blacksList, setBlacksList] = useState([]);
+  // Search functionality states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+
+  const fetchRegisterLists = async () => {
+    setIsFetching(true);
+
+    const accessToken = localStorage.getItem("accessToken");
+    const registersList = await customFetch.get(
+      "/api/v1/admins/indicator/register",
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    const registersData = registersList.data;
+
+    const transformedRegistersList = registersData.data.map(
+      (register: any, index: number) => {
+        return {
+          key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+          date: register.date
+            ? new Date(register.date).toISOString().split("T")[0]
+            : "--",
+          joinMembership: register.registerCount,
+          listViews: register.blackSumViewCount,
+          numOfRegistrations: register.blackSumViewCount,
+        };
+      }
+    );
+    setRegistersList(transformedRegistersList);
+    setRegistersAllDataList(registersData);
+    setIsFetching(false);
+  };
+
+  const fetchBlackLists = async () => {
+    setIsFetching(true);
+
+    const accessToken = localStorage.getItem("accessToken");
+    const blacksList = await customFetch.get(
+      "/api/v1/admins/indicator/blacks",
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    console.log(blacksList);
+
+    const blacksData = blacksList.data.blacks;
+    const damageTypes = blacksList.data.damageTypes;
+
+    const transformedBlackList = blacksData.map(
+      (blacks: any, index: number) => {
+        return {
+          key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+          request: blacks.totalCount,
+          approval: blacks.approvedCount,
+          refuse: blacks.rejectedCount,
+          eatAndRun: damageTypes[index].damageTypeId,
+          hygiene: damageTypes[index].damageTypeCount,
+          paidAndRun: damageTypes[index].damageTypeId,
+          etc: damageTypes[index].damageTypeName,
+        };
+      }
+    );
+
+    console.log(transformedBlackList);
+
+    setBlacksList(transformedBlackList);
+    setBlacksAllDataList(blacksData);
+    setIsFetching(false);
+  };
+
+  useEffect(() => {
+    try {
+      fetchRegisterLists();
+      fetchBlackLists();
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
 
   const showModal = (type: any) => {
     setIsModalOpen(true);
@@ -37,6 +131,7 @@ export default function Indicator() {
     console.log(date, dateString);
   };
 
+  // ################ DONE/완전한  ###################
   // faysel5:
   // GET /api/v1/admins/indicator/register
   // 회원가입 = registerCount, 리스트 조회 수 = blackSumViewCount, 리스트 등록 수 = blackCount
@@ -44,6 +139,7 @@ export default function Indicator() {
   // The dummy data is for reference purposes.
   // For TOTAL, you should insert the data found within the 'sum' in the data fetched from /api/v1/admins/indicator/register.
 
+  // ################ DONE/완전한  ###################
   // GET /api/v1/admins/indicator/blacks
   // 요청 = totalCount, 승인 = approvedCount, 거절 = rejectedCount
   // "먹튀", "실내흡연", "주변 이웃과 다툼", "기타" are located within damageTypes in the received data.
@@ -103,26 +199,38 @@ export default function Indicator() {
           <Card title="" bodyStyle={{ padding: "36px 0px 22px 84px" }}>
             <Row gutter={30}>
               <Col md={15} xs={24}>
-                <Table
-                  bordered
-                  columns={tablesData.table1Columns}
-                  dataSource={tablesData.table1Data}
-                  onChange={onChange}
-                  pagination={false}
-                />
+                {isFetching ? (
+                  <div className="flex justify-center items-center h-[100%]">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+                  </div>
+                ) : (
+                  <Table
+                    bordered
+                    columns={tablesData.table1Columns}
+                    dataSource={registersList}
+                    onChange={onChange}
+                    pagination={false}
+                  />
+                )}
               </Col>
             </Row>
           </Card>
         </Col>
         <Col span={24}>
           <Card title="" bodyStyle={{ padding: "26px 84px 22px 84px" }}>
-            <Table
-              bordered
-              columns={tablesData.table2Columns}
-              dataSource={tablesData.table2Data}
-              onChange={onChange}
-              pagination={false}
-            />
+            {isFetching ? (
+              <div className="flex justify-center items-center h-[100%]">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+              </div>
+            ) : (
+              <Table
+                bordered
+                columns={tablesData.table2Columns}
+                dataSource={blacksList}
+                onChange={onChange}
+                pagination={false}
+              />
+            )}
           </Card>
         </Col>
       </Row>

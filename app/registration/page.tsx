@@ -272,6 +272,7 @@ export default function Page() {
   //   The corresponding API for this is POST /api/v1/admins/blacks.
   //  Please check the parameters of the API in the Swagger documentation. Thank you."
 
+  // ################ DONE/완전한  ###################
   // faysel5:
   // PATCH /api/v1/admins/blacks/{id}
   // Additionally, it should be possible to modify the information of the corresponding black consumer.

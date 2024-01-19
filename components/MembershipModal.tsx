@@ -6,6 +6,8 @@ import ConfirmMembership from "./ConfirmMembership";
 import RejectmMembership from "./RejectmMembership";
 import MembershipSanction from "./MembershipSanction";
 import MembershipUnblock from "./MembershipUnblock";
+import customFetch from "@/utils/customFetch";
+import { toast } from "react-toastify";
 
 export default function MembershipModal({
   clickedMemberData,
@@ -57,6 +59,43 @@ export default function MembershipModal({
 
   const handleCancel = () => {
     setIsModalOpen(false);
+  };
+
+  const handleChangePhone = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+
+    const updatedPhone = form.getFieldValue("phone");
+
+    if (!updatedPhone) {
+      return toast.error("Please insert a valid phone number", {
+        autoClose: 4000,
+      });
+    }
+
+    const memberId = +clickedMemberData[0].id;
+
+    console.log(typeof memberId);
+
+    try {
+      const response = await customFetch.patch(
+        `/api/v1/admins/users/phone-email/${memberId}?field=PHONE`,
+        {
+          data: updatedPhone,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      console.log(response);
+      handleCancel();
+      toast.success("완료", { autoClose: 3500 });
+      fetchMembersLists!();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // ################ DONE / 완전한 ############## //
@@ -370,9 +409,7 @@ export default function MembershipModal({
           {modalType === "ConfirmMembership" ? (
             <ConfirmMembership
               onCancel={handleCancel}
-              memberId={clickedMemberData[0].id}
-              updatedPhone={form.getFieldValue("phone")}
-              fetchMembersLists={fetchMembersLists!}
+              executeFunction={handleChangePhone}
             />
           ) : modalType === "MembershipSanction" ? (
             <MembershipSanction

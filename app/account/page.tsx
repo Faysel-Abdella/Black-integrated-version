@@ -57,16 +57,20 @@ export default function Account() {
 
     const adminsData = adminsList.data.data;
 
-    const transformedAdminsList = adminsData.map((admin: AdminType) => ({
-      key: admin.id,
-      id: admin.id,
-      name: admin.name,
-      consumerNumber: admin.phone,
-      lastAccessDate: new Date(admin.lastLoginDate).toISOString().split("T")[0],
-      allowIP: admin.allowedIp,
-      department: admin.author.department,
-      registrationManager: admin.author.name,
-    }));
+    const transformedAdminsList = adminsData.map(
+      (admin: AdminType, index: number) => ({
+        key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+        name: admin.name,
+        id: admin.id,
+        department: admin.department,
+        allowIP: admin.allowedIp ? admin.allowedIp : "---",
+        consumerNumber: admin.phone,
+        lastAccessDate: new Date(admin.lastLoginDate)
+          .toISOString()
+          .split("T")[0],
+        registrationManager: admin.author.name,
+      })
+    );
 
     setAdminsList(transformedAdminsList);
     setAdminsAllDataList(adminsData);
@@ -330,6 +334,7 @@ export default function Account() {
             buttonType={buttonType}
             onCancel={handleCancel}
             clickedAdminData={clickedAdminData}
+            fetchAdminLists={fetchAdminLists}
           />
         </div>
       </Modal>

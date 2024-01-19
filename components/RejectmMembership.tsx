@@ -32,9 +32,6 @@ export default function RejectmMembership({
   const handleChangeEmail = async () => {
     const accessToken = localStorage.getItem("accessToken");
 
-    console.log(memberId);
-    console.log(updatedEmail);
-
     if (!updatedEmail) {
       return toast.error("Please insert a valid email", {
         autoClose: 4000,
@@ -43,9 +40,9 @@ export default function RejectmMembership({
 
     try {
       const response = await customFetch.patch(
-        `/api/v1/admins/users/phone-email/${memberId}`,
+        `/api/v1/admins/users/phone-email/${memberId}?field=EMAIL`,
         {
-          EMAIL: updatedEmail,
+          data: updatedEmail,
         },
         {
           headers: {

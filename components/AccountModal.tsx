@@ -8,12 +8,14 @@ interface AccountModalProps {
   onCancel: () => void;
   buttonType: string;
   clickedAdminData?: any;
+  fetchAdminLists?: () => void;
 }
 
 export default function AccountModal({
   onCancel,
   buttonType,
   clickedAdminData,
+  fetchAdminLists,
 }: AccountModalProps) {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,9 +32,7 @@ export default function AccountModal({
       name: buttonType === "changeInfo" ? clickedAdminData[0].name : null,
       id: buttonType === "changeInfo" ? clickedAdminData[0].id : null,
       department:
-        buttonType === "changeInfo"
-          ? clickedAdminData[0].author.department
-          : null,
+        buttonType === "changeInfo" ? clickedAdminData[0].department : null,
       phone: buttonType === "changeInfo" ? clickedAdminData[0].phone : null,
       email: buttonType === "changeInfo" ? clickedAdminData[0].email : null,
       allowedIp:
@@ -43,7 +43,7 @@ export default function AccountModal({
   }, [clickedAdminData, buttonType, form]);
 
   useEffect(() => {
-    console.log(clickedAdminData);
+    // console.log(clickedAdminData);
   }, []);
 
   const handlePermissionChange = (e: any, permissionName: string) => {
@@ -84,12 +84,15 @@ export default function AccountModal({
             },
           }
         );
+        console.log(response);
+        closeModal();
+        onCancel();
         // Reset all permissions
         setSelectedPermissions([]);
         // Clear all fields
         form.resetFields();
-        // Close the modal
-        closeModal();
+        toast.success("완료", { autoClose: 3500 });
+        fetchAdminLists!();
       } else {
         const response = await customFetch.post(
           "/api/v1/admins",
@@ -110,12 +113,16 @@ export default function AccountModal({
           }
         );
         console.log(response);
+        // Close the modal
+        closeModal();
+        onCancel();
         // Reset all permissions
         setSelectedPermissions([]);
         // Clear all fields
         form.resetFields();
-        // Close the modal
-        closeModal();
+        toast.success("완료", { autoClose: 3500 });
+
+        fetchAdminLists!();
       }
     } catch (error: any) {
       console.error(error);
@@ -131,6 +138,26 @@ export default function AccountModal({
           autoClose: 4000,
         });
       }
+    }
+  };
+
+  const handleDelete = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    try {
+      const response = await customFetch.delete(
+        `/api/v1/admins/${changeInfoAdminData[0].id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      closeModal();
+      onCancel();
+      toast.success("완료", { autoClose: 3500 });
+      fetchAdminLists!();
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -192,6 +219,8 @@ export default function AccountModal({
   // I always wish you happiness.
   // Thank you.
 
+  // ################ DONE /완전한 ############## //
+
   // faysel5:
   // DELETE /api/v1/admins/{id}
   // This is an API for deleting a specific user.
@@ -202,7 +231,7 @@ export default function AccountModal({
   };
 
   const closeModal = () => {
-    setIsModalOpen(true);
+    setIsModalOpen(false);
   };
 
   const handleOk = () => {
@@ -247,9 +276,7 @@ export default function AccountModal({
                       fontWeight: 400,
                     }}
                     className="ant-btn-info"
-                    onClick={() => {
-                      console.log("delete button");
-                    }}
+                    onClick={handleDelete}
                   >
                     삭제
                   </Button>
@@ -522,7 +549,7 @@ export default function AccountModal({
           <Button
             style={{ padding: 0, width: 148, height: 42, fontWeight: 400 }}
             className="ant-btn ant-btn-info"
-            onClick={handleSubmit}
+            onClick={() => showModal(ConfirmMembership)}
           >
             등록
           </Button>
@@ -547,7 +574,10 @@ export default function AccountModal({
         centered
       >
         <div className="px-1">
-          <ConfirmMembership onCancel={handleCancel} />
+          <ConfirmMembership
+            onCancel={handleCancel}
+            executeFunction={handleSubmit}
+          />
         </div>
       </Modal>
     </div>

@@ -132,14 +132,14 @@ const table2Columns: ColumnsType<Table2Data> = [
     title: "블랙리스트 현황 수",
     children: [
       {
-        title: "요청",
+        title: "요청", // blacks[0,1].totalCount
         dataIndex: "request",
         render(value, record, index) {
           return <span>{record.request.toString().padStart(2, "0")}</span>;
         },
       },
       {
-        title: "승인 ",
+        title: "승인 ", // blacks[0,1].approvedCount
         dataIndex: "approval",
         render(value, record, index) {
           return <span>{record.approval.toString().padStart(2, "0")}</span>;
@@ -147,7 +147,7 @@ const table2Columns: ColumnsType<Table2Data> = [
       },
       {
         title: "거절",
-        dataIndex: "refuse",
+        dataIndex: "refuse", // blacks[0,1].rejectedCount
         render(value, record, index) {
           return <span>{record.refuse.toString().padStart(2, "0")}</span>;
         },
@@ -191,13 +191,13 @@ const table2Columns: ColumnsType<Table2Data> = [
 
 const table2Data: Table2Data[] = [
   {
-    key: 1,
-    request: 180,
-    approval: 32,
-    refuse: 18,
-    eatAndRun: 10,
-    hygiene: 4,
-    paidAndRun: 4,
+    key: 1, // YES
+    request: 180, // YES (totalCount)
+    approval: 32, // YES (approvedCount)
+    refuse: 18, // YES (rejectedCount)
+    eatAndRun: 10, // ???????
+    hygiene: 4, // ?????????
+    paidAndRun: 4, // ?????????
     etc: 36,
   },
   {
