@@ -8,12 +8,14 @@ import LineChart from "../components/LineChart";
 import customFetch from "@/utils/customFetch";
 
 export default function Home() {
-  const [thisWeekData, setThisWeekData] = useState<any>({});
+  const [isFetchingGeneralData, setIsFetchingGeneralDate] = useState(false);
   const [isFetchingThisWeekData, setIsFetchingThisWeekData] = useState(false);
   const [isFetchingThisWeekDataTable, setIsFetchingThisWeekDataTable] =
     useState(false);
 
+  const [thisWeekData, setThisWeekData] = useState<any>({});
   const [weekTableData, setWeekTableData] = useState([]);
+  const [generalData, setGeneralData] = useState([]);
 
   const today = new Date();
   const sevenDaysAgo = new Date();
@@ -101,9 +103,43 @@ export default function Home() {
     }
   };
 
+  const fetchGeneralData = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+
+    setIsFetchingGeneralDate(true);
+    try {
+      const generalData = await customFetch.get(
+        "/api/v1/admins/dashboard/blacks/approval-request",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      const transformedGeneralData = generalData.data.map(
+        (data: any, index: number) => ({
+          key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+          date: new Date(data.createdAt).toISOString().split("T")[0],
+          id: data.id,
+          idTwo: data.authorLoginId,
+          name: data.name,
+          detail: "자세히보기",
+        })
+      );
+
+      setGeneralData(transformedGeneralData);
+
+      setIsFetchingGeneralDate(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     fetchThisWeekData();
     fetchThisWeekDataTable();
+    fetchGeneralData();
   }, []);
 
   const chartData = {
@@ -343,6 +379,8 @@ export default function Home() {
     console.log("params", pagination, filters, sorter, extra);
   };
 
+  // ################ DONE / 완전한 ############## //
+
   // faysel5:
   // GET /api/v1/admins/dashboard/register
   // This is the API for this week's registration status.
@@ -408,12 +446,22 @@ export default function Home() {
                 </Card> */}
                 <Card title="이의신청 리스트">
                   <div className="table-dark">
-                    <Table
-                      pagination={false}
-                      columns={columnsTwo}
-                      dataSource={dataTwo}
-                      onChange={onChange}
-                    />
+                    {isFetchingGeneralData ? (
+                      <div className="flex justify-center items-center h-[100%]  py-3">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-purple-500"></div>
+                      </div>
+                    ) : weekTableData && weekTableData.length > 0 ? (
+                      <Table
+                        pagination={false}
+                        columns={columnsTwo}
+                        dataSource={generalData}
+                        onChange={onChange}
+                      />
+                    ) : (
+                      <div className="flex justify-center items-center h-[100%]  py-3">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-purple-500"></div>
+                      </div>
+                    )}
                   </div>
                 </Card>
               </Space>
