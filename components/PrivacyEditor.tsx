@@ -88,6 +88,15 @@ export default function PrivacyEditor({
       ) {
         return toast.error("Please fill all inputs", { autoClose: 4000 });
       }
+
+      if (!isValidDateFormat(form.getFieldValue("startDateTime"))) {
+        return toast.error("Please insert a start date like yyyy-mm-dd");
+      }
+
+      if (!isValidDateFormat(form.getFieldValue("endDateTime"))) {
+        return toast.error("Please insert a end date like yyyy-mm-dd");
+      }
+
       const title = form.getFieldValue("title");
       const startDateTime = new Date(
         form.getFieldValue("startDateTime")
@@ -274,6 +283,11 @@ export default function PrivacyEditor({
         }
       }
     }
+  };
+
+  const isValidDateFormat = (dateString: any) => {
+    const dateFormatRegex = /^\d{4}-\d{2}-\d{2}$/;
+    return dateFormatRegex.test(dateString);
   };
 
   return (

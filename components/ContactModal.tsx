@@ -78,7 +78,7 @@ export default function ContactModal({
               name="status"
               label={<span style={{ lineHeight: "32px" }}>상태</span>}
             >
-              <Input disabled />
+              <Input readOnly />
             </Form.Item>
           </Col>
           <Col md={12}>
@@ -89,7 +89,7 @@ export default function ContactModal({
               name="id"
               label={<span style={{ lineHeight: "32px" }}>ID</span>}
             >
-              <Input disabled />
+              <Input readOnly />
             </Form.Item>
           </Col>
           <Col md={12}>
@@ -104,7 +104,7 @@ export default function ContactModal({
                 </span>
               }
             >
-              <Input disabled />
+              <Input readOnly />
             </Form.Item>
           </Col>
 
@@ -116,7 +116,7 @@ export default function ContactModal({
               name="phone"
               label={<span style={{ lineHeight: "32px" }}>휴대폰번호</span>}
             >
-              <Input disabled />
+              <Input readOnly />
             </Form.Item>
           </Col>
           <Col md={12}>
@@ -131,7 +131,7 @@ export default function ContactModal({
                 </span>
               }
             >
-              <Input disabled />
+              <Input readOnly />
             </Form.Item>
           </Col>
 
@@ -143,7 +143,7 @@ export default function ContactModal({
               name="email"
               label={<span style={{ lineHeight: "32px" }}>이메일</span>}
             >
-              <Input disabled />
+              <Input readOnly />
             </Form.Item>
           </Col>
 
@@ -155,7 +155,7 @@ export default function ContactModal({
               name="title"
               label={<span style={{ lineHeight: "32px" }}>제목</span>}
             >
-              <Input disabled />
+              <Input readOnly />
             </Form.Item>
           </Col>
 
@@ -167,7 +167,7 @@ export default function ContactModal({
               name="contact"
               label={<span>문의내용</span>}
             >
-              <TextArea disabled rows={4} style={{ resize: "none" }} />
+              <TextArea readOnly rows={4} style={{ resize: "none" }} />
             </Form.Item>
           </Col>
 
