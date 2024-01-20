@@ -23,28 +23,6 @@ export default function AccountModal({
   const [changeInfoAdminData, setChangeInfoAdminData] =
     useState(clickedAdminData);
   const [allowedPermissions, setAllowedPermissions] = useState<string[]>([]);
-  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
-
-  // Tracking Radio buttons
-  const [isDashboardSelected, setIsDashboardSelected] = useState(false);
-  const [isSummarySelected, setIsSummarySelected] = useState(false);
-  const [isUser_ManagementSelected, setIsUser_ManagementSelected] =
-    useState(false);
-  const [isUser_BanSelected, setIsUser_BanSelected] = useState(false);
-  const [
-    isBlack_registration_approvalSelected,
-    setIsBlack_registration_approvalSelected,
-  ] = useState(false);
-  const [isAdmin_managementSelected, setIsAdmin_managementSelected] =
-    useState(false);
-  const [
-    isAdmin_password_mismatchSelected,
-    setAdmin_password_mismatchSelected,
-  ] = useState(false);
-
-  const [isFaq_managementSelected, setFaq_managementSelected] = useState(false);
-  const [isInquiry_managementSelected, setInquiry_managementSelected] =
-    useState(false);
 
   useEffect(() => {
     setChangeInfoAdminData(clickedAdminData);
@@ -66,6 +44,7 @@ export default function AccountModal({
         buttonType === "changeInfo" ? clickedAdminData[0].permissions : null,
     });
     if (buttonType === "changeInfo") {
+      setAllowedPermissions([]);
       if (
         clickedAdminData[0].permissions &&
         clickedAdminData[0].permissions.length > 0
@@ -74,12 +53,9 @@ export default function AccountModal({
           (permission: string) => permission
         );
         setAllowedPermissions(clickedAdminData[0].permissions);
-        console.log(allowedPermissions);
       } else {
         setAllowedPermissions([]);
-        console.log(allowedPermissions);
       }
-      setActivePermissions();
     }
   }, [clickedAdminData, buttonType, form]);
 
@@ -97,7 +73,7 @@ export default function AccountModal({
             email: form.getFieldValue("email"),
             phone: form.getFieldValue("phone"),
             allowedIp: form.getFieldValue("allowedIp"),
-            permissions: selectedPermissions,
+            permissions: allowedPermissions,
           },
           {
             headers: {
@@ -105,15 +81,15 @@ export default function AccountModal({
             },
           }
         );
-        console.log(response);
+
         closeModal();
         onCancel();
         // Reset all permissions
-        setSelectedPermissions([]);
+        setAllowedPermissions([]);
         // Clear all fields
         form.resetFields();
-        toast.success("완료", { autoClose: 3500 });
         fetchAdminLists!();
+        toast.success("완료", { autoClose: 3500 });
       } else {
         const response = await customFetch.post(
           "/api/v1/admins",
@@ -125,7 +101,7 @@ export default function AccountModal({
             email: form.getFieldValue("email"),
             phone: form.getFieldValue("phone"),
             allowedIp: form.getFieldValue("allowedIp"),
-            permissions: selectedPermissions,
+            permissions: allowedPermissions,
           },
           {
             headers: {
@@ -138,7 +114,8 @@ export default function AccountModal({
         closeModal();
         onCancel();
         // Reset all permissions
-        setSelectedPermissions([]);
+        setAllowedPermissions([]);
+
         // Clear all fields
         form.resetFields();
         toast.success("완료", { autoClose: 3500 });
@@ -188,81 +165,47 @@ export default function AccountModal({
     );
   };
 
-  const setActivePermissions = () => {
-    setIsDashboardSelected(
-      allowedPermissions.some(
-        (element) => element.toLowerCase() === "dashboard".toLowerCase()
-      )
-    );
-
-    setIsSummarySelected(
-      allowedPermissions.some(
-        (element) => element.toLowerCase() === "summary".toLowerCase()
-      )
-    );
-
-    setIsUser_ManagementSelected(
-      allowedPermissions.some(
-        (element) => element.toLowerCase() === "user_management".toLowerCase()
-      )
-    );
-
-    setIsUser_BanSelected(
-      allowedPermissions.some(
-        (element) => element.toLowerCase() === "user_ban".toLowerCase()
-      )
-    );
-
-    setIsBlack_registration_approvalSelected(
-      allowedPermissions.some(
-        (element) =>
-          element.toLowerCase() === "black_registration_approval".toLowerCase()
-      )
-    );
-
-    setIsAdmin_managementSelected(
-      allowedPermissions.some(
-        (element) => element.toLowerCase() === "admin_management".toLowerCase()
-      )
-    );
-
-    setAdmin_password_mismatchSelected(
-      allowedPermissions.some(
-        (element) =>
-          element.toLowerCase() === "admin_password_mismatch".toLowerCase()
-      )
-    );
-
-    setFaq_managementSelected(
-      allowedPermissions.some(
-        (element) => element.toLowerCase() === "faq_management".toLowerCase()
-      )
-    );
-
-    setInquiry_managementSelected(
-      allowedPermissions.some(
-        (element) =>
-          element.toLowerCase() === "inquiry_management".toLowerCase()
-      )
-    );
-  };
-
   const handlePermissionChange = (newPermission: string) => {
-    const isExist = allowedPermissions.indexOf(newPermission);
+    const isExist = allowedPermissions.indexOf(newPermission.toUpperCase());
+    const isExistLower = allowedPermissions.indexOf(
+      newPermission.toLowerCase()
+    );
 
-    if (isExist == -1) {
+    if (isExist == -1 && isExistLower == -1) {
       setAllowedPermissions((prev) => [...prev, newPermission]);
-      setIsDashboardSelected(true);
     } else {
-      const removedPermissions = allowedPermissions.filter(
-        (permission) => permission !== newPermission
+      const restPermissions = allowedPermissions.filter(
+        (permission) => permission.toLowerCase() !== newPermission.toLowerCase()
       );
 
-      setIsDashboardSelected(false);
-
-      setAllowedPermissions(removedPermissions);
+      setAllowedPermissions(restPermissions);
+      console.log(restPermissions);
     }
   };
+
+  const [isSelectAllActive, setIsSelectAllActive] = useState(false);
+
+  const selectAll = () => {
+    if (!isSelectAllActive) {
+      const allPermissions = [
+        "dashboard",
+        "summary",
+        "user_management",
+        "user_ban",
+        "black_registration_approval",
+        "admin_management",
+        "admin_password_mismatch",
+        "faq_management",
+        "inquiry_management",
+      ];
+      setAllowedPermissions(allPermissions);
+      setIsSelectAllActive(true);
+    } else {
+      setAllowedPermissions([]);
+      setIsSelectAllActive(false);
+    }
+  };
+
   // ################ DONE /완전한 ############## //
 
   //   faysel:
@@ -299,7 +242,7 @@ export default function AccountModal({
   //   Please carefully review the Swagger documentation before proceeding with the work.
   //   Thank you."
 
-  // ################ In progress (Ready to go) ############## //
+  // ################ DONE /완전한 ############## //
 
   // faysel3:
   // dear faysel,
@@ -544,10 +487,16 @@ export default function AccountModal({
               label={<span style={{ textAlign: "left" }}>권한 설정</span>}
               className="input-group"
             >
-              <Radio.Group>
-                {/* select all */}
-                <Radio value="horizontal">전체 선택</Radio>
-              </Radio.Group>
+              {/* <Radio.Group> */}
+              {/* select all */}
+              <Radio
+                value="horizontal"
+                checked={isSelectAllActive}
+                onClick={selectAll}
+              >
+                전체 선택
+              </Radio>
+              {/* </Radio.Group> */}
             </Form.Item>
           </Col>
           <Col md={24}>
@@ -560,12 +509,16 @@ export default function AccountModal({
               {/* <Radio.Group onChange={(e) => handlePermissionChange(e, "home")}> */}
               <Radio
                 value="dashboard"
-                checked={isDashboardSelected}
+                checked={permissionExists("dashboard")}
                 onClick={() => handlePermissionChange("dashboard")}
               >
                 대시보드
               </Radio>
-              <Radio value="summary" checked={isSummarySelected}>
+              <Radio
+                value="summary"
+                onClick={() => handlePermissionChange("summary")}
+                checked={permissionExists("summary")}
+              >
                 종합지표
               </Radio>
               {/* </Radio.Group> */}
@@ -583,11 +536,16 @@ export default function AccountModal({
               {/* > */}
               <Radio
                 value="user_management"
-                checked={isUser_ManagementSelected}
+                onClick={() => handlePermissionChange("user_management")}
+                checked={permissionExists("user_management")}
               >
                 회원 관리
               </Radio>
-              <Radio value="user_ban" checked={isUser_BanSelected}>
+              <Radio
+                value="user_ban"
+                onClick={() => handlePermissionChange("user_ban")}
+                checked={permissionExists("user_ban")}
+              >
                 회원 제재
               </Radio>
               {/* <Radio value="2_user_update">등록 관리</Radio> */}
@@ -608,7 +566,10 @@ export default function AccountModal({
               {/* > */}
               <Radio
                 value="black_registration_approval"
-                checked={isBlack_registration_approvalSelected}
+                onClick={() =>
+                  handlePermissionChange("black_registration_approval")
+                }
+                checked={permissionExists("black_registration_approval")}
               >
                 승인요청 관리
               </Radio>
@@ -629,13 +590,17 @@ export default function AccountModal({
               {/*  > */}
               <Radio
                 value="admin_management"
-                checked={isAdmin_managementSelected}
+                onClick={() => handlePermissionChange("admin_management")}
+                checked={permissionExists("admin_management")}
               >
                 계정관리
               </Radio>
               <Radio
                 value="admin_password_mismatch"
-                checked={isAdmin_password_mismatchSelected}
+                onClick={() =>
+                  handlePermissionChange("admin_password_mismatch")
+                }
+                checked={permissionExists("admin_password_mismatch")}
               >
                 비밀번호 불일치 관리
               </Radio>
@@ -653,12 +618,17 @@ export default function AccountModal({
               {/* <Radio.Group */}
               {/* onChange={(e) => handlePermissionChange(e, "noticeManagement")} */}
               {/*  > */}
-              <Radio value="faq_management" checked={isFaq_managementSelected}>
+              <Radio
+                value="faq_management"
+                onClick={() => handlePermissionChange("faq_management")}
+                checked={permissionExists("faq_management")}
+              >
                 FAQ 관리
               </Radio>
               <Radio
                 value="inquiry_management"
-                checked={isInquiry_managementSelected}
+                onClick={() => handlePermissionChange("inquiry_management")}
+                checked={permissionExists("inquiry_management")}
               >
                 1 : 1 문의하기
               </Radio>
