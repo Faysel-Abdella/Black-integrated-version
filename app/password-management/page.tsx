@@ -51,7 +51,7 @@ export default function PasswordManagement() {
     const transformedAdminsList = adminsData.map((admin: any) => ({
       key: admin.id,
       name: admin.admin.name,
-      id: admin.admin.id,
+      id: admin.id,
       department: admin.admin.department,
       sanctionDate: new Date(admin.bannedDate).toISOString().split("T")[0],
       situation: "제재 해지",
@@ -82,13 +82,12 @@ export default function PasswordManagement() {
         }
       );
 
-      closeModal();
+      handleCancel();
+      fetchAdminLists();
       toast.success("제재가 해제되었습니다.", { autoClose: 3000 });
     } catch (error) {
       console.log(error);
     }
-
-    fetchAdminLists();
   };
 
   const showModal = () => {

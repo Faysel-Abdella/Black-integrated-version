@@ -84,7 +84,7 @@ export default function MembershipManagement() {
     const transformedMembersBanList = membersData.map(
       (member: any, index: number) => ({
         key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
-        id: member.id,
+        id: member.user.id,
         name: member.user.name,
         phoneNumber: member.user.phone,
         sanctionPeriod: member.period,

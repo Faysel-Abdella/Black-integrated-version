@@ -65,21 +65,22 @@ export default function AccountModal({
       permissions:
         buttonType === "changeInfo" ? clickedAdminData[0].permissions : null,
     });
-    console.log(clickedAdminData[0].permissions);
-    if (
-      clickedAdminData[0].permissions &&
-      clickedAdminData[0].permissions.length > 0
-    ) {
-      const thisAdminPermissions = clickedAdminData[0].permissions.map(
-        (permission: string) => permission
-      );
-      setAllowedPermissions(clickedAdminData[0].permissions);
-      console.log(allowedPermissions);
-    } else {
-      setAllowedPermissions([]);
-      console.log(allowedPermissions);
+    if (buttonType === "changeInfo") {
+      if (
+        clickedAdminData[0].permissions &&
+        clickedAdminData[0].permissions.length > 0
+      ) {
+        const thisAdminPermissions = clickedAdminData[0].permissions.map(
+          (permission: string) => permission
+        );
+        setAllowedPermissions(clickedAdminData[0].permissions);
+        console.log(allowedPermissions);
+      } else {
+        setAllowedPermissions([]);
+        console.log(allowedPermissions);
+      }
+      setActivePermissions();
     }
-    setActivePermissions();
   }, [clickedAdminData, buttonType, form]);
 
   const handleSubmit = async () => {

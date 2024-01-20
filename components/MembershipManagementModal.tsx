@@ -32,18 +32,32 @@ export default function MembershipManagementModal(
     form.resetFields();
   }, [clickedMemberId]);
 
+  useEffect(() => {
+    form.resetFields();
+  }, []);
+
+  const releaseReason = form.getFieldValue("releaseReason");
+
+  const accessToken = localStorage.getItem("accessToken");
+
+  let config = {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    data: {
+      releaseReason: releaseReason,
+    },
+  };
+
   const handleUnblock = async () => {
-    const accessToken = localStorage.getItem("accessToken");
     try {
       const response = await customFetch.delete(
-        `/api/v1/admins/ban/${memberId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
+        `/api/v1/admins/users/ban/${memberId}`,
+        config
       );
+      console.log(response);
       closeModal();
+      form.resetFields();
       toast.success("완료", { autoClose: 3500 });
       fetchMemberLists();
     } catch (error) {

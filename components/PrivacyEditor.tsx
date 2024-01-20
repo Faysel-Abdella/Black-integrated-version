@@ -248,6 +248,8 @@ export default function PrivacyEditor({
           console.log(error);
         }
       } else {
+        console.log(title);
+        console.log(content);
         try {
           const response = await customFetch.post(
             `/api/v1/admins/post/terms`,
