@@ -16,7 +16,7 @@ export default function MembershipModal({
 }: {
   clickedMemberData?: any;
   fetchMembersLists?: () => void;
-  closeParentModal: () => void;
+  closeParentModal?: () => void;
 }) {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -411,14 +411,14 @@ export default function MembershipModal({
           ) : modalType === "MembershipSanction" ? (
             <MembershipSanction
               onCancel={handleCancel}
-              closeParentModal={closeParentModal}
+              closeParentModal={closeParentModal!}
               memberId={clickedMemberData[0].id}
               fetchMembersLists={fetchMembersLists!}
             />
           ) : modalType === "MembershipUnblock" ? (
             <MembershipUnblock
               onCancel={handleCancel}
-              closeParentModal={closeParentModal}
+              closeParentModal={closeParentModal!}
               memberId={clickedMemberData[0].id}
               fetchMembersLists={fetchMembersLists!}
             />

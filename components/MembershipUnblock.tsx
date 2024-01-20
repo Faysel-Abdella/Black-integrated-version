@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 interface MembershipUnblockProps {
   onCancel: () => void;
-  closeParentModal: () => void;
+  closeParentModal?: () => void;
   memberId: string | number;
   fetchMembersLists: () => void;
 }
@@ -54,7 +54,7 @@ export default function MembershipUnblock({
       );
       console.log(response);
       onCancel();
-      closeParentModal();
+      closeParentModal!();
       form.resetFields();
       toast.success("완료", { autoClose: 3500 });
       fetchMembersLists();
