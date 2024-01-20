@@ -114,7 +114,7 @@ export default function Membership() {
     showModal("user");
   };
 
-  const onChangeDateSearch = (date) => {
+  const onChangeDateSearch = (date: any) => {
     console.log(date);
   };
 

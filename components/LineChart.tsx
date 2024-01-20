@@ -10,7 +10,7 @@ interface LineChartProps {
       borderColor: string;
       borderWidth: number;
       fill: boolean;
-    };
+    }[];
   };
 }
 
