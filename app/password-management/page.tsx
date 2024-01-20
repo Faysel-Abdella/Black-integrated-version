@@ -150,7 +150,7 @@ export default function PasswordManagement() {
       },
     },
   ];
-  const data: TableData[] = [
+  const data = [
     {
       key: 1,
       name: "이중재",
