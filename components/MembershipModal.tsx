@@ -74,8 +74,6 @@ export default function MembershipModal({
 
     const memberId = +clickedMemberData[0].id;
 
-    console.log(typeof memberId);
-
     try {
       const response = await customFetch.patch(
         `/api/v1/admins/users/phone-email/${memberId}?field=PHONE`,
@@ -89,7 +87,6 @@ export default function MembershipModal({
         }
       );
 
-      console.log(response);
       handleCancel();
       toast.success("완료", { autoClose: 3500 });
       fetchMembersLists!();

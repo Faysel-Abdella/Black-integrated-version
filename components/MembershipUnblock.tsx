@@ -27,14 +27,10 @@ export default function MembershipUnblock({
 
   const id = memberId;
 
-  console.log(id);
-
   const handleDeleteBan = async () => {
     const accessToken = localStorage.getItem("accessToken");
 
     const releaseReason = form.getFieldValue("releaseReason");
-
-    console.log(releaseReason);
 
     if (!releaseReason) {
       return toast.error("Please insert the release reason", {

@@ -44,17 +44,17 @@ export default function Contact() {
     const transformedQueriesList = queriesData.map(
       (query: any, index: number) => ({
         key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
-        title: query.title,
+        title: query.title ? query.title : "--",
         id: query.id,
         name: query.author.name,
         phone: query.phone,
         registrationDate: query.createdAt
           ? new Date(query.createdAt).toISOString().split("T")[0]
           : "-",
-        admin: query.adminName ? query.adminName : "-",
+        admin: query.adminName ? query.adminName : "--",
         processingDate: query.processingDate
           ? new Date(query.completionDate).toISOString().split("T")[0]
-          : "-",
+          : "--",
         status: query.status,
         // fields that are not part of the table
         answerContent: query.answerContent ? query.answerContent : "-",

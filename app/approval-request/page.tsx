@@ -46,9 +46,9 @@ export default function PasswordManagement() {
         approvalDate: request.approvedDate
           ? new Date(request.approvedDate).toISOString().split("T")[0]
           : new Date("01-01-2024").toISOString().split("T")[0],
-        registrantId: request.user.loginId,
-        consumerName: request.user.name,
-        consumerNumber: request.user.phone,
+        registrantId: request.authorLoginId,
+        consumerName: request.name,
+        consumerNumber: request.phone,
         consumerDOB: request.birth,
         damageDate: request.damageDate,
         damageContent: request.damageContent,

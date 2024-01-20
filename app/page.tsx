@@ -1,12 +1,121 @@
 "use client";
 import { Card, Col, Row, Table, Space } from "antd";
 
+import { useState, useEffect } from "react";
+
 import Sidebar from "../components/Sidebar";
 import LineChart from "../components/LineChart";
+import customFetch from "@/utils/customFetch";
 
 export default function Home() {
+  const [thisWeekData, setThisWeekData] = useState<any>({});
+  const [isFetchingThisWeekData, setIsFetchingThisWeekData] = useState(false);
+  const [isFetchingThisWeekDataTable, setIsFetchingThisWeekDataTable] =
+    useState(false);
+
+  const [weekTableData, setWeekTableData] = useState([]);
+
+  const today = new Date();
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(today.getDate() - 7);
+
+  const formatDate = (date: any) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const startDate = formatDate(sevenDaysAgo);
+  const endDate = formatDate(today);
+
+  const fetchThisWeekData = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+
+    setIsFetchingThisWeekData(true);
+    try {
+      const weekData = await customFetch.get(
+        `/api/v1/admins/dashboard/register?start_date=${startDate}&end_date=${endDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      const days = weekData.data.map((oneDay: any) => oneDay.day);
+
+      const numbersData = weekData.data.map(
+        (oneDay: any) => oneDay.registerCount
+      );
+
+      const transformedWeekData = {
+        labels: days,
+        datasets: [
+          {
+            label: "Line 1",
+            data: numbersData,
+            borderColor: "rgba(255, 99, 132, 1)",
+            borderWidth: 2,
+            fill: false,
+          },
+        ],
+      };
+
+      setThisWeekData(transformedWeekData);
+
+      setIsFetchingThisWeekData(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchThisWeekDataTable = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+
+    setIsFetchingThisWeekDataTable(true);
+    try {
+      const weekData = await customFetch.get(
+        `/api/v1/admins/dashboard/register?start_date=${startDate}&end_date=${endDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      const transformedWeekDataTable = weekData.data.map(
+        (data: any, index: number) => ({
+          key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+          date: new Date(data.date).toISOString().split("T")[0],
+          signUp: data.registerCount,
+          total: data.registerCount,
+        })
+      );
+
+      setWeekTableData(transformedWeekDataTable);
+
+      setIsFetchingThisWeekDataTable(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchThisWeekData();
+    fetchThisWeekDataTable();
+  }, []);
+
   const chartData = {
-    labels: ["January", "February", "March", "April", "May", "June", "July"],
+    labels: [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ],
     datasets: [
       {
         label: "Line 1",
@@ -24,6 +133,7 @@ export default function Home() {
       },
     ],
   };
+
   const columnsThree = [
     {
       title: "Week",
@@ -50,6 +160,7 @@ export default function Home() {
       },
     },
   ];
+
   const columns = [
     {
       title: "승인요청 일시",
@@ -160,6 +271,8 @@ export default function Home() {
       total: 50,
     },
   ];
+
+  // Un used
   const data = [
     {
       key: "1",
@@ -190,6 +303,8 @@ export default function Home() {
       english: "자세히보기",
     },
   ];
+  // Un used
+
   const dataTwo = [
     {
       key: "1",
@@ -246,30 +361,51 @@ export default function Home() {
             <Col span={12}>
               <Card title="이번주 가입 현황">
                 <div className="h-[310px]">
-                  <LineChart data={chartData} />
+                  {isFetchingThisWeekData ? (
+                    <div className="flex justify-center items-center h-[100%]  py-3">
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-purple-500"></div>
+                    </div>
+                  ) : thisWeekData && Object.keys(thisWeekData).length > 0 ? (
+                    <LineChart data={thisWeekData} />
+                  ) : (
+                    <div className="flex justify-center items-center h-[100%]  py-3">
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-purple-500"></div>
+                    </div>
+                  )}
                 </div>
+
                 <div className="mt-3 table-dark">
-                  <Table
-                    pagination={false}
-                    columns={columnsThree}
-                    dataSource={dataThree}
-                    onChange={onChange}
-                  />
+                  {isFetchingThisWeekData ? (
+                    <div className="flex justify-center items-center h-[100%]  py-3">
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-purple-500"></div>
+                    </div>
+                  ) : weekTableData && weekTableData.length > 0 ? (
+                    <Table
+                      pagination={false}
+                      columns={columnsThree}
+                      dataSource={weekTableData}
+                      onChange={onChange}
+                    />
+                  ) : (
+                    <div className="flex justify-center items-center h-[100%]  py-3">
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-purple-500"></div>
+                    </div>
+                  )}
                 </div>
               </Card>
             </Col>
             <Col span={12}>
               <Space direction="vertical" size="large" className="w-full">
-                <Card title="블랙리스트 승인 요청 리스트">
+                {/* <Card title="블랙리스트 승인 요청 리스트">
                   <div className="table-dark">
-                    <Table
+                     <Table
                       pagination={false}
                       columns={columns}
                       dataSource={data}
                       onChange={onChange}
-                    />
+                    /> 
                   </div>
-                </Card>
+                </Card> */}
                 <Card title="이의신청 리스트">
                   <div className="table-dark">
                     <Table

@@ -49,40 +49,42 @@ export default function Account() {
   const fetchAdminLists = async () => {
     setIsFetching(true);
     const accessToken = localStorage.getItem("accessToken");
-    const adminsList = await customFetch.get("/api/v1/admins", {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    const adminsData = adminsList.data.data;
-
-    const transformedAdminsList = adminsData.map(
-      (admin: AdminType, index: number) => ({
-        key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
-        name: admin.name,
-        id: admin.id,
-        department: admin.department,
-        allowIP: admin.allowedIp ? admin.allowedIp : "---",
-        consumerNumber: admin.phone,
-        lastAccessDate: new Date(admin.lastLoginDate)
-          .toISOString()
-          .split("T")[0],
-        registrationManager: admin.author.name,
-      })
-    );
-
-    setAdminsList(transformedAdminsList);
-    setAdminsAllDataList(adminsData);
-    setIsFetching(false);
-  };
-
-  useEffect(() => {
     try {
-      fetchAdminLists();
+      const adminsList = await customFetch.get("/api/v1/admins", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const adminsData = adminsList.data.data;
+
+      const transformedAdminsList = adminsData.map(
+        (admin: AdminType, index: number) => ({
+          key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+          name: admin.name,
+          id: admin.id,
+          department: admin.department,
+          allowIP: admin.allowedIp ? admin.allowedIp : "--",
+          consumerNumber: admin.phone,
+          lastAccessDate: new Date(admin.lastLoginDate)
+            .toISOString()
+            .split("T")[0],
+          registrationManager: admin.author.name,
+          //
+          permissions: admin.permissions,
+        })
+      );
+
+      setAdminsList(transformedAdminsList);
+      setAdminsAllDataList(adminsData);
+      setIsFetching(false);
     } catch (error) {
       console.log("Error when fetching admins list", error);
     }
+  };
+
+  useEffect(() => {
+    fetchAdminLists();
   }, []);
 
   const showModal = () => {
@@ -296,7 +298,7 @@ export default function Account() {
                 </h2>
               </div>
               {isFetching ? (
-                <div className="flex justify-center items-center h-[100%]">
+                <div className="flex justify-center items-center h-[100%] py-3">
                   <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
                 </div>
               ) : (
