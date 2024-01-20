@@ -48,14 +48,16 @@ export default function PasswordManagement() {
 
     const adminsData = adminsList.data.data;
 
-    const transformedAdminsList = adminsData.map((admin: any) => ({
-      key: admin.id,
-      name: admin.admin.name,
-      id: admin.id,
-      department: admin.admin.department,
-      sanctionDate: new Date(admin.bannedDate).toISOString().split("T")[0],
-      situation: "제재 해지",
-    }));
+    const transformedAdminsList = adminsData.map(
+      (admin: any, index: number) => ({
+        key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
+        name: admin.admin.name,
+        id: admin.admin.id,
+        department: admin.admin.department,
+        sanctionDate: new Date(admin.bannedDate).toISOString().split("T")[0],
+        situation: "제재 해지",
+      })
+    );
 
     setAdminsList(transformedAdminsList);
     setIsFetching(false);
@@ -84,7 +86,7 @@ export default function PasswordManagement() {
 
       handleCancel();
       fetchAdminLists();
-      toast.success("제재가 해제되었습니다.", { autoClose: 3000 });
+      toast.success("완료", { autoClose: 3000 });
     } catch (error) {
       console.log(error);
     }
