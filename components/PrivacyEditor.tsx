@@ -399,7 +399,9 @@ export default function PrivacyEditor({
           <Button className="ant-btn ant-btn-info" onClick={handleCorrection}>
             수정
           </Button>
-          <Button className="ant-btn ant-btn-info">닫기</Button>
+          <Button onClick={handleCancel} className="ant-btn ant-btn-info">
+            닫기
+          </Button>
         </Flex>
       </Form>
     </div>
