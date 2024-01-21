@@ -29,7 +29,7 @@ export default function AccountModal({
     } else {
       form.resetFields();
     }
-  }, [buttonType]);
+  }, [buttonType, clickedFaqData]);
 
   const handleAddFaq = async () => {
     const title = form.getFieldValue("title");
@@ -59,6 +59,8 @@ export default function AccountModal({
           }
         );
         onCancel();
+        form.resetFields();
+
         fetchFaqLists();
         toast.success("완료", { autoClose: 4000 });
       } catch (error) {
@@ -80,6 +82,8 @@ export default function AccountModal({
           }
         );
         onCancel();
+        form.resetFields();
+
         fetchFaqLists();
         toast.success("완료", { autoClose: 4000 });
       } catch (error) {
