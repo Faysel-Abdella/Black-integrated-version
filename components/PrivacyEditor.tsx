@@ -44,6 +44,8 @@ export default function PrivacyEditor({
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
+  const [isLoading, setIsLoading] = useState(false);
+
   let editorText = "";
 
   const firstFilling = () => {
@@ -78,8 +80,19 @@ export default function PrivacyEditor({
     firstFilling();
     if (buttonType == "register") {
       form.resetFields();
+      setStartDate("");
+      setEndDate("");
     }
   }, [clickedData, buttonType, extraFilter]);
+
+  useEffect(() => {
+    firstFilling();
+    if (buttonType == "register") {
+      form.resetFields();
+      setStartDate("");
+      setEndDate("");
+    }
+  }, []);
 
   const onChangeStartDate = (date: any, dateString: any) => {
     setStartDate(dateString);
@@ -88,13 +101,6 @@ export default function PrivacyEditor({
   const onChangeEndDate = (date: any, dateString: any) => {
     setEndDate(dateString);
   };
-
-  useEffect(() => {
-    firstFilling();
-    if (buttonType == "register") {
-      form.resetFields();
-    }
-  }, []);
 
   const handleEditorChange = (data: string) => {
     editorText = data;
@@ -111,16 +117,12 @@ export default function PrivacyEditor({
       const endDateTime = new Date(endDate).toISOString().split("T")[0];
       const content = editorText;
 
-      console.log(startDateTime);
-      console.log(endDateTime);
-
-      console.log(typeof startDateTime);
-
       const accessToken = localStorage.getItem("accessToken");
 
       if (buttonType! === "modification") {
         const id = clickedData[0].id;
         try {
+          setIsLoading(true);
           const response = await customFetch.patch(
             `/api/v1/admins/post/notices/${id}`,
             {
@@ -138,19 +140,23 @@ export default function PrivacyEditor({
 
           handleCancel();
           form.resetFields();
+          setIsLoading(false);
           editorText = "";
           setStartDate("");
           setEndDate("");
           toast.success("완료", { autoClose: 3500 });
           fetchDataLists!();
         } catch (error: any) {
-          toast.success("The date must be in the yyyy-mm-dd format", {
+          setIsLoading(false);
+
+          toast.success(error.response.data.message, {
             autoClose: 3500,
           });
           console.log(error);
         }
       } else {
         try {
+          setIsLoading(true);
           const response = await customFetch.post(
             `/api/v1/admins/post/notices`,
             {
@@ -168,13 +174,16 @@ export default function PrivacyEditor({
 
           handleCancel();
           form.resetFields();
+          setIsLoading(false);
           editorText = "";
           setStartDate("");
           setEndDate("");
           toast.success("완료", { autoClose: 3500 });
           fetchDataLists!();
         } catch (error: any) {
-          toast.success("The date must be in the yyyy-mm-dd format", {
+          setIsLoading(false);
+
+          toast.success(error.response.data.message, {
             autoClose: 3500,
           });
           console.log(error);
@@ -192,6 +201,7 @@ export default function PrivacyEditor({
       if (buttonType! === "modification") {
         const id = clickedData[0].id;
         try {
+          setIsLoading(true);
           const response = await customFetch.patch(
             `/api/v1/admins/post/privacy-policies/${id}`,
             {
@@ -207,14 +217,18 @@ export default function PrivacyEditor({
 
           handleCancel();
           form.resetFields();
+          setIsLoading(false);
           editorText = "";
           toast.success("완료", { autoClose: 3500 });
           fetchDataLists!();
         } catch (error: any) {
+          setIsLoading(false);
+
           console.log(error);
         }
       } else {
         try {
+          setIsLoading(true);
           const response = await customFetch.post(
             `/api/v1/admins/post/privacy-policies`,
             {
@@ -230,10 +244,13 @@ export default function PrivacyEditor({
 
           handleCancel();
           form.resetFields();
+          setIsLoading(false);
           editorText = "";
           toast.success("완료", { autoClose: 3500 });
           fetchDataLists!();
         } catch (error: any) {
+          setIsLoading(false);
+
           console.log(error);
         }
       }
@@ -249,6 +266,7 @@ export default function PrivacyEditor({
       if (buttonType! === "modification") {
         const id = clickedData[0].id;
         try {
+          setIsLoading(true);
           const response = await customFetch.patch(
             `/api/v1/admins/post/terms/${id}`,
             {
@@ -264,16 +282,21 @@ export default function PrivacyEditor({
 
           handleCancel();
           form.resetFields();
+          setIsLoading(false);
+
           editorText = "";
           toast.success("완료", { autoClose: 3500 });
           fetchDataLists!();
         } catch (error: any) {
+          setIsLoading(false);
+
           console.log(error);
         }
       } else {
         console.log(title);
         console.log(content);
         try {
+          setIsLoading(true);
           const response = await customFetch.post(
             `/api/v1/admins/post/terms`,
             {
@@ -289,10 +312,14 @@ export default function PrivacyEditor({
 
           handleCancel();
           form.resetFields();
+          setIsLoading(false);
+
           editorText = "";
           toast.success("완료", { autoClose: 3500 });
           fetchDataLists!();
         } catch (error: any) {
+          setIsLoading(false);
+
           console.log(error);
         }
       }
@@ -431,6 +458,7 @@ export default function PrivacyEditor({
               {/* <Editor onChange={handleEditorChange} /> */}
               <Editor
                 // editor={ClassicEditor}
+
                 onChange={handleEditorChange}
                 buttonType={buttonType}
                 clickedDataContent={
@@ -447,8 +475,20 @@ export default function PrivacyEditor({
           </Col>
         </Row>
         <Flex gap="middle" align="center" justify="center" className="mt-8">
-          <Button className="ant-btn ant-btn-info" onClick={handleCorrection}>
-            수정
+          <Button
+            className="ant-btn ant-btn-info"
+            disabled={isLoading}
+            onClick={handleCorrection}
+          >
+            {isLoading ? (
+              <div
+                className="animate-spin inline-block w-4 h-4 border-[2px] border-current border-t-transparent text-slate-50 rounded-full"
+                role="status"
+                aria-label="loading"
+              ></div>
+            ) : (
+              "수정"
+            )}
           </Button>
           <Button onClick={handleCancel} className="ant-btn ant-btn-info">
             닫기
