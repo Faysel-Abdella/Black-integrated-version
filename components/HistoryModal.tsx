@@ -15,6 +15,7 @@ type TableData = {
 export default function HistoryModal() {
   const [damageTypes, setDamageTypes] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchAdminLists = async () => {
     setIsFetching(true);
@@ -56,6 +57,12 @@ export default function HistoryModal() {
 
     const name = form.getFieldValue("name");
 
+    if (!name) {
+      return toast.error("Please fill the form", { autoClose: 4000 });
+    }
+
+    setIsLoading(true);
+
     try {
       const response = await customFetch.post(
         "/api/v1/admins/blacks/damagetypes",
@@ -69,6 +76,8 @@ export default function HistoryModal() {
         }
       );
 
+      setIsLoading(false);
+      form.resetFields();
       fetchAdminLists();
       toast.success("완료", { autoClose: 3000 });
     } catch (error) {
@@ -144,7 +153,7 @@ export default function HistoryModal() {
   // POST /api/v1/admins/blacks/damagetypes
 
   return (
-    <div className="modal-form form-inline">
+    <div className="modal-form form-inline h-[100%]">
       <Form colon={false} layout="horizontal" form={form}>
         <Row gutter={[16, 0]}>
           <Col md={24}>
@@ -162,8 +171,17 @@ export default function HistoryModal() {
                     onClick={handleAddNewDamageType}
                     size="small"
                     className="ant-btn-info ml-2"
+                    disabled={isLoading}
                   >
-                    추가
+                    {isLoading ? (
+                      <div
+                        className="animate-spin inline-block w-5 h-5 border-[3px] border-current border-t-transparent text-slate-50 rounded-full"
+                        role="status"
+                        aria-label="loading"
+                      ></div>
+                    ) : (
+                      "추가"
+                    )}
                   </Button>
                 </div>
               </Space>

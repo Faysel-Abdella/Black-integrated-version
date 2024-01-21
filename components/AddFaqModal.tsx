@@ -152,7 +152,7 @@ export default function AccountModal({
                 <Radio checked value="USED">
                   사용
                 </Radio>
-                <Radio value="UNUSED">종합지표</Radio>
+                <Radio value="UNUSED">미사용</Radio>
               </Radio.Group>
             </Form.Item>
           </Col>

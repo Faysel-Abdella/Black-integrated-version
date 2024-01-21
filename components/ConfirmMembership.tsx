@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 interface ConfirmMembershipProps {
   onCancel?: () => void;
   executeFunction?: any;
+  isLoading?: boolean;
 }
 
 // ################ DONE / 완전한 ############## //
@@ -13,6 +14,7 @@ interface ConfirmMembershipProps {
 export default function ConfirmMembership({
   onCancel,
   executeFunction,
+  isLoading,
 }: ConfirmMembershipProps) {
   // useEffect(() => {
   //   console.log(memberId);
@@ -29,8 +31,17 @@ export default function ConfirmMembership({
           onClick={() => executeFunction!()}
           className="ant-btn ant-btn-info"
           size="small"
+          disabled={isLoading}
         >
-          발송
+          {isLoading! ? (
+            <div
+              className="animate-spin inline-block w-4 h-4 border-[3px] border-current border-t-transparent text-slate-50 rounded-full"
+              role="status"
+              aria-label="loading"
+            ></div>
+          ) : (
+            "발송"
+          )}
         </Button>
         <Button
           className="ant-btn ant-btn-info"

@@ -24,6 +24,8 @@ export default function AccountModal({
     useState(clickedAdminData);
   const [allowedPermissions, setAllowedPermissions] = useState<string[]>([]);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     setChangeInfoAdminData(clickedAdminData);
     setAllowedPermissions([]);
@@ -60,6 +62,7 @@ export default function AccountModal({
   }, [clickedAdminData, buttonType, form]);
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     const accessToken = localStorage.getItem("accessToken");
 
     try {
@@ -82,6 +85,8 @@ export default function AccountModal({
           }
         );
 
+        setIsLoading(false);
+
         closeModal();
         onCancel();
         // Reset all permissions
@@ -91,6 +96,7 @@ export default function AccountModal({
         fetchAdminLists!();
         toast.success("완료", { autoClose: 3500 });
       } else {
+        setIsLoading(true);
         const response = await customFetch.post(
           "/api/v1/admins",
           {
@@ -109,7 +115,7 @@ export default function AccountModal({
             },
           }
         );
-        console.log(response);
+        setIsLoading(false);
         // Close the modal
         closeModal();
         onCancel();
@@ -139,8 +145,32 @@ export default function AccountModal({
     }
   };
 
+  const handleSendEmail = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    setIsLoading(true);
+    try {
+      const response = await customFetch.post(
+        `/api/v1/admins/mail/send-password/${changeInfoAdminData[0].id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      setIsLoading(false);
+      closeModal();
+      onCancel();
+      toast.success("완료", { autoClose: 3500 });
+      fetchAdminLists!();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleDelete = async () => {
     const accessToken = localStorage.getItem("accessToken");
+    setIsLoading(true);
     try {
       const response = await customFetch.delete(
         `/api/v1/admins/${changeInfoAdminData[0].id}`,
@@ -150,6 +180,7 @@ export default function AccountModal({
           },
         }
       );
+      setIsLoading(false);
       closeModal();
       onCancel();
       toast.success("완료", { autoClose: 3500 });
@@ -644,9 +675,18 @@ export default function AccountModal({
           <Button
             style={{ padding: 0, width: 148, height: 42, fontWeight: 400 }}
             className="ant-btn ant-btn-info"
-            onClick={() => showModal(ConfirmMembership)}
+            onClick={handleSubmit}
+            disabled={isLoading}
           >
-            등록
+            {isLoading ? (
+              <div
+                className="animate-spin inline-block w-5 h-5 border-[3px] border-current border-t-transparent text-slate-50 rounded-full ="
+                role="status"
+                aria-label="loading"
+              ></div>
+            ) : (
+              "등록"
+            )}
           </Button>
           <Button
             onClick={onCancel}
@@ -671,7 +711,8 @@ export default function AccountModal({
         <div className="px-1">
           <ConfirmMembership
             onCancel={handleCancel}
-            executeFunction={handleSubmit}
+            executeFunction={handleSendEmail}
+            isLoading={isLoading}
           />
         </div>
       </Modal>

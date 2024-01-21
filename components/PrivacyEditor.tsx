@@ -1,8 +1,19 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Form, Row, Button, Space, Input, Col, Flex, Select } from "antd";
+import {
+  Form,
+  Row,
+  Button,
+  Space,
+  Input,
+  Col,
+  Flex,
+  Select,
+  DatePicker,
+} from "antd";
 import Editor from "./CKEditor";
 import dynamic from "next/dynamic";
+import dayjs from "dayjs";
 import { toast } from "react-toastify";
 
 // import { CKEditor } from "@ckeditor/ckeditor5-react";
@@ -30,20 +41,23 @@ export default function PrivacyEditor({
   const [form] = Form.useForm();
   const Editor = dynamic(() => import("./CKEditor"), { ssr: false });
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
   let editorText = "";
 
   const firstFilling = () => {
     if (buttonType! === "modification" && usedOnPage === "announcement") {
       form.setFieldsValue({
         title: clickedData[0].title,
-        startDateTime: new Date(clickedData[0].startDateTime)
-          .toISOString()
-          .split("T")[0],
-        endDateTime: new Date(clickedData[0].endDateTime)
-          .toISOString()
-          .split("T")[0],
         content: clickedData[0].content,
       });
+      setStartDate(
+        new Date(clickedData[0].startDateTime).toISOString().split("T")[0]
+      );
+      setEndDate(
+        new Date(clickedData[0].endDateTime).toISOString().split("T")[0]
+      );
     } else if (
       buttonType! === "modification" &&
       usedOnPage === "privacyPolicy"
@@ -67,6 +81,14 @@ export default function PrivacyEditor({
     }
   }, [clickedData, buttonType, extraFilter]);
 
+  const onChangeStartDate = (date: any, dateString: any) => {
+    setStartDate(dateString);
+  };
+
+  const onChangeEndDate = (date: any, dateString: any) => {
+    setEndDate(dateString);
+  };
+
   useEffect(() => {
     firstFilling();
     if (buttonType == "register") {
@@ -80,31 +102,19 @@ export default function PrivacyEditor({
 
   const handleCorrection = async () => {
     if (usedOnPage === "announcement") {
-      if (
-        !form.getFieldValue("title") ||
-        !form.getFieldValue("startDateTime") ||
-        !form.getFieldValue("endDateTime") ||
-        !editorText
-      ) {
+      if (!form.getFieldValue("title") || !editorText) {
         return toast.error("Please fill all inputs", { autoClose: 4000 });
       }
 
-      if (!isValidDateFormat(form.getFieldValue("startDateTime"))) {
-        return toast.error("Please insert a start date like yyyy-mm-dd");
-      }
-
-      if (!isValidDateFormat(form.getFieldValue("endDateTime"))) {
-        return toast.error("Please insert a end date like yyyy-mm-dd");
-      }
-
       const title = form.getFieldValue("title");
-      const startDateTime = new Date(
-        form.getFieldValue("startDateTime")
-      ).toISOString();
-      const endDateTime = new Date(
-        form.getFieldValue("endDateTime")
-      ).toISOString();
+      const startDateTime = new Date(startDate).toISOString().split("T")[0];
+      const endDateTime = new Date(endDate).toISOString().split("T")[0];
       const content = editorText;
+
+      console.log(startDateTime);
+      console.log(endDateTime);
+
+      console.log(typeof startDateTime);
 
       const accessToken = localStorage.getItem("accessToken");
 
@@ -129,6 +139,8 @@ export default function PrivacyEditor({
           handleCancel();
           form.resetFields();
           editorText = "";
+          setStartDate("");
+          setEndDate("");
           toast.success("완료", { autoClose: 3500 });
           fetchDataLists!();
         } catch (error: any) {
@@ -157,6 +169,8 @@ export default function PrivacyEditor({
           handleCancel();
           form.resetFields();
           editorText = "";
+          setStartDate("");
+          setEndDate("");
           toast.success("완료", { autoClose: 3500 });
           fetchDataLists!();
         } catch (error: any) {
@@ -224,7 +238,7 @@ export default function PrivacyEditor({
         }
       }
     } else if (usedOnPage === "term") {
-      if (!form.getFieldValue("title") || !editorText) {
+      if (!form.getFieldValue("title") || startDate || endDate || !editorText) {
         return toast.error("Please fill all inputs", { autoClose: 4000 });
       }
       const title = form.getFieldValue("title");
@@ -308,7 +322,26 @@ export default function PrivacyEditor({
               >
                 <Space>
                   <Space.Compact block>
-                    <Form.Item
+                    <div className="border-cyan-900">
+                      <DatePicker
+                        className="h-[41px] border-cyan-600 rounded-xl"
+                        onChange={onChangeStartDate}
+                        value={
+                          buttonType! === "modification" && startDate == ""
+                            ? dayjs(
+                                new Date(clickedData[0].startDateTime)
+                                  .toISOString()
+                                  .split("T")[0]
+                              )
+                            : startDate == ""
+                            ? null
+                            : dayjs(startDate)
+                        }
+                        placeholder="변경"
+                      />
+                    </div>
+
+                    {/* <Form.Item
                       name="startDateTime"
                       rules={[{ required: true }]}
                       className="m-0"
@@ -318,9 +351,9 @@ export default function PrivacyEditor({
                     </Form.Item>
                     <Button size="small" className="ant-btn-info">
                       변경
-                    </Button>
+                    </Button> */}
                   </Space.Compact>
-                  <Select
+                  {/* <Select
                     defaultValue="lucy"
                     style={{ width: 70 }}
                     options={[
@@ -336,10 +369,28 @@ export default function PrivacyEditor({
                       { value: "jack", label: "21" },
                       { value: "lucy", label: "22" },
                     ]}
-                  />
-                  <p className="whitespace-nowrap">분 ~</p>
+                  /> */}
+                  <p className="whitespace-nowrap"> ~ </p>
                   <Space.Compact block>
-                    <Form.Item
+                    <div className="border-cyan-900">
+                      <DatePicker
+                        className="h-[41px] border-cyan-600 rounded-xl"
+                        onChange={onChangeEndDate}
+                        value={
+                          buttonType! === "modification" && endDate == ""
+                            ? dayjs(
+                                new Date(clickedData[0].endDateTime)
+                                  .toISOString()
+                                  .split("T")[0]
+                              )
+                            : endDate == ""
+                            ? null
+                            : dayjs(endDate)
+                        }
+                        placeholder="변경"
+                      />
+                    </div>
+                    {/* <Form.Item
                       name="endDateTime"
                       rules={[{ required: true }]}
                       className="m-0"
@@ -349,9 +400,9 @@ export default function PrivacyEditor({
                     </Form.Item>
                     <Button size="small" className="ant-btn-info">
                       변경
-                    </Button>
+                    </Button> */}
                   </Space.Compact>
-                  <Select
+                  {/* <Select
                     defaultValue="lucy"
                     style={{ width: 70 }}
                     options={[
@@ -368,7 +419,7 @@ export default function PrivacyEditor({
                       { value: "lucy", label: "22" },
                     ]}
                   />
-                  <p>분</p>
+                  <p>분</p> */}
                 </Space>
               </Form.Item>
             </Col>

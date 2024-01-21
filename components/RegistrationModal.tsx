@@ -10,8 +10,10 @@ import {
   Flex,
   Space,
   Select,
+  DatePicker,
 } from "antd";
 import { toast } from "react-toastify";
+import dayjs from "dayjs";
 
 import customFetch from "@/utils/customFetch";
 
@@ -37,20 +39,59 @@ export default function Membership({
   const [form] = Form.useForm();
   const { TextArea } = Input;
 
+  const [availableTypes, setAvailableTypes] = useState([]);
+
+  const [damageDate, setDamageDate] = useState("");
+
+  const onChangeDamageDate = (date: any, dateString: any) => {
+    setDamageDate(dateString);
+  };
+
+  const getAvailableTypes = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    try {
+      const response = await customFetch.get(
+        `/api/v1/admins/blacks/damagetypes`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      const types = response.data;
+
+      const transformedTypes = types.map((type: any) => ({
+        value: type.name,
+        label: type.name,
+      }));
+
+      setAvailableTypes(transformedTypes);
+    } catch (error: any) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
+    console.log(isForRegister);
+    console.log(clickedBlackListData[0]);
+    getAvailableTypes();
+
     if (!isForRegister) {
       form.setFieldsValue({
         name: clickedBlackListData[0].consumerName,
         phone: clickedBlackListData[0].consumerNumber,
         birth: clickedBlackListData[0].consumerDOB,
-        type: clickedBlackListData[0].damageType,
+        // type: clickedBlackListData[0].damageType,
         date: clickedBlackListData[0].approvalDate,
         description: clickedBlackListData[0].damageContent,
       });
+      setDamageDate(clickedBlackListData[0].damageDate);
     } else {
       form.resetFields();
+      setDamageDate("");
     }
-  });
+  }, [clickedBlackListData, isForRegister]);
 
   const handleSubmit = async () => {
     const accessToken = localStorage.getItem("accessToken");
@@ -63,7 +104,7 @@ export default function Membership({
             name: form.getFieldValue("name"),
             phone: form.getFieldValue("phone"),
             birth: form.getFieldValue("birth"),
-            damageDate: form.getFieldValue("date"),
+            damageDate: damageDate,
             damageContent: form.getFieldValue("description"),
             damageTypeId: form.getFieldValue("damageType"),
             files: form.getFieldValue("files"),
@@ -83,7 +124,7 @@ export default function Membership({
             name: form.getFieldValue("name"),
             phone: form.getFieldValue("phone"),
             birth: form.getFieldValue("birth"),
-            damageDate: form.getFieldValue("date"),
+            damageDate: damageDate,
             damageContent: form.getFieldValue("description"),
             damageTypeId: form.getFieldValue("damageType"),
             files: form.getFieldValue("files"),
@@ -193,12 +234,11 @@ export default function Membership({
               <Select
                 style={{ height: 42, borderRadius: 5 }}
                 placeholder="피해 유형 선택"
-                options={[
-                  { value: "피해유형1", label: "피해유형1" },
-                  { value: "피해유형2", label: "피해유형2" },
-                  { value: "피해유형3", label: "피해유형3" },
-                  { value: "피해유형4", label: "피해유형4" },
-                ]}
+                options={availableTypes}
+                // defaultValue={!isForRegister ? damageDate : "null"}
+                value={
+                  !isForRegister ? clickedBlackListData[0].damageType : "null"
+                }
               />
             </Form.Item>
           </Col>
@@ -217,7 +257,23 @@ export default function Membership({
             >
               <Space>
                 <div className="flex">
-                  <Form.Item name="date">
+                  <DatePicker
+                    className="h-[41px] border-cyan-600 rounded-xl"
+                    onChange={onChangeDamageDate}
+                    value={
+                      !isForRegister && damageDate == ""
+                        ? dayjs(
+                            new Date(clickedBlackListData[0].damageDate)
+                              .toISOString()
+                              .split("T")[0]
+                          )
+                        : damageDate == ""
+                        ? null
+                        : dayjs(damageDate)
+                    }
+                    placeholder="변경"
+                  />
+                  {/* <Form.Item name="date">
                     <Input />
                   </Form.Item>
                   <Button
@@ -225,7 +281,7 @@ export default function Membership({
                     className="ant-btn-info ml-2 font-normal"
                   >
                     변경
-                  </Button>
+                  </Button> */}
                 </div>
               </Space>
             </Form.Item>

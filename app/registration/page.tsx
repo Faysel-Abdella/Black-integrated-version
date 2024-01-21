@@ -71,6 +71,7 @@ export default function Page() {
         id: admin.id,
         damageContent: admin.damageContent,
         damageType: admin.damageType.name,
+        damageDate: admin.damageDate,
       })
     );
 
