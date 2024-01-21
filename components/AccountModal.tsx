@@ -188,15 +188,15 @@ export default function AccountModal({
   const selectAll = () => {
     if (!isSelectAllActive) {
       const allPermissions = [
-        "dashboard",
-        "summary",
-        "user_management",
-        "user_ban",
-        "black_registration_approval",
-        "admin_management",
-        "admin_password_mismatch",
-        "faq_management",
-        "inquiry_management",
+        "DASHBOARD",
+        "OVERALL_METRICS",
+        "USER_MANAGEMENT",
+        "USER_BAN",
+        "BLACK_MANAGEMENT",
+        "ADMIN_MANAGEMENT",
+        "ADMIN_PASSWORD_MISMATCH",
+        "FAQ_MANAGEMENT",
+        "CONTACT_SUPPORT",
       ];
       setAllowedPermissions(allPermissions);
       setIsSelectAllActive(true);
@@ -249,14 +249,14 @@ export default function AccountModal({
   // "It seems that the implementation of radio buttons has not been done.
   // If there are radio buttons corresponding to 'permissions' in the received data, they should be activated. Also, the radio buttons should not be limited to one selection per line; instead, all of them should be selectable.
 
-  // Within the received 'permissions' data, if 'dashboard' exists, then the '대시보드' radio button should be activated, if 'summary' exists, then the '종합지표' radio button should be activated, and similarly for the following:
-  // 'user_management' -> '회원 관리'
-  // 'user_ban' -> '회원 제재'
-  // 'black_registration_approval' -> '승인요청 관리'
-  // 'admin_management' -> '계정관리'
-  // 'admin_password_mismatch' -> '비밀번호 불일치 관리'
-  // 'faq_management' -> 'FAQ관리'
-  // 'inquiry_management' -> '1:1 문의하기'
+  // Within the received 'permissions' data, if 'DASHBOARD' exists, then the '대시보드' radio button should be activated, if 'OVERALL_METRICS' exists, then the '종합지표' radio button should be activated, and similarly for the following:
+  // 'USER_MANAGEMENT' -> '회원 관리'
+  // 'USER_BAN' -> '회원 제재'
+  // 'BLACK_MANAGEMENT' -> '승인요청 관리'
+  // 'ADMIN_MANAGEMENT' -> '계정관리'
+  // 'ADMIN_PASSWORD_MISMATCH' -> '비밀번호 불일치 관리'
+  // 'FAQ_MANAGEMENT' -> 'FAQ관리'
+  // 'CONTACT_SUPPORT' -> '1:1 문의하기'
 
   // Those not in the 'permissions' array should remain deactivated. However, if any of the listed terms are in the array, the corresponding button should be activated.
   // Additionally, you can remove 'Registration Management' '등록 관리' and 'Objection Management' '이의신청 관리' as they were not mentioned."
@@ -508,16 +508,16 @@ export default function AccountModal({
             >
               {/* <Radio.Group onChange={(e) => handlePermissionChange(e, "home")}> */}
               <Radio
-                value="dashboard"
-                checked={permissionExists("dashboard")}
-                onClick={() => handlePermissionChange("dashboard")}
+                value="DASHBOARD"
+                checked={permissionExists("DASHBOARD")}
+                onClick={() => handlePermissionChange("DASHBOARD")}
               >
                 대시보드
               </Radio>
               <Radio
-                value="summary"
-                onClick={() => handlePermissionChange("summary")}
-                checked={permissionExists("summary")}
+                value="OVERALL_METRICS"
+                onClick={() => handlePermissionChange("OVERALL_METRICS")}
+                checked={permissionExists("OVERALL_METRICS")}
               >
                 종합지표
               </Radio>
@@ -535,16 +535,16 @@ export default function AccountModal({
               {/* onChange={(e) => handlePermissionChange(e, "memberManagement")} */}
               {/* > */}
               <Radio
-                value="user_management"
-                onClick={() => handlePermissionChange("user_management")}
-                checked={permissionExists("user_management")}
+                value="USER_MANAGEMENT"
+                onClick={() => handlePermissionChange("USER_MANAGEMENT")}
+                checked={permissionExists("USER_MANAGEMENT")}
               >
                 회원 관리
               </Radio>
               <Radio
-                value="user_ban"
-                onClick={() => handlePermissionChange("user_ban")}
-                checked={permissionExists("user_ban")}
+                value="USER_BAN"
+                onClick={() => handlePermissionChange("USER_BAN")}
+                checked={permissionExists("USER_BAN")}
               >
                 회원 제재
               </Radio>
@@ -565,11 +565,9 @@ export default function AccountModal({
               {/* } */}
               {/* > */}
               <Radio
-                value="black_registration_approval"
-                onClick={() =>
-                  handlePermissionChange("black_registration_approval")
-                }
-                checked={permissionExists("black_registration_approval")}
+                value="BLACK_MANAGEMENT"
+                onClick={() => handlePermissionChange("BLACK_MANAGEMENT")}
+                checked={permissionExists("BLACK_MANAGEMENT")}
               >
                 승인요청 관리
               </Radio>
@@ -589,18 +587,18 @@ export default function AccountModal({
               {/*  onChange={(e) => handlePermissionChange(e, "accountManagement")} */}
               {/*  > */}
               <Radio
-                value="admin_management"
-                onClick={() => handlePermissionChange("admin_management")}
-                checked={permissionExists("admin_management")}
+                value="ADMIN_MANAGEMENT"
+                onClick={() => handlePermissionChange("ADMIN_MANAGEMENT")}
+                checked={permissionExists("ADMIN_MANAGEMENT")}
               >
                 계정관리
               </Radio>
               <Radio
-                value="admin_password_mismatch"
+                value="ADMIN_PASSWORD_MISMATCH"
                 onClick={() =>
-                  handlePermissionChange("admin_password_mismatch")
+                  handlePermissionChange("ADMIN_PASSWORD_MISMATCH")
                 }
-                checked={permissionExists("admin_password_mismatch")}
+                checked={permissionExists("ADMIN_PASSWORD_MISMATCH")}
               >
                 비밀번호 불일치 관리
               </Radio>
@@ -609,6 +607,7 @@ export default function AccountModal({
               {/* </Radio.Group> */}
             </Form.Item>
           </Col>
+
           <Col md={24}>
             <Form.Item
               name="noticeManagement"
@@ -619,16 +618,16 @@ export default function AccountModal({
               {/* onChange={(e) => handlePermissionChange(e, "noticeManagement")} */}
               {/*  > */}
               <Radio
-                value="faq_management"
-                onClick={() => handlePermissionChange("faq_management")}
-                checked={permissionExists("faq_management")}
+                value="FAQ_MANAGEMENT"
+                onClick={() => handlePermissionChange("FAQ_MANAGEMENT")}
+                checked={permissionExists("FAQ_MANAGEMENT")}
               >
                 FAQ 관리
               </Radio>
               <Radio
-                value="inquiry_management"
-                onClick={() => handlePermissionChange("inquiry_management")}
-                checked={permissionExists("inquiry_management")}
+                value="CONTACT_SUPPORT"
+                onClick={() => handlePermissionChange("CONTACT_SUPPORT")}
+                checked={permissionExists("CONTACT_SUPPORT")}
               >
                 1 : 1 문의하기
               </Radio>
