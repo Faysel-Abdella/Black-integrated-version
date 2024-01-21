@@ -75,8 +75,18 @@ export default function Membership({
   };
 
   useEffect(() => {
-    console.log(isForRegister);
-    console.log(clickedBlackListData[0]);
+    if (!isForRegister) {
+      console.log(isForRegister);
+      setFirstDamageType("먹튀");
+    } else {
+      console.log(isForRegister);
+      setFirstDamageType("");
+    }
+  }, [isForRegister]);
+
+  useEffect(() => {
+    // console.log(isForRegister);
+    // console.log(clickedBlackListData[0]);
     getAvailableTypes();
 
     if (!isForRegister) {
@@ -89,11 +99,9 @@ export default function Membership({
         description: clickedBlackListData[0].damageContent,
       });
       setDamageDate(clickedBlackListData[0].damageDate);
-      setFirstDamageType("먹튀");
     } else {
       form.resetFields();
       setDamageDate("");
-      setFirstDamageType(null);
     }
   }, [clickedBlackListData, isForRegister]);
 
