@@ -3,7 +3,7 @@ import { Form, Row, Button, Radio, Input, Col, Flex } from "antd";
 import { toast } from "react-toastify";
 
 import { error } from "console";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type MembershipManagementModalProps = {
   clickedMemberId?: string;
@@ -36,31 +36,39 @@ export default function MembershipManagementModal(
     form.resetFields();
   }, []);
 
-  const releaseReason = form.getFieldValue("releaseReason");
-
-  const accessToken = localStorage.getItem("accessToken");
-
-  let config = {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-    data: {
-      releaseReason: releaseReason,
-    },
-  };
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleUnblock = async () => {
+    const releaseReason = form.getFieldValue("releaseReason");
+
+    const accessToken = localStorage.getItem("accessToken");
+
+    let config = {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      data: {
+        releaseReason: releaseReason,
+      },
+    };
+
+    if (!releaseReason) {
+      return toast.error("Please fill the release reason", { autoClose: 4000 });
+    }
+    setIsLoading(true);
     try {
       const response = await customFetch.delete(
         `/api/v1/admins/users/ban/${memberId}`,
         config
       );
-      console.log(response);
+      setIsLoading(false);
       closeModal();
       form.resetFields();
       toast.success("완료", { autoClose: 3500 });
       fetchMemberLists();
     } catch (error) {
+      setIsLoading(false);
+
       console.log(error);
     }
   };
@@ -80,9 +88,18 @@ export default function MembershipManagementModal(
           <Button
             style={{ padding: 0, width: 148, height: 42, fontWeight: 400 }}
             className="ant-btn ant-btn-info"
+            disabled={isLoading}
             onClick={handleUnblock}
           >
-            변경
+            {isLoading ? (
+              <div
+                className="animate-spin inline-block w-4 h-4 border-[3px] border-current border-t-transparent text-slate-50 rounded-full"
+                role="status"
+                aria-label="loading"
+              ></div>
+            ) : (
+              "변경"
+            )}
           </Button>
           <Button
             onClick={closeModal}

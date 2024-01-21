@@ -367,7 +367,10 @@ export default function MembershipManagement() {
                   closeModal={closeModal}
                 />
               ) : (
-                <BlockRegisterModal />
+                <BlockRegisterModal
+                  fetchMemberLists={fetchMemberLists}
+                  closeModal={closeModal}
+                />
               )}
             </div>
           </Modal>

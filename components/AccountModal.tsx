@@ -680,7 +680,7 @@ export default function AccountModal({
           >
             {isLoading ? (
               <div
-                className="animate-spin inline-block w-5 h-5 border-[3px] border-current border-t-transparent text-slate-50 rounded-full ="
+                className="animate-spin inline-block w-5 h-5 border-[3px] border-current border-t-transparent text-slate-50 rounded-full"
                 role="status"
                 aria-label="loading"
               ></div>

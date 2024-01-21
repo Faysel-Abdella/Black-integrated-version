@@ -1,8 +1,108 @@
-import { Form, Row, Button, Radio, Input, Col, Flex, Space } from "antd";
+import customFetch from "@/utils/customFetch";
+import {
+  Form,
+  Row,
+  Button,
+  Radio,
+  Input,
+  Col,
+  Flex,
+  Space,
+  AutoComplete,
+} from "antd";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
-export default function BlockRegisterModal() {
+type MembershipManagementModalProps = {
+  fetchMemberLists?: () => void;
+  closeModal?: () => void;
+};
+
+export default function BlockRegisterModal({
+  fetchMemberLists,
+  closeModal,
+}: MembershipManagementModalProps) {
   const [form] = Form.useForm();
   const { TextArea } = Input;
+
+  const [userID, setUserId] = useState(0);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const findThisUser = async (state: string) => {
+    const loginID = form.getFieldValue("loginID");
+
+    if (!loginID) {
+      return toast.error("Please fill the login ID", { autoClose: 4000 });
+    }
+
+    const accessToken = localStorage.getItem("accessToken");
+
+    setIsLoading(true);
+
+    try {
+      const response = await customFetch.get(
+        `/api/v1/admins/users/loginid?loginId=${loginID}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      if (state === "yes") {
+        toast.success("사용자를 찾았습니다", { autoClose: 4000 });
+      }
+      setUserId(response.data.userId);
+      setIsLoading(false);
+    } catch (error: any) {
+      setIsLoading(false);
+      toast.error("Please fill a valid login ID", { autoClose: 4000 });
+      console.log(error);
+    }
+  };
+
+  const handleDeleteByEmail = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+
+    findThisUser("no");
+    const status = form.getFieldValue("status");
+    const reason = form.getFieldValue("reason");
+
+    if (!status) {
+      return toast.error("Please fill the block period");
+    }
+
+    if (!reason) {
+      return toast.error("Please fill the block reason");
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await customFetch.post(
+        `/api/v1/admins/users/ban/${userID}`,
+        {
+          status: status,
+          reason: reason,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      closeModal!();
+      form.resetFields();
+      toast.success("완료", { autoClose: 3500 });
+      fetchMemberLists!();
+      setIsLoading(false);
+    } catch (error: any) {
+      console.log(error);
+      setIsLoading(false);
+      toast.error(error.response.message, { autoClose: 4000 });
+    }
+  };
+
   return (
     <div className="modal-form form-inline">
       <Form colon={false} layout="horizontal" form={form}>
@@ -22,12 +122,15 @@ export default function BlockRegisterModal() {
             >
               <Space style={{ display: "block" }}>
                 <div className="flex">
-                  <Input placeholder="fdpd100@naver.com" />
+                  <Form.Item name="loginID">
+                    <Input placeholder="login ID" />
+                  </Form.Item>
                   <Button
                     size="small"
                     style={{ fontWeight: 400 }}
                     className="ant-btn-info ml-2"
-                    onClick={() => console.log("클릭")}
+                    disabled={isLoading}
+                    onClick={() => findThisUser("yes")}
                   >
                     아이디 조회
                   </Button>
@@ -39,7 +142,7 @@ export default function BlockRegisterModal() {
             <Form.Item
               labelCol={{ span: 4 }}
               wrapperCol={{ span: 20 }}
-              name="date"
+              name="status"
               label={
                 <span style={{ textAlign: "left" }}>
                   상태
@@ -49,9 +152,9 @@ export default function BlockRegisterModal() {
               className="input-group custom-label-margin"
             >
               <Radio.Group>
-                <Radio value="7일">7일</Radio>
-                <Radio value="30일">30일</Radio>
-                <Radio value="영구">영구</Radio>
+                <Radio value="SEVEN_DAYS">7일</Radio>
+                <Radio value="THIRTY_DAYS">30일</Radio>
+                <Radio value="PERMANENT">영구</Radio>
               </Radio.Group>
             </Form.Item>
           </Col>
@@ -71,10 +174,21 @@ export default function BlockRegisterModal() {
           <Button
             style={{ padding: 0, width: 148, height: 42 }}
             className="ant-btn ant-btn-info"
+            onClick={handleDeleteByEmail}
+            disabled={isLoading}
           >
-            변경
+            {isLoading ? (
+              <div
+                className="animate-spin inline-block w-4 h-4 border-[3px] border-current border-t-transparent text-slate-50 rounded-full"
+                role="status"
+                aria-label="loading"
+              ></div>
+            ) : (
+              "변경"
+            )}
           </Button>
           <Button
+            onClick={closeModal}
             style={{ padding: 0, width: 148, height: 42 }}
             className="ant-btn ant-btn-info"
           >
