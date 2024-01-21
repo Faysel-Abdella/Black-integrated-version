@@ -34,11 +34,13 @@ export default function MembershipSanction({
     const accessToken = localStorage.getItem("accessToken");
 
     try {
+      console.log(reason);
+      console.log(period);
       const response = await customFetch.post(
         `/api/v1/admins/users/ban/${id}`,
         {
           reason: reason,
-          period: period,
+          status: period,
         },
         {
           headers: {
@@ -46,6 +48,7 @@ export default function MembershipSanction({
           },
         }
       );
+
       onCancel();
       closeParentModal!();
       form.resetFields();
@@ -75,9 +78,9 @@ export default function MembershipSanction({
               className="input-group custom-label-margin"
             >
               <Radio.Group>
-                <Radio value="7일">7일</Radio>
-                <Radio value="30일">30일</Radio>
-                <Radio value="영구">영구</Radio>
+                <Radio value="SEVEN_DAYS">7일</Radio>
+                <Radio value="THIRTY_DAYS">30일</Radio>
+                <Radio value="PERMANENT">영구</Radio>
               </Radio.Group>
             </Form.Item>
           </Col>

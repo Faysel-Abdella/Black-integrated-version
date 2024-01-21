@@ -43,6 +43,8 @@ export default function Membership({
 
   const [damageDate, setDamageDate] = useState("");
 
+  const [firstDamageType, setFirstDamageType] = useState<string | null>("");
+
   const onChangeDamageDate = (date: any, dateString: any) => {
     setDamageDate(dateString);
   };
@@ -87,9 +89,11 @@ export default function Membership({
         description: clickedBlackListData[0].damageContent,
       });
       setDamageDate(clickedBlackListData[0].damageDate);
+      setFirstDamageType("먹튀");
     } else {
       form.resetFields();
       setDamageDate("");
+      setFirstDamageType(null);
     }
   }, [clickedBlackListData, isForRegister]);
 
@@ -235,10 +239,7 @@ export default function Membership({
                 style={{ height: 42, borderRadius: 5 }}
                 placeholder="피해 유형 선택"
                 options={availableTypes}
-                // defaultValue={!isForRegister ? damageDate : "null"}
-                value={
-                  !isForRegister ? clickedBlackListData[0].damageType : "null"
-                }
+                defaultValue={firstDamageType}
               />
             </Form.Item>
           </Col>
