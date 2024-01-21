@@ -8,6 +8,7 @@ import MembershipSanction from "./MembershipSanction";
 import MembershipUnblock from "./MembershipUnblock";
 import customFetch from "@/utils/customFetch";
 import { toast } from "react-toastify";
+import ChangePhone from "./ChangePhone";
 
 export default function MembershipModal({
   clickedMemberData,
@@ -21,6 +22,10 @@ export default function MembershipModal({
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("ConfirmMembership");
+
+  const [isUnblockModalOpen, setIsUnblockModalOpen] = useState(true);
+
+  const [isEmailSending, setIsEmailSending] = useState(false);
 
   const setFirstValue = () => {
     form.setFieldsValue({
@@ -88,6 +93,28 @@ export default function MembershipModal({
       );
 
       handleCancel();
+      toast.success("완료", { autoClose: 3500 });
+      fetchMembersLists!();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSendEmail = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+    setIsEmailSending(true);
+    try {
+      const response = await customFetch.post(
+        `/api/v1/admins/mail/send-password/${clickedMemberData[0].id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      setIsEmailSending(false);
+      fetchMembersLists;
       toast.success("완료", { autoClose: 3500 });
       fetchMembersLists!();
     } catch (error) {
@@ -201,7 +228,7 @@ export default function MembershipModal({
                       size="small"
                       className="ant-btn-info"
                       style={{ fontWeight: 400 }}
-                      onClick={() => showModal("ConfirmMembership")}
+                      onClick={() => showModal("ChangePhone")}
                     >
                       변경
                     </Button>
@@ -358,7 +385,10 @@ export default function MembershipModal({
                     }}
                     size="small"
                     className="ant-btn-info"
-                    onClick={() => showModal("MembershipUnblock")}
+                    onClick={() => {
+                      setIsUnblockModalOpen(true);
+                      showModal("MembershipUnblock");
+                    }}
                   >
                     해제하기
                   </Button>
@@ -406,10 +436,19 @@ export default function MembershipModal({
           {modalType === "ConfirmMembership" ? (
             <ConfirmMembership
               onCancel={handleCancel}
+              executeFunction={handleSendEmail}
+              isLoading={isEmailSending}
+              special={true}
+            />
+          ) : modalType === "ChangePhone" ? (
+            <ChangePhone
+              onCancel={handleCancel}
               executeFunction={handleChangePhone}
             />
           ) : modalType === "MembershipSanction" ? (
             <MembershipSanction
+              isUnblockModalOpen={isUnblockModalOpen}
+              setIsUnblockModalOpen={setIsUnblockModalOpen}
               onCancel={handleCancel}
               closeParentModal={closeParentModal!}
               memberId={clickedMemberData[0].id}

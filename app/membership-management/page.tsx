@@ -49,6 +49,8 @@ export default function Membership() {
   // Updating admin data
   const [clickedMemberData, setClickedMemberData] = useState([]);
 
+  const [total, setTotal] = useState(0);
+
   const fetchMembersLists = async () => {
     setIsFetching(true);
     const accessToken = localStorage.getItem("accessToken");
@@ -85,6 +87,7 @@ export default function Membership() {
     );
 
     setMembersList(transformedMembersList);
+    setTotal(transformedMembersList.length);
     setMembersAllDataList(membersData);
     setIsFetching(false);
   };
@@ -420,8 +423,8 @@ export default function Membership() {
           <Card title="" bodyStyle={{ padding: "75px 85px 40px 85px" }}>
             <div className="card-heading">
               <h2 style={{ fontWeight: 400 }}>
-                <strong style={{ fontWeight: 600 }}>N건</strong>의 게시물이
-                검색되었습니다
+                <strong style={{ fontWeight: 600 }}>{total}건</strong>의
+                게시물이 검색되었습니다
               </h2>
             </div>
             {isFetching ? (

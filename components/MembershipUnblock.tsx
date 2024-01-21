@@ -1,6 +1,6 @@
 import customFetch from "@/utils/customFetch";
 import { Form, Row, Button, Radio, Input, Col, Flex } from "antd";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 interface MembershipUnblockProps {
@@ -18,6 +18,8 @@ export default function MembershipUnblock({
 }: MembershipUnblockProps) {
   const [form] = Form.useForm();
   const { TextArea } = Input;
+
+  const [isLoading, setIsLoading] = useState(false);
 
   // ################ DONE / 완전한 ############## //
 
@@ -48,20 +50,25 @@ export default function MembershipUnblock({
     };
 
     try {
+      setIsLoading(true);
       const response = await customFetch.delete(
         `/api/v1/admins/users/ban/${id}`,
         config
       );
-      console.log(response);
+
       onCancel();
       closeParentModal!();
+      setIsLoading(false);
+
       form.resetFields();
       toast.success("완료", { autoClose: 3500 });
       fetchMembersLists();
     } catch (error: any) {
       console.log(error);
+      setIsLoading(false);
       const errorMessage = error.response.data.message;
       toast.error(errorMessage, { autoClose: 4000 });
+      onCancel();
     }
   };
 
@@ -83,10 +90,19 @@ export default function MembershipUnblock({
         <Flex gap="middle" align="center" justify="center" className="mt-8">
           <Button
             onClick={handleDeleteBan}
+            disabled={isLoading}
             style={{ padding: 0, width: 148, height: 42, fontWeight: 400 }}
             className="ant-btn ant-btn-info"
           >
-            변경
+            {isLoading ? (
+              <div
+                className="animate-spin inline-block w-4 h-4 border-[2px] border-current border-t-transparent text-slate-50 rounded-full"
+                role="status"
+                aria-label="loading"
+              ></div>
+            ) : (
+              "변경"
+            )}
           </Button>
           <Button
             style={{ padding: 0, width: 148, height: 42, fontWeight: 400 }}

@@ -24,11 +24,6 @@ export default function RejectmMembership({
 
   // For more details, please refer to the Swagger documentation."
 
-  useEffect(() => {
-    console.log(memberId);
-    console.log(updatedEmail);
-  }, [memberId, updatedEmail]);
-
   const handleChangeEmail = async () => {
     const accessToken = localStorage.getItem("accessToken");
 
@@ -51,7 +46,6 @@ export default function RejectmMembership({
         }
       );
 
-      console.log(response);
       onCancel();
       toast.success("완료", { autoClose: 3500 });
       fetchMembersLists!();
