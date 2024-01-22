@@ -27,10 +27,19 @@ export default function Indicator() {
 
   //
   const [blacksAllDataList, setBlacksAllDataList] = useState([]);
-  const [blacksList, setBlacksList] = useState([]);
+  const [IndicatorList, setIndicatorList] = useState([]);
   // Search functionality states
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+
+  const [startDateFilter, setStartDateFilter] = useState("");
+  const [endDataFilter, setEndDateFilter] = useState("");
+  const [dateFilterRegisterResults, setDateFilterRegisterResults] = useState(
+    []
+  );
+  const [dateFilterIndicatorResults, setDateFilterIndicatorResults] = useState(
+    []
+  );
 
   const fetchRegisterLists = async () => {
     setIsFetching(true);
@@ -69,7 +78,7 @@ export default function Indicator() {
     setIsFetching(true);
 
     const accessToken = localStorage.getItem("accessToken");
-    const blacksList = await customFetch.get(
+    const IndicatorList = await customFetch.get(
       "/api/v1/admins/indicator/blacks",
       {
         headers: {
@@ -78,29 +87,53 @@ export default function Indicator() {
       }
     );
 
-    console.log(blacksList);
+    console.log(IndicatorList);
 
-    const blacksData = blacksList.data.blacks;
-    const damageTypes = blacksList.data.damageTypes;
+    const blacksData = IndicatorList.data.blacks;
+    const damageTypes = IndicatorList.data.damageTypes;
 
     const transformedBlackList = blacksData.map(
       (blacks: any, index: number) => {
+        const eatAndRunType = damageTypes[index].damageTypes.find(
+          (type: any) => type.damageTypeId == "1"
+        );
+        const eatAndRun = eatAndRunType ? eatAndRunType.damageTypeCount : "0";
+
+        const hygieneType = damageTypes[index].damageTypes.find(
+          (type: any) => type.damageTypeId == "2"
+        );
+        const hygiene = hygieneType ? hygieneType.damageTypeCount : "0";
+
+        const paidAndRunType = damageTypes[index].damageTypes.find(
+          (type: any) => type.damageTypeId == "3"
+        );
+        const paidAndRun = paidAndRunType
+          ? paidAndRunType.damageTypeCount
+          : "0";
+
+        const othersType = damageTypes[index].damageTypes.find(
+          (type: any) => type.damageTypeId == "-1"
+        );
+        const others = othersType ? othersType.damageTypeCount : "0";
+
         return {
           key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
           request: blacks.totalCount,
           approval: blacks.approvedCount,
           refuse: blacks.rejectedCount,
-          eatAndRun: damageTypes[index].damageTypeId,
-          hygiene: damageTypes[index].damageTypeCount,
-          paidAndRun: damageTypes[index].damageTypeId,
-          etc: damageTypes[index].damageTypeName,
+          eatAndRun: eatAndRun,
+          hygiene: hygiene,
+          paidAndRun: paidAndRun,
+          etc: others,
+          // not included in table fields
+          date: new Date(blacks.date).toISOString().split("T")[0],
         };
       }
     );
 
     console.log(transformedBlackList);
 
-    setBlacksList(transformedBlackList);
+    setIndicatorList(transformedBlackList);
     setBlacksAllDataList(blacksData);
     setIsFetching(false);
   };
@@ -127,8 +160,72 @@ export default function Indicator() {
     console.log("params", pagination, filters, sorter, extra);
   };
 
-  const onChangeDate = (date: any, dateString: any) => {
-    console.log(date, dateString);
+  const onChangeStartDate = (date: any, dateString: any) => {
+    // console.log()
+    setStartDateFilter(dateString);
+
+    if (dateString) {
+      console.log(dateString);
+
+      const standardStartDate = new Date(dateString);
+      if (!endDataFilter) {
+        // If the end date is not specified filter all dates greater than or equal start date
+        const filterRegisterResult = registersList.filter(
+          (list: any) => new Date(list.date) >= standardStartDate
+        );
+        setDateFilterRegisterResults(filterRegisterResult);
+
+        const filterIndicatorResult = IndicatorList.filter(
+          (list: any) => new Date(list.date) >= standardStartDate
+        );
+        setDateFilterIndicatorResults(filterIndicatorResult);
+      } else {
+        // If the end date is  specified filter all dates greater than or equal start date and less than or equal to end date
+        const filterBlackResult = registersList.filter(
+          (list: any) =>
+            new Date(list.date) >= standardStartDate &&
+            new Date(list.date) <= new Date(endDataFilter)
+        );
+        setDateFilterRegisterResults(filterBlackResult);
+
+        const filterIndicatorResult = IndicatorList.filter(
+          (list: any) =>
+            new Date(list.date) >= standardStartDate &&
+            new Date(list.date) <= new Date(endDataFilter)
+        );
+        setDateFilterIndicatorResults(filterIndicatorResult);
+      }
+    } else {
+      setDateFilterRegisterResults([]);
+    }
+  };
+
+  const onChangeEndDate = (date: any, dateString: any) => {
+    console.log(dateString);
+    setEndDateFilter(dateString);
+
+    if (dateString) {
+      const standardEndDate = new Date(dateString);
+
+      if (startDateFilter) {
+        const standardStartDate = new Date(startDateFilter);
+        const filterBlackResult = registersList.filter(
+          (list: any) =>
+            new Date(list.date) >= standardStartDate &&
+            new Date(list.date) <= standardEndDate
+        );
+        setDateFilterRegisterResults(filterBlackResult);
+
+        const filterIndicatorResult = IndicatorList.filter(
+          (list: any) =>
+            new Date(list.date) >= standardStartDate &&
+            new Date(list.date) <= standardEndDate
+        );
+        setDateFilterIndicatorResults(filterIndicatorResult);
+      }
+    } else {
+      setDateFilterRegisterResults([]);
+    }
   };
 
   // ################ DONE/완전한  ###################
@@ -167,20 +264,20 @@ export default function Indicator() {
             <Space className="date-range" size="small">
               <DatePicker
                 className="h-[41px] border-none"
-                onChange={onChangeDate}
+                onChange={onChangeStartDate}
               />
               <p className="m-0">~</p>
               <DatePicker
                 className="h-[41px] border-none"
-                onChange={onChangeDate}
+                onChange={onChangeEndDate}
               />
             </Space>
-            <Button
+            {/* <Button
               icon={
                 <img src="/assets/images/search_icon.png" alt="search_icon" />
               }
               className="pt-5 border-0 shadow-none"
-            ></Button>
+            ></Button> */}
           </Space>
         </Col>
         <Col>
@@ -207,7 +304,11 @@ export default function Indicator() {
                   <Table
                     bordered
                     columns={tablesData.table1Columns}
-                    dataSource={registersList}
+                    dataSource={
+                      startDateFilter !== ""
+                        ? dateFilterRegisterResults
+                        : registersList
+                    }
                     onChange={onChange}
                     pagination={false}
                   />
@@ -226,7 +327,11 @@ export default function Indicator() {
               <Table
                 bordered
                 columns={tablesData.table2Columns}
-                dataSource={blacksList}
+                dataSource={
+                  startDateFilter !== ""
+                    ? dateFilterIndicatorResults
+                    : IndicatorList
+                }
                 onChange={onChange}
                 pagination={false}
               />

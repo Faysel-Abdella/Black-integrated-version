@@ -49,6 +49,19 @@ export default function Membership({
     setDamageDate(dateString);
   };
 
+  const [selectedFiles, setSelectedFiles] = useState<any>([]);
+
+  const handleFileChange = (event: any) => {
+    const files = event.target.files;
+    console.log(typeof files);
+
+    // const fileNames = Array.from(files).map((file: any) => file.name);
+    setSelectedFiles((prevSelectedFiles: any) => [
+      ...prevSelectedFiles,
+      ...files,
+    ]);
+  };
+
   const getAvailableTypes = async () => {
     const accessToken = localStorage.getItem("accessToken");
     try {
@@ -81,6 +94,7 @@ export default function Membership({
     } else {
       console.log(isForRegister);
       setFirstDamageType("");
+      setSelectedFiles([]);
     }
   }, [isForRegister]);
 
@@ -102,6 +116,7 @@ export default function Membership({
     } else {
       form.resetFields();
       setDamageDate("");
+      setSelectedFiles([]);
     }
   }, [clickedBlackListData, isForRegister]);
 
@@ -109,21 +124,33 @@ export default function Membership({
     const accessToken = localStorage.getItem("accessToken");
 
     try {
+      const formData = new FormData();
+      console.log(selectedFiles);
+
+      formData.append(
+        "files",
+        selectedFiles.map((selected: any) => selected)
+      );
+
+      console.log("PASSED");
+
+      formData.append("name", form.getFieldValue("name"));
+      formData.append("phone", form.getFieldValue("phone"));
+      formData.append("birth", form.getFieldValue("birth"));
+      formData.append("damageDate", damageDate);
+      formData.append("damageContent", form.getFieldValue("description"));
+      formData.append("damageTypeId", "1");
+
+      console.log(formData.keys);
+
       if (isForRegister) {
         const response = await customFetch.post(
           `/api/v1/admins/blacks`,
-          {
-            name: form.getFieldValue("name"),
-            phone: form.getFieldValue("phone"),
-            birth: form.getFieldValue("birth"),
-            damageDate: damageDate,
-            damageContent: form.getFieldValue("description"),
-            damageTypeId: form.getFieldValue("damageType"),
-            files: form.getFieldValue("files"),
-          },
+          formData,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "multipart/form-data",
             },
           }
         );
@@ -132,15 +159,7 @@ export default function Membership({
       } else {
         const response = await customFetch.patch(
           `/api/v1/admins/blacks/${clickedBlackListData[0].id}`,
-          {
-            name: form.getFieldValue("name"),
-            phone: form.getFieldValue("phone"),
-            birth: form.getFieldValue("birth"),
-            damageDate: damageDate,
-            damageContent: form.getFieldValue("description"),
-            damageTypeId: form.getFieldValue("damageType"),
-            files: form.getFieldValue("files"),
-          },
+          formData,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -315,11 +334,28 @@ export default function Membership({
               className="m-0"
             >
               <Space style={{ display: "block" }}>
-                <div style={{ display: "flex" }}>
-                  <Input />
-                  <Button size="small" className="ant-btn-info ml-2">
+                <div className="flex justify-center items-center">
+                  <TextArea
+                    value={selectedFiles.join(", ")}
+                    readOnly
+                    autoSize={{ minRows: 1, maxRows: 6 }}
+                  />
+                  <label
+                    htmlFor="file-upload"
+                    className="ant-btn ant-btn-info py-2 px-2 ml-2 cursor-pointer"
+                  >
+                    <p style={{ whiteSpace: "nowrap" }}>파일 선택</p>
+                    <input
+                      id="file-upload"
+                      type="file"
+                      multiple
+                      style={{ display: "none" }}
+                      onChange={handleFileChange}
+                    />
+                  </label>
+                  {/* <Button size="small" className="ant-btn-info ml-2">
                     파일 선택
-                  </Button>
+                  </Button> */}
                 </div>
               </Space>
             </Form.Item>
