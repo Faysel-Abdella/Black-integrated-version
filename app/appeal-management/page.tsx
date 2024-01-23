@@ -37,6 +37,7 @@ type TableData = {
 export default function AppealManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("membership");
+  
   const showModal = (type: any) => {
     setIsModalOpen(true);
     setModalType(type);

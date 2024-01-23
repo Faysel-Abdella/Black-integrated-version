@@ -119,12 +119,10 @@ export default function Home() {
 
       const transformedGeneralData = generalData.data.map(
         (data: any, index: number) => ({
-          key: index + 1 < 9 ? `0${index + 1}` : `${index + 1}`,
-          date: new Date(data.createdAt).toISOString().split("T")[0],
-          id: data.id,
-          idTwo: data.authorLoginId,
-          name: data.name,
-          detail: "자세히보기",
+          name: new Date(data.createdAt).toISOString().split("T")[0],
+          chinese: data.authorLoginId,
+          math: data.name,
+          english: "자세히보기",
         })
       );
 
@@ -434,17 +432,27 @@ export default function Home() {
             </Col>
             <Col span={12}>
               <Space direction="vertical" size="large" className="w-full">
-                {/* <Card title="블랙리스트 승인 요청 리스트">
+                <Card title="블랙리스트 승인 요청 리스트">
                   <div className="table-dark">
-                     <Table
-                      pagination={false}
-                      columns={columns}
-                      dataSource={data}
-                      onChange={onChange}
-                    /> 
+                    {isFetchingGeneralData ? (
+                      <div className="flex justify-center items-center h-[100%]  py-3">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-purple-500"></div>
+                      </div>
+                    ) : weekTableData && weekTableData.length > 0 ? (
+                      <Table
+                        pagination={false}
+                        columns={columns}
+                        dataSource={generalData}
+                        onChange={onChange}
+                      />
+                    ) : (
+                      <div className="flex justify-center items-center h-[100%]  py-3">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-purple-500"></div>
+                      </div>
+                    )}
                   </div>
-                </Card> */}
-                <Card title="이의신청 리스트">
+                </Card>
+                {/* <Card title="이의신청 리스트">
                   <div className="table-dark">
                     {isFetchingGeneralData ? (
                       <div className="flex justify-center items-center h-[100%]  py-3">
@@ -463,7 +471,7 @@ export default function Home() {
                       </div>
                     )}
                   </div>
-                </Card>
+                </Card> */}
               </Space>
             </Col>
           </Row>

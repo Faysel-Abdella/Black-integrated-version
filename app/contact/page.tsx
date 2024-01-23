@@ -30,6 +30,8 @@ export default function Contact() {
   // Updating admin data
   const [clickedQueryData, setClickedQueryData] = useState([]);
 
+  const [total, setTotal] = useState(0);
+
   const fetchQueryLists = async () => {
     setIsFetching(true);
     const accessToken = localStorage.getItem("accessToken");
@@ -64,6 +66,7 @@ export default function Contact() {
     );
 
     setQueriesList(transformedQueriesList);
+    setTotal(transformedQueriesList.length);
     setQueriesAllDataList(queriesData);
     setIsFetching(false);
   };
@@ -279,7 +282,7 @@ export default function Contact() {
           <Card title="" bodyStyle={{ padding: "75px 84px 40px" }}>
             <div className="card-heading">
               <h2 style={{ fontWeight: 400 }}>
-                <strong className="font-semibold">N건</strong>의 게시물이
+                <strong className="font-semibold">{total}건</strong>의 게시물이
                 검색되었습니다
               </h2>
             </div>

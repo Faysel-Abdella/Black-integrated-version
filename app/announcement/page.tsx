@@ -45,6 +45,8 @@ export default function Announcement() {
   // Updating notice data
   const [clickedNoticeData, setClickedNoticeData] = useState([]);
 
+  const [total, setTotal] = useState(0);
+
   const fetchNoticesLists = async () => {
     setIsFetching(true);
     const accessToken = localStorage.getItem("accessToken");
@@ -75,6 +77,7 @@ export default function Announcement() {
     );
 
     setNoticesList(transformedNoticesList);
+    setTotal(transformedNoticesList.length);
     setNoticesAllDataList(noticesData);
     setIsFetching(false);
   };
@@ -314,7 +317,7 @@ export default function Announcement() {
           <Card title="" bodyStyle={{ padding: "75px 84px 40px" }}>
             <div className="card-heading">
               <h2 style={{ fontWeight: 400 }} className="font-normal">
-                <strong className="font-semibold">N건</strong>의 게시물이
+                <strong className="font-semibold">{total}건</strong>의 게시물이
                 검색되었습니다
               </h2>
             </div>

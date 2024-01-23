@@ -46,6 +46,18 @@ export default function Membership() {
   // Search functionality states
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+
+  const [startDateFilter, setStartDateFilter] = useState("");
+  const [endDataFilter, setEndDateFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const [latestFiltersResult, setLatestFiltersResult] = useState([]);
+
+  const [resultOfDateFilter, setResultOfDateFilter] = useState([]);
+  const [resultOfStatusFilter, setResultOfStatusFilter] = useState([]);
+
+  const [isDateFilteringAllowed, setIsDateFilteringAllowed] = useState(false);
+
   // Updating admin data
   const [clickedMemberData, setClickedMemberData] = useState([]);
 
@@ -102,10 +114,17 @@ export default function Membership() {
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
-    const filteredMembers = membersList.filter((member: any) =>
-      member.name.toLowerCase().includes(value.toLowerCase())
-    );
-    setSearchResults(filteredMembers);
+    if (latestFiltersResult.length > 0) {
+      const filteredMembers = latestFiltersResult.filter((member: any) =>
+        member.name.toLowerCase().includes(value.toLowerCase())
+      );
+      setLatestFiltersResult(filteredMembers);
+    } else {
+      const filteredMembers = membersList.filter((member: any) =>
+        member.name.toLowerCase().includes(value.toLowerCase())
+      );
+      setLatestFiltersResult(filteredMembers);
+    }
   };
 
   const handleClickMember = (data: any) => {
@@ -136,6 +155,88 @@ export default function Membership() {
 
   const closeParentModal = () => {
     setIsModalOpen(false);
+  };
+
+  const onChangeStartDate = (date: any, dateString: any) => {
+    // console.log()
+    setStartDateFilter(dateString);
+
+    if (dateString) {
+      console.log(dateString);
+
+      const standardStartDate = new Date(dateString);
+      if (!endDataFilter) {
+        console.log(statusFilter);
+        // If the end date is not specified filter all dates greater than or equal start date
+        if (statusFilter !== "all" && searchResults.length > 0) {
+          const filterMemberResult = searchResults.filter(
+            (list: any) =>
+              new Date(list.joinDate) >= standardStartDate &&
+              list.accountStatus == statusFilter
+          );
+          setLatestFiltersResult(filterMemberResult);
+          setResultOfDateFilter(filterMemberResult);
+        } else if (statusFilter !== "all") {
+          const filterMemberResult = membersList.filter(
+            (list: any) =>
+              new Date(list.joinDate) >= standardStartDate &&
+              list.accountStatus == statusFilter
+          );
+          setLatestFiltersResult(filterMemberResult);
+          setResultOfDateFilter(filterMemberResult);
+          console.log(filterMemberResult);
+        } else {
+          const filterMemberResult = membersList.filter(
+            (list: any) => new Date(list.joinDate) >= standardStartDate
+          );
+          setLatestFiltersResult(filterMemberResult);
+          setResultOfDateFilter(filterMemberResult);
+        }
+      } else {
+        // If the end date is  specified filter all dates greater than or equal start date and less than or equal to end date
+        if (latestFiltersResult.length > 0) {
+          const filterMemberResult = latestFiltersResult.filter(
+            (list: any) =>
+              new Date(list.joinDate) >= standardStartDate &&
+              new Date(list.joinDate) <= new Date(endDataFilter)
+          );
+          setLatestFiltersResult(filterMemberResult);
+          setResultOfDateFilter(filterMemberResult);
+        } else {
+          const filterMemberResult = membersList.filter(
+            (list: any) =>
+              new Date(list.joinDate) >= standardStartDate &&
+              new Date(list.joinDate) <= new Date(endDataFilter)
+          );
+
+          setLatestFiltersResult(filterMemberResult);
+          setResultOfDateFilter(filterMemberResult);
+        }
+      }
+    } else {
+      setLatestFiltersResult([]);
+    }
+  };
+
+  const onChangeEndDate = (date: any, dateString: any) => {
+    console.log(dateString);
+    setEndDateFilter(dateString);
+
+    if (dateString) {
+      const standardEndDate = new Date(dateString);
+
+      if (startDateFilter) {
+        const standardStartDate = new Date(startDateFilter);
+        const filterBlackResult = membersList.filter(
+          (list: any) =>
+            new Date(list.joinDate) >= standardStartDate &&
+            new Date(list.joinDate) <= standardEndDate
+        );
+        setLatestFiltersResult(filterBlackResult);
+      }
+    } else {
+      setLatestFiltersResult([]);
+    }
   };
 
   const tableColumns: ColumnsType<TableData> = [
@@ -264,6 +365,53 @@ export default function Membership() {
     console.log(date, dateString);
   };
 
+  const handleAllowDateFiltering = (event: any) => {
+    const selectedValue = event.target.value;
+    if (selectedValue === "all") {
+      setIsDateFilteringAllowed(false);
+    } else {
+      setIsDateFilteringAllowed(true);
+    }
+  };
+
+  const handleStatusFiltering = (event: any) => {
+    const selectedValue = event.target.value;
+
+    if (selectedValue !== "all") {
+      if (resultOfDateFilter.length > 0 && searchQuery != "") {
+        const filterMemberResult = resultOfDateFilter.filter(
+          (list: any) =>
+            list.accountStatus == selectedValue &&
+            list.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setLatestFiltersResult(filterMemberResult);
+      } else if (resultOfDateFilter.length > 0) {
+        console.log(resultOfDateFilter);
+        const filterMemberResult = resultOfDateFilter.filter(
+          (list: any) => list.accountStatus == selectedValue
+        );
+        setLatestFiltersResult(filterMemberResult);
+      } else {
+        const filterMemberResult = membersList.filter(
+          (list: any) => list.accountStatus == selectedValue
+        );
+        setLatestFiltersResult(filterMemberResult);
+      }
+    } else {
+      if (resultOfDateFilter.length > 0 && searchQuery != "") {
+        const filterMemberResult = resultOfDateFilter.filter((list: any) =>
+          list.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setLatestFiltersResult(filterMemberResult);
+      } else if (resultOfDateFilter.length > 0) {
+        setLatestFiltersResult(resultOfDateFilter);
+      } else {
+        setLatestFiltersResult([]);
+      }
+    }
+    setStatusFilter(selectedValue);
+  };
+
   // ################ DONE/완전한 -- Except the search by date  #############
 
   // * Jin is preparing the data.
@@ -347,19 +495,25 @@ export default function Membership() {
             <label htmlFor="#" className="font-black">
               가입일자
             </label>
-            <Radio.Group name="radiogroup" defaultValue={1}>
-              <Radio value={1}>전체</Radio>
-              <Radio value={2}>설정</Radio>
+            <Radio.Group
+              name="radiogroup"
+              onChange={handleAllowDateFiltering}
+              defaultValue="all"
+            >
+              <Radio value="all">전체</Radio>
+              <Radio value="custom">설정</Radio>
             </Radio.Group>
             <Space className="date-range" size="small">
               <DatePicker
                 className="h-[41px] border-none"
-                onChange={(value) => onChangeDateSearch(value)}
+                onChange={onChangeStartDate}
+                disabled={!isDateFilteringAllowed}
               />
               <p className="m-0">~</p>
               <DatePicker
                 className="h-[41px] border-none"
-                onChange={(value) => onChangeDateSearch(value)}
+                onChange={onChangeEndDate}
+                disabled={!isDateFilteringAllowed}
               />
             </Space>
           </Space>
@@ -385,17 +539,22 @@ export default function Membership() {
               <label htmlFor="#" className="font-black">
                 계정 상태
               </label>
-              <Radio.Group name="radiogroup" defaultValue={1}>
-                <Radio value={1}>전체</Radio>
-                <Radio value={2}>설정</Radio>
-                <Radio value={3}>정지</Radio>
+              <Radio.Group
+                name="radiogroup"
+                defaultValue="all"
+                onChange={handleStatusFiltering}
+              >
+                <Radio value="all">전체</Radio>
+                {/* <Radio value={2}>설정</Radio> */}
+                <Radio value="true">활동적인</Radio>
+                <Radio value="false">정지</Radio>
               </Radio.Group>
             </Space>
             <Space
               className="filter-section rounded-full bg-white pl-[42px] pr-[20px] py-3.5 h-[61px]"
               size="middle"
             >
-              <label htmlFor="#" className="font-black">
+              <label htmlFor="#" className="font-black whitespace-nowrap">
                 검색어
               </label>
               <Select
@@ -435,7 +594,11 @@ export default function Membership() {
               <Table
                 bordered
                 columns={tableColumns}
-                dataSource={searchQuery !== "" ? searchResults : membersList}
+                dataSource={
+                  latestFiltersResult.length > 0
+                    ? latestFiltersResult
+                    : membersList
+                }
                 onChange={onChange}
               />
             )}

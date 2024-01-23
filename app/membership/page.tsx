@@ -45,6 +45,8 @@ export default function MembershipManagement() {
   // Updating admin data
   const [clickedMemberId, setClickedMemberId] = useState("");
 
+  const [total, setTotal] = useState(0);
+
   const showModal = (type: any) => {
     setIsModalOpen(true);
     setModalType(type);
@@ -96,6 +98,8 @@ export default function MembershipManagement() {
 
     setMembersList(transformedMembersBanList);
     setMembersAllDataList(membersData);
+    setTotal(transformedMembersBanList.length);
+
     setIsFetching(false);
   };
 
@@ -316,8 +320,8 @@ export default function MembershipManagement() {
               <Card title="" bodyStyle={{ padding: "75px 85px 40px 85px" }}>
                 <div className="card-heading">
                   <h2 style={{ fontWeight: 400 }}>
-                    <strong style={{ fontWeight: 600 }}>N건</strong>의 게시물이
-                    검색되었습니다
+                    <strong style={{ fontWeight: 600 }}>{total}건</strong>의
+                    게시물이 검색되었습니다
                   </h2>
                 </div>
                 {isFetching ? (

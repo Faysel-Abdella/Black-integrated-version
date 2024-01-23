@@ -34,6 +34,8 @@ export default function Faq() {
   // Updating faq data
   const [clickedFaqData, setClickedFaqData] = useState([]);
 
+  const [total, setTotal] = useState(0);
+
   const fetchFaqLists = async () => {
     setIsFetching(true);
     const accessToken = localStorage.getItem("accessToken");
@@ -59,6 +61,7 @@ export default function Faq() {
     }));
 
     setFaqsList(transformedFaqsList);
+    setTotal(transformedFaqsList.length);
     setFaqsAllDataList(faqsData);
     setIsFetching(false);
   };
@@ -295,7 +298,7 @@ export default function Faq() {
           <Card title="" bodyStyle={{ padding: "75px 84px 40px" }}>
             <div className="card-heading">
               <h2 style={{ fontWeight: 400 }} className="font-normal">
-                <strong className="font-semibold">N건</strong>의 게시물이
+                <strong className="font-semibold">{total}건</strong>의 게시물이
                 검색되었습니다
               </h2>
             </div>

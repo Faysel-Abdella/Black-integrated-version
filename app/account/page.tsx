@@ -46,6 +46,8 @@ export default function Account() {
   // Updating admin data
   const [clickedAdminData, setClickedAdminData] = useState([]);
 
+  const [total, setTotal] = useState(0);
+
   const fetchAdminLists = async () => {
     setIsFetching(true);
     const accessToken = localStorage.getItem("accessToken");
@@ -77,6 +79,7 @@ export default function Account() {
 
       setAdminsList(transformedAdminsList);
       setAdminsAllDataList(adminsData);
+      setTotal(transformedAdminsList.length);
       setIsFetching(false);
     } catch (error) {
       console.log("Error when fetching admins list", error);
@@ -294,7 +297,7 @@ export default function Account() {
             <Card title="" bodyStyle={{ padding: "75px 84px 0 84px" }}>
               <div className="card-heading">
                 <h2 style={{ fontWeight: 400 }}>
-                  <strong>N건</strong>의 게시물이 검색되었습니다
+                  <strong>{total}건</strong>의 게시물이 검색되었습니다
                 </h2>
               </div>
               {isFetching ? (
