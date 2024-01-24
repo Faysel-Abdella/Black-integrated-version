@@ -114,17 +114,11 @@ export default function Membership() {
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
-    if (latestFiltersResult.length > 0) {
-      const filteredMembers = latestFiltersResult.filter((member: any) =>
-        member.name.toLowerCase().includes(value.toLowerCase())
-      );
-      setLatestFiltersResult(filteredMembers);
-    } else {
-      const filteredMembers = membersList.filter((member: any) =>
-        member.name.toLowerCase().includes(value.toLowerCase())
-      );
-      setLatestFiltersResult(filteredMembers);
-    }
+
+    const filteredMembers = membersList.filter((member: any) =>
+      member.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setLatestFiltersResult(filteredMembers);
   };
 
   const handleClickMember = (data: any) => {
@@ -157,13 +151,13 @@ export default function Membership() {
     setIsModalOpen(false);
   };
 
+  // ############ Filtering operations ###########
+
   const onChangeStartDate = (date: any, dateString: any) => {
     // console.log()
     setStartDateFilter(dateString);
 
     if (dateString) {
-      console.log(dateString);
-
       const standardStartDate = new Date(dateString);
       if (!endDataFilter) {
         console.log(statusFilter);
@@ -176,15 +170,6 @@ export default function Membership() {
           );
           setLatestFiltersResult(filterMemberResult);
           setResultOfDateFilter(filterMemberResult);
-        } else if (statusFilter !== "all") {
-          const filterMemberResult = membersList.filter(
-            (list: any) =>
-              new Date(list.joinDate) >= standardStartDate &&
-              list.accountStatus == statusFilter
-          );
-          setLatestFiltersResult(filterMemberResult);
-          setResultOfDateFilter(filterMemberResult);
-          console.log(filterMemberResult);
         } else {
           const filterMemberResult = membersList.filter(
             (list: any) => new Date(list.joinDate) >= standardStartDate
@@ -194,24 +179,15 @@ export default function Membership() {
         }
       } else {
         // If the end date is  specified filter all dates greater than or equal start date and less than or equal to end date
-        if (latestFiltersResult.length > 0) {
-          const filterMemberResult = latestFiltersResult.filter(
-            (list: any) =>
-              new Date(list.joinDate) >= standardStartDate &&
-              new Date(list.joinDate) <= new Date(endDataFilter)
-          );
-          setLatestFiltersResult(filterMemberResult);
-          setResultOfDateFilter(filterMemberResult);
-        } else {
-          const filterMemberResult = membersList.filter(
-            (list: any) =>
-              new Date(list.joinDate) >= standardStartDate &&
-              new Date(list.joinDate) <= new Date(endDataFilter)
-          );
 
-          setLatestFiltersResult(filterMemberResult);
-          setResultOfDateFilter(filterMemberResult);
-        }
+        const filterMemberResult = membersList.filter(
+          (list: any) =>
+            new Date(list.joinDate) >= standardStartDate &&
+            new Date(list.joinDate) <= new Date(endDataFilter)
+        );
+
+        setLatestFiltersResult(filterMemberResult);
+        setResultOfDateFilter(filterMemberResult);
       }
     } else {
       setLatestFiltersResult([]);
@@ -219,7 +195,6 @@ export default function Membership() {
   };
 
   const onChangeEndDate = (date: any, dateString: any) => {
-    console.log(dateString);
     setEndDateFilter(dateString);
 
     if (dateString) {
@@ -237,6 +212,29 @@ export default function Membership() {
     } else {
       setLatestFiltersResult([]);
     }
+  };
+
+  const handleAllowDateFiltering = (event: any) => {
+    const selectedValue = event.target.value;
+    if (selectedValue === "all") {
+      setIsDateFilteringAllowed(false);
+    } else {
+      setIsDateFilteringAllowed(true);
+    }
+  };
+
+  const handleStatusFiltering = (event: any) => {
+    const selectedValue = event.target.value;
+
+    if (selectedValue !== "all") {
+      const filterMemberResult = membersList.filter(
+        (list: any) => list.accountStatus == selectedValue
+      );
+      setLatestFiltersResult(filterMemberResult);
+    } else {
+      setLatestFiltersResult([]);
+    }
+    setStatusFilter(selectedValue);
   };
 
   const tableColumns: ColumnsType<TableData> = [
@@ -363,53 +361,6 @@ export default function Membership() {
 
   const search = (date: any, dateString: any) => {
     console.log(date, dateString);
-  };
-
-  const handleAllowDateFiltering = (event: any) => {
-    const selectedValue = event.target.value;
-    if (selectedValue === "all") {
-      setIsDateFilteringAllowed(false);
-    } else {
-      setIsDateFilteringAllowed(true);
-    }
-  };
-
-  const handleStatusFiltering = (event: any) => {
-    const selectedValue = event.target.value;
-
-    if (selectedValue !== "all") {
-      if (resultOfDateFilter.length > 0 && searchQuery != "") {
-        const filterMemberResult = resultOfDateFilter.filter(
-          (list: any) =>
-            list.accountStatus == selectedValue &&
-            list.name.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        setLatestFiltersResult(filterMemberResult);
-      } else if (resultOfDateFilter.length > 0) {
-        console.log(resultOfDateFilter);
-        const filterMemberResult = resultOfDateFilter.filter(
-          (list: any) => list.accountStatus == selectedValue
-        );
-        setLatestFiltersResult(filterMemberResult);
-      } else {
-        const filterMemberResult = membersList.filter(
-          (list: any) => list.accountStatus == selectedValue
-        );
-        setLatestFiltersResult(filterMemberResult);
-      }
-    } else {
-      if (resultOfDateFilter.length > 0 && searchQuery != "") {
-        const filterMemberResult = resultOfDateFilter.filter((list: any) =>
-          list.name.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-        setLatestFiltersResult(filterMemberResult);
-      } else if (resultOfDateFilter.length > 0) {
-        setLatestFiltersResult(resultOfDateFilter);
-      } else {
-        setLatestFiltersResult([]);
-      }
-    }
-    setStatusFilter(selectedValue);
   };
 
   // ################ DONE/완전한 -- Except the search by date  #############

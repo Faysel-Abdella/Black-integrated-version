@@ -48,6 +48,16 @@ export default function Page() {
 
   const [total, setTotal] = useState(0);
 
+  // Filtering states
+
+  const [startDateFilter, setStartDateFilter] = useState("");
+  const [endDataFilter, setEndDateFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const [latestFiltersResult, setLatestFiltersResult] = useState([]);
+
+  const [isDateFilteringAllowed, setIsDateFilteringAllowed] = useState(false);
+
   const fetchBlackLists = async () => {
     setIsFetching(true);
     const accessToken = localStorage.getItem("accessToken");
@@ -107,7 +117,7 @@ export default function Page() {
     const filteredAdmins = blacksList.filter((admin: any) =>
       admin.consumerName.toLowerCase().includes(value.toLowerCase())
     );
-    setSearchResults(filteredAdmins);
+    setLatestFiltersResult(filteredAdmins);
   };
 
   const showModal = (type: any) => {
@@ -121,6 +131,81 @@ export default function Page() {
 
   const handleCancel = () => {
     setIsModalOpen(false);
+  };
+
+  // ############ Filtering operations ###########
+
+  const onChangeStartDate = (date: any, dateString: any) => {
+    // console.log()
+    setStartDateFilter(dateString);
+
+    if (dateString) {
+      const standardStartDate = new Date(dateString);
+      if (!endDataFilter) {
+        console.log(statusFilter);
+        // If the end date is not specified filter all dates greater than or equal start date
+
+        const filterMemberResult = blacksList.filter(
+          (list: any) => new Date(list.approvalDate) >= standardStartDate
+        );
+        setLatestFiltersResult(filterMemberResult);
+      } else {
+        // If the end date is  specified filter all dates greater than or equal start date and less than or equal to end date
+
+        const filterMemberResult = blacksList.filter(
+          (list: any) =>
+            new Date(list.approvalDate) >= standardStartDate &&
+            new Date(list.approvalDate) <= new Date(endDataFilter)
+        );
+
+        setLatestFiltersResult(filterMemberResult);
+      }
+    } else {
+      setLatestFiltersResult([]);
+    }
+  };
+
+  const onChangeEndDate = (date: any, dateString: any) => {
+    setEndDateFilter(dateString);
+
+    if (dateString) {
+      const standardEndDate = new Date(dateString);
+
+      if (startDateFilter) {
+        const standardStartDate = new Date(startDateFilter);
+        const filterBlackResult = blacksList.filter(
+          (list: any) =>
+            new Date(list.approvalDate) >= standardStartDate &&
+            new Date(list.approvalDate) <= standardEndDate
+        );
+        setLatestFiltersResult(filterBlackResult);
+      }
+    } else {
+      setLatestFiltersResult([]);
+    }
+  };
+
+  const handleAllowDateFiltering = (event: any) => {
+    const selectedValue = event.target.value;
+    if (selectedValue === "all") {
+      setIsDateFilteringAllowed(false);
+    } else {
+      setIsDateFilteringAllowed(true);
+    }
+  };
+
+  const handleStatusFiltering = (event: any) => {
+    const selectedValue = event.target.value;
+
+    if (selectedValue !== "all") {
+      const filterMemberResult = blacksList.filter(
+        (list: any) => list.situation == selectedValue
+      );
+      setLatestFiltersResult(filterMemberResult);
+    } else {
+      setLatestFiltersResult([]);
+    }
+    setStatusFilter(selectedValue);
   };
 
   const tableColumns: ColumnsType<TableData> = [
@@ -293,19 +378,25 @@ export default function Page() {
             <label htmlFor="#" className="font-black">
               승인일
             </label>
-            <Radio.Group name="radiogroup" defaultValue={1}>
-              <Radio value={1}>전체</Radio>
-              <Radio value={2}>설정</Radio>
+            <Radio.Group
+              name="radiogroup"
+              onChange={handleAllowDateFiltering}
+              defaultValue="all"
+            >
+              <Radio value="all">전체</Radio>
+              <Radio value="custom">설정</Radio>
             </Radio.Group>
             <Space className="date-range" size="small">
               <DatePicker
                 className="h-[41px] border-none"
-                onChange={onChangeDate}
+                onChange={onChangeStartDate}
+                disabled={!isDateFilteringAllowed}
               />
               <p className="m-0">~</p>
               <DatePicker
                 className="h-[41px] border-none"
-                onChange={onChangeDate}
+                onChange={onChangeEndDate}
+                disabled={!isDateFilteringAllowed}
               />
             </Space>
           </Space>
@@ -321,10 +412,15 @@ export default function Page() {
               <label htmlFor="#" className="font-black">
                 상태
               </label>
-              <Radio.Group name="radiogroup" defaultValue={1}>
-                <Radio value={1}>전체</Radio>
-                <Radio value={2}>설정</Radio>
-                <Radio value={3}>미노출</Radio>
+              <Radio.Group
+                name="radiogroup"
+                defaultValue="all"
+                onChange={handleStatusFiltering}
+              >
+                <Radio value="all">전체</Radio>
+                {/* <Radio value={2}>설정</Radio> */}
+                <Radio value="approved">노출된</Radio>
+                <Radio value="notApproved">미노출</Radio>
               </Radio.Group>
             </Space>
             <Space
@@ -394,7 +490,11 @@ export default function Page() {
               <Table
                 bordered
                 columns={tableColumns}
-                dataSource={searchQuery !== "" ? searchResults : blacksList}
+                dataSource={
+                  latestFiltersResult.length > 0
+                    ? latestFiltersResult
+                    : blacksList
+                }
                 onChange={onChange}
               />
             )}
