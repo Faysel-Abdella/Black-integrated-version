@@ -58,6 +58,8 @@ export default function Page() {
 
   const [isDateFilteringAllowed, setIsDateFilteringAllowed] = useState(false);
 
+  const [showNotFound, setShowNotFound] = useState(false);
+
   const fetchBlackLists = async () => {
     setIsFetching(true);
     const accessToken = localStorage.getItem("accessToken");
@@ -112,14 +114,6 @@ export default function Page() {
     showModal("registration");
   };
 
-  const handleSearch = (value: string) => {
-    setSearchQuery(value);
-    const filteredAdmins = blacksList.filter((admin: any) =>
-      admin.consumerName.toLowerCase().includes(value.toLowerCase())
-    );
-    setLatestFiltersResult(filteredAdmins);
-  };
-
   const showModal = (type: any) => {
     setIsModalOpen(true);
     setModalType(type);
@@ -135,53 +129,213 @@ export default function Page() {
 
   // ############ Filtering operations ###########
 
-  const onChangeStartDate = (date: any, dateString: any) => {
-    // console.log()
-    setStartDateFilter(dateString);
+  // ############ Filtering operations ###########
 
+  const onChangeStartDate = (date: any, dateString: any) => {
+    setStartDateFilter(dateString);
+    setShowNotFound(false);
+
+    let filterResult: any = [];
     if (dateString) {
       const standardStartDate = new Date(dateString);
       if (!endDataFilter) {
         console.log(statusFilter);
         // If the end date is not specified filter all dates greater than or equal start date
 
-        const filterMemberResult = blacksList.filter(
+        filterResult = blacksList.filter(
           (list: any) => new Date(list.approvalDate) >= standardStartDate
         );
-        setLatestFiltersResult(filterMemberResult);
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        if (statusFilter != "" && statusFilter != "all") {
+          filterResult = filterResult.filter(
+            (list: any) => list.situation == statusFilter
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.consumerName
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        setLatestFiltersResult(filterResult);
       } else {
         // If the end date is  specified filter all dates greater than or equal start date and less than or equal to end date
 
-        const filterMemberResult = blacksList.filter(
+        filterResult = blacksList.filter(
           (list: any) =>
             new Date(list.approvalDate) >= standardStartDate &&
             new Date(list.approvalDate) <= new Date(endDataFilter)
         );
 
-        setLatestFiltersResult(filterMemberResult);
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        if (statusFilter != "" && statusFilter != "all") {
+          filterResult = filterResult.filter(
+            (list: any) => list.situation == statusFilter
+          );
+        }
+
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.consumerName
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        setLatestFiltersResult(filterResult);
       }
     } else {
-      setLatestFiltersResult([]);
+      let filterResult: any = [];
+      if (statusFilter != "" && statusFilter != "all") {
+        filterResult = blacksList.filter(
+          (list: any) => list.situation == statusFilter
+        );
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.consumerName
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+          if (filterResult.length == 0) {
+            return setShowNotFound(true);
+          }
+        }
+      } else {
+        if (searchQuery) {
+          filterResult = blacksList.filter((member: any) =>
+            member.consumerName
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+          if (filterResult.length == 0) {
+            return setShowNotFound(true);
+          }
+        }
+      }
+
+      setLatestFiltersResult(filterResult);
     }
   };
 
   const onChangeEndDate = (date: any, dateString: any) => {
     setEndDateFilter(dateString);
+    setShowNotFound(false);
 
     if (dateString) {
       const standardEndDate = new Date(dateString);
+      let filterResult: any = [];
 
       if (startDateFilter) {
         const standardStartDate = new Date(startDateFilter);
-        const filterBlackResult = blacksList.filter(
+        filterResult = blacksList.filter(
           (list: any) =>
             new Date(list.approvalDate) >= standardStartDate &&
             new Date(list.approvalDate) <= standardEndDate
         );
-        setLatestFiltersResult(filterBlackResult);
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        if (statusFilter != "" && statusFilter != "all") {
+          filterResult = filterResult.filter(
+            (list: any) => list.situation == statusFilter
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.consumerName
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        setLatestFiltersResult(filterResult);
       }
     } else {
-      setLatestFiltersResult([]);
+      let filterResult: any = [];
+      if (startDateFilter) {
+        filterResult = blacksList.filter(
+          (list: any) =>
+            new Date(list.approvalDate) >= new Date(startDateFilter)
+        );
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+        if (statusFilter != "" && statusFilter != "all") {
+          filterResult = filterResult.filter(
+            (list: any) => list.situation == statusFilter
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.consumerName
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+        }
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+      }
+      if (statusFilter != "" && statusFilter != "all") {
+        filterResult = blacksList.filter(
+          (list: any) => list.situation == statusFilter
+        );
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.consumerName
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+        }
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+      }
+      setLatestFiltersResult(filterResult);
     }
   };
 
@@ -196,16 +350,140 @@ export default function Page() {
 
   const handleStatusFiltering = (event: any) => {
     const selectedValue = event.target.value;
+    setStatusFilter(selectedValue);
+    setShowNotFound(false);
+
+    console.log(searchQuery);
+
+    const filterFrom = blacksList;
+
+    // let filterResult: any = [];
+    let filterResult: any = [];
 
     if (selectedValue !== "all") {
-      const filterMemberResult = blacksList.filter(
+      filterResult = filterFrom.filter(
         (list: any) => list.situation == selectedValue
       );
-      setLatestFiltersResult(filterMemberResult);
+      if (startDateFilter && endDataFilter) {
+        filterResult = filterResult.filter(
+          (list: any) =>
+            new Date(list.approvalDate) >= new Date(startDateFilter) &&
+            new Date(list.approvalDate) <= new Date(endDataFilter)
+        );
+      } else if (startDateFilter) {
+        filterResult = filterResult.filter(
+          (list: any) =>
+            new Date(list.approvalDate) >= new Date(startDateFilter)
+        );
+      }
+      if (searchQuery) {
+        filterResult = filterResult.filter((member: any) =>
+          member.consumerName.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+      if (filterResult.length == 0) {
+        return setShowNotFound(true);
+      }
+      setLatestFiltersResult(filterResult);
     } else {
-      setLatestFiltersResult([]);
+      if (startDateFilter && endDataFilter) {
+        filterResult = blacksList.filter(
+          (list: any) =>
+            new Date(list.approvalDate) >= new Date(startDateFilter) &&
+            new Date(list.approvalDate) <= new Date(endDataFilter)
+        );
+        if (filterResult.length == 0 && !searchQuery) {
+          return setShowNotFound(true);
+        }
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.consumerName
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+        }
+        if (filterResult.length == 0 && searchQuery) {
+          return setShowNotFound(true);
+        }
+      } else if (startDateFilter) {
+        console.log(startDateFilter);
+        console.log(searchQuery);
+        filterResult = blacksList.filter(
+          (list: any) =>
+            new Date(list.approvalDate) >= new Date(startDateFilter)
+        );
+        if (filterResult.length == 0 && searchQuery) {
+          return setShowNotFound(true);
+        }
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.consumerName
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+        }
+        if (filterResult.length == 0 && searchQuery) {
+          return setShowNotFound(true);
+        }
+        console.log(filterResult);
+      } else {
+        if (searchQuery) {
+          filterResult = blacksList.filter((member: any) =>
+            member.consumerName
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
+          );
+          if (filterResult.length == 0 && searchQuery) {
+            return setShowNotFound(true);
+          }
+        }
+      }
+
+      setLatestFiltersResult(filterResult);
     }
-    setStatusFilter(selectedValue);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    setShowNotFound(false);
+
+    let filterResult: any = [];
+
+    filterResult = blacksList.filter((member: any) =>
+      member.consumerName.toLowerCase().includes(value.toLowerCase())
+    );
+
+    if (filterResult.length == 0) {
+      return setShowNotFound(true);
+    }
+
+    if (statusFilter != "" && statusFilter != "all") {
+      filterResult = filterResult.filter(
+        (list: any) => list.situation == statusFilter
+      );
+    }
+
+    if (filterResult.length == 0) {
+      return setShowNotFound(true);
+    }
+
+    if (startDateFilter && endDataFilter) {
+      filterResult = filterResult.filter(
+        (list: any) =>
+          new Date(list.approvalDate) >= new Date(startDateFilter) &&
+          new Date(list.approvalDate) <= new Date(endDataFilter)
+      );
+    } else if (startDateFilter) {
+      filterResult = filterResult.filter(
+        (list: any) => new Date(list.approvalDate) >= new Date(startDateFilter)
+      );
+    }
+
+    if (filterResult.length == 0) {
+      return setShowNotFound(true);
+    }
+
+    setLatestFiltersResult(filterResult);
   };
 
   const tableColumns: ColumnsType<TableData> = [
@@ -419,8 +697,8 @@ export default function Page() {
               >
                 <Radio value="all">전체</Radio>
                 {/* <Radio value={2}>설정</Radio> */}
-                <Radio value="approved">노출된</Radio>
-                <Radio value="notApproved">미노출</Radio>
+                <Radio value="APPROVED">노출된</Radio>
+                <Radio value="INVISIBLE">미노출</Radio>
               </Radio.Group>
             </Space>
             <Space
@@ -485,6 +763,12 @@ export default function Page() {
             {isFetching ? (
               <div className="flex justify-center items-center h-[100%]">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+              </div>
+            ) : showNotFound ? (
+              <div className="flex justify-center items-center">
+                <h2 className="text-center font-semibold text-[26px] ">
+                  Not Found
+                </h2>
               </div>
             ) : (
               <Table

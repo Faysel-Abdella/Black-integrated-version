@@ -47,6 +47,8 @@ export default function Announcement() {
 
   const [total, setTotal] = useState(0);
 
+  const [showNotFound, setShowNotFound] = useState(false);
+
   // Filtering states
 
   const [startDateFilter, setStartDateFilter] = useState("");
@@ -97,14 +99,6 @@ export default function Announcement() {
     setIsFetching(false);
   };
 
-  const handleSearch = (value: string) => {
-    setSearchQuery(value);
-    const filteredNotices = noticesList.filter((notice: any) =>
-      notice.title.toLowerCase().includes(value.toLowerCase())
-    );
-    setLatestFiltersResult(filteredNotices);
-  };
-
   const handleClickNotice = (data: any) => {
     const thisNoticeData: any = noticesAllDataList.filter(
       (notice: any) => notice.id.toString() == data.id.toString()
@@ -138,52 +132,196 @@ export default function Announcement() {
   // ############ Filtering operations ###########
 
   const onChangeStartDate = (date: any, dateString: any) => {
-    // console.log()
     setStartDateFilter(dateString);
+    setShowNotFound(false);
 
+    let filterResult: any = [];
     if (dateString) {
       const standardStartDate = new Date(dateString);
       if (!endDataFilter) {
         console.log(statusFilter);
         // If the end date is not specified filter all dates greater than or equal start date
 
-        const filterMemberResult = noticesList.filter(
+        filterResult = noticesList.filter(
           (list: any) => new Date(list.startDateTime) >= standardStartDate
         );
-        setLatestFiltersResult(filterMemberResult);
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        if (statusFilter != "" && statusFilter != "all") {
+          filterResult = filterResult.filter(
+            (list: any) => list.status == statusFilter
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        setLatestFiltersResult(filterResult);
       } else {
         // If the end date is  specified filter all dates greater than or equal start date and less than or equal to end date
 
-        const filterMemberResult = noticesList.filter(
+        filterResult = noticesList.filter(
           (list: any) =>
             new Date(list.startDateTime) >= standardStartDate &&
             new Date(list.endDateTime) <= new Date(endDataFilter)
         );
 
-        setLatestFiltersResult(filterMemberResult);
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        if (statusFilter != "" && statusFilter != "all") {
+          filterResult = filterResult.filter(
+            (list: any) => list.status == statusFilter
+          );
+        }
+
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        setLatestFiltersResult(filterResult);
       }
     } else {
-      setLatestFiltersResult([]);
+      let filterResult: any = [];
+      if (statusFilter != "" && statusFilter != "all") {
+        filterResult = noticesList.filter(
+          (list: any) => list.status == statusFilter
+        );
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          if (filterResult.length == 0) {
+            return setShowNotFound(true);
+          }
+        }
+      } else {
+        if (searchQuery) {
+          filterResult = noticesList.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          if (filterResult.length == 0) {
+            return setShowNotFound(true);
+          }
+        }
+      }
+
+      setLatestFiltersResult(filterResult);
     }
   };
 
   const onChangeEndDate = (date: any, dateString: any) => {
     setEndDateFilter(dateString);
+    setShowNotFound(false);
 
     if (dateString) {
       const standardEndDate = new Date(dateString);
+      let filterResult: any = [];
 
       if (startDateFilter) {
         const standardStartDate = new Date(startDateFilter);
-        const filterBlackResult = noticesList.filter(
+        filterResult = noticesList.filter(
           (list: any) =>
             new Date(list.startDateTime) >= standardStartDate &&
             new Date(list.endDateTime) <= standardEndDate
         );
-        setLatestFiltersResult(filterBlackResult);
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        if (statusFilter != "" && statusFilter != "all") {
+          filterResult = filterResult.filter(
+            (list: any) => list.status == statusFilter
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        setLatestFiltersResult(filterResult);
       }
     } else {
-      setLatestFiltersResult([]);
+      let filterResult: any = [];
+      if (startDateFilter) {
+        filterResult = noticesList.filter(
+          (list: any) =>
+            new Date(list.startDateTime) >= new Date(startDateFilter)
+        );
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+        if (statusFilter != "" && statusFilter != "all") {
+          filterResult = filterResult.filter(
+            (list: any) => list.status == statusFilter
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+      }
+      if (statusFilter != "" && statusFilter != "all") {
+        filterResult = noticesList.filter(
+          (list: any) => list.status == statusFilter
+        );
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+      }
+      setLatestFiltersResult(filterResult);
     }
   };
 
@@ -198,16 +336,136 @@ export default function Announcement() {
 
   const handleStatusFiltering = (event: any) => {
     const selectedValue = event.target.value;
+    setStatusFilter(selectedValue);
+    setShowNotFound(false);
+
+    console.log(searchQuery);
+
+    const filterFrom = noticesList;
+
+    // let filterResult: any = [];
+    let filterResult: any = [];
+    console.log(selectedValue);
 
     if (selectedValue !== "all") {
-      const filterMemberResult = noticesList.filter(
+      filterResult = filterFrom.filter(
         (list: any) => list.status == selectedValue
       );
-      setLatestFiltersResult(filterMemberResult);
+
+      if (startDateFilter && endDataFilter) {
+        filterResult = filterResult.filter(
+          (list: any) =>
+            new Date(list.startDateTime) >= new Date(startDateFilter) &&
+            new Date(list.endDateTime) <= new Date(endDataFilter)
+        );
+      } else if (startDateFilter) {
+        filterResult = filterResult.filter(
+          (list: any) =>
+            new Date(list.startDateTime) >= new Date(startDateFilter)
+        );
+      }
+      if (searchQuery) {
+        filterResult = filterResult.filter((member: any) =>
+          member.title.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+      console.log(filterResult);
+      if (filterResult.length == 0) {
+        return setShowNotFound(true);
+      }
+      setLatestFiltersResult(filterResult);
     } else {
-      setLatestFiltersResult([]);
+      if (startDateFilter && endDataFilter) {
+        filterResult = noticesList.filter(
+          (list: any) =>
+            new Date(list.startDateTime) >= new Date(startDateFilter) &&
+            new Date(list.endDateTime) <= new Date(endDataFilter)
+        );
+        if (filterResult.length == 0 && !searchQuery) {
+          return setShowNotFound(true);
+        }
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+        if (filterResult.length == 0 && searchQuery) {
+          return setShowNotFound(true);
+        }
+      } else if (startDateFilter) {
+        console.log(startDateFilter);
+        console.log(searchQuery);
+        filterResult = noticesList.filter(
+          (list: any) => new Date(list.joinDate) >= new Date(startDateFilter)
+        );
+        if (filterResult.length == 0 && searchQuery) {
+          return setShowNotFound(true);
+        }
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+        if (filterResult.length == 0 && searchQuery) {
+          return setShowNotFound(true);
+        }
+        console.log(filterResult);
+      } else {
+        if (searchQuery) {
+          filterResult = noticesList.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          if (filterResult.length == 0 && searchQuery) {
+            return setShowNotFound(true);
+          }
+        }
+      }
+
+      setLatestFiltersResult(filterResult);
     }
-    setStatusFilter(selectedValue);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    setShowNotFound(false);
+
+    let filterResult: any = [];
+
+    filterResult = noticesList.filter((member: any) =>
+      member.title.toLowerCase().includes(value.toLowerCase())
+    );
+
+    if (filterResult.length == 0) {
+      return setShowNotFound(true);
+    }
+
+    if (statusFilter != "" && statusFilter != "all") {
+      filterResult = filterResult.filter(
+        (list: any) => list.status == statusFilter
+      );
+    }
+
+    if (filterResult.length == 0) {
+      return setShowNotFound(true);
+    }
+
+    if (startDateFilter && endDataFilter) {
+      filterResult = filterResult.filter(
+        (list: any) =>
+          new Date(list.startDateTime) >= new Date(startDateFilter) &&
+          new Date(list.endDateTime) <= new Date(endDataFilter)
+      );
+    } else if (startDateFilter) {
+      filterResult = filterResult.filter(
+        (list: any) => new Date(list.joinDate) >= new Date(startDateFilter)
+      );
+    }
+
+    if (filterResult.length == 0) {
+      return setShowNotFound(true);
+    }
+
+    setLatestFiltersResult(filterResult);
   };
 
   const columns: ColumnsType<TableData> = [
@@ -372,8 +630,8 @@ export default function Announcement() {
                 onChange={handleStatusFiltering}
               >
                 <Radio value="all">전체</Radio>
-                <Radio value="progress">진행</Radio>
-                <Radio value="completed">종료</Radio>
+                <Radio value="PROGRESS">진행</Radio>
+                <Radio value="COMPLETED">종료</Radio>
               </Radio.Group>
             </Space>
             <Space
@@ -424,6 +682,12 @@ export default function Announcement() {
             {isFetching ? (
               <div className="flex justify-center items-center h-[100%]">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+              </div>
+            ) : showNotFound ? (
+              <div className="flex justify-center items-center">
+                <h2 className="text-center font-semibold text-[26px] ">
+                  Not Found
+                </h2>
               </div>
             ) : (
               <Table

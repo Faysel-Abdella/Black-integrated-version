@@ -388,26 +388,41 @@ export default function Membership() {
             new Date(list.joinDate) >= new Date(startDateFilter) &&
             new Date(list.joinDate) <= new Date(endDataFilter)
         );
+        if (filterResult.length == 0 && !searchQuery) {
+          return setShowNotFound(true);
+        }
         if (searchQuery) {
           filterResult = filterResult.filter((member: any) =>
             member.name.toLowerCase().includes(searchQuery.toLowerCase())
           );
         }
+        if (filterResult.length == 0 && searchQuery) {
+          return setShowNotFound(true);
+        }
       } else if (startDateFilter) {
+        console.log(startDateFilter);
+        console.log(searchQuery);
         filterResult = membersList.filter(
           (list: any) => new Date(list.joinDate) >= new Date(startDateFilter)
         );
+        if (filterResult.length == 0 && searchQuery) {
+          return setShowNotFound(true);
+        }
         if (searchQuery) {
           filterResult = filterResult.filter((member: any) =>
             member.name.toLowerCase().includes(searchQuery.toLowerCase())
           );
         }
+        if (filterResult.length == 0 && searchQuery) {
+          return setShowNotFound(true);
+        }
+        console.log(filterResult);
       } else {
         if (searchQuery) {
           filterResult = membersList.filter((member: any) =>
             member.name.toLowerCase().includes(searchQuery.toLowerCase())
           );
-          if (filterResult.length == 0 && !searchQuery) {
+          if (filterResult.length == 0 && searchQuery) {
             return setShowNotFound(true);
           }
         }

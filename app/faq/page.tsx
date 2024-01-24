@@ -44,6 +44,8 @@ export default function Faq() {
 
   const [latestFiltersResult, setLatestFiltersResult] = useState([]);
 
+  const [showNotFound, setShowNotFound] = useState(false);
+
   const [isDateFilteringAllowed, setIsDateFilteringAllowed] = useState(false);
 
   const fetchFaqLists = async () => {
@@ -84,14 +86,6 @@ export default function Faq() {
     }
   }, []);
 
-  const handleSearch = (value: string) => {
-    setSearchQuery(value);
-    const filteredFaqs = faqsList.filter((faq: any) =>
-      faq.faqTitle.toLowerCase().includes(value.toLowerCase())
-    );
-    setLatestFiltersResult(filteredFaqs);
-  };
-
   const handleClickFaq = (data: any) => {
     const thisFaqData: any = faqsAllDataList.filter(
       (faq: any) => faq.id.toString() == data.id.toString()
@@ -117,52 +111,196 @@ export default function Faq() {
   // ############ Filtering operations ###########
 
   const onChangeStartDate = (date: any, dateString: any) => {
-    // console.log()
     setStartDateFilter(dateString);
+    setShowNotFound(false);
 
+    let filterResult: any = [];
     if (dateString) {
       const standardStartDate = new Date(dateString);
       if (!endDataFilter) {
         console.log(statusFilter);
         // If the end date is not specified filter all dates greater than or equal start date
 
-        const filterMemberResult = faqsList.filter(
+        filterResult = faqsList.filter(
           (list: any) => new Date(list.registerDate) >= standardStartDate
         );
-        setLatestFiltersResult(filterMemberResult);
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        if (statusFilter != "" && statusFilter != "all") {
+          filterResult = filterResult.filter(
+            (list: any) => list.status == statusFilter
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        setLatestFiltersResult(filterResult);
       } else {
         // If the end date is  specified filter all dates greater than or equal start date and less than or equal to end date
 
-        const filterMemberResult = faqsList.filter(
+        filterResult = faqsList.filter(
           (list: any) =>
             new Date(list.registerDate) >= standardStartDate &&
             new Date(list.registerDate) <= new Date(endDataFilter)
         );
 
-        setLatestFiltersResult(filterMemberResult);
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        if (statusFilter != "" && statusFilter != "all") {
+          filterResult = filterResult.filter(
+            (list: any) => list.status == statusFilter
+          );
+        }
+
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        setLatestFiltersResult(filterResult);
       }
     } else {
-      setLatestFiltersResult([]);
+      let filterResult: any = [];
+      if (statusFilter != "" && statusFilter != "all") {
+        filterResult = faqsList.filter(
+          (list: any) => list.status == statusFilter
+        );
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          if (filterResult.length == 0) {
+            return setShowNotFound(true);
+          }
+        }
+      } else {
+        if (searchQuery) {
+          filterResult = faqsList.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          if (filterResult.length == 0) {
+            return setShowNotFound(true);
+          }
+        }
+      }
+
+      setLatestFiltersResult(filterResult);
     }
   };
 
   const onChangeEndDate = (date: any, dateString: any) => {
     setEndDateFilter(dateString);
+    setShowNotFound(false);
 
     if (dateString) {
       const standardEndDate = new Date(dateString);
+      let filterResult: any = [];
 
       if (startDateFilter) {
         const standardStartDate = new Date(startDateFilter);
-        const filterBlackResult = faqsList.filter(
+        filterResult = faqsList.filter(
           (list: any) =>
             new Date(list.registerDate) >= standardStartDate &&
             new Date(list.registerDate) <= standardEndDate
         );
-        setLatestFiltersResult(filterBlackResult);
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        if (statusFilter != "" && statusFilter != "all") {
+          filterResult = filterResult.filter(
+            (list: any) => list.status == statusFilter
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+
+        setLatestFiltersResult(filterResult);
       }
     } else {
-      setLatestFiltersResult([]);
+      let filterResult: any = [];
+      if (startDateFilter) {
+        filterResult = faqsList.filter(
+          (list: any) =>
+            new Date(list.registerDate) >= new Date(startDateFilter)
+        );
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+        if (statusFilter != "" && statusFilter != "all") {
+          filterResult = filterResult.filter(
+            (list: any) => list.status == statusFilter
+          );
+        }
+
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+      }
+      if (statusFilter != "" && statusFilter != "all") {
+        filterResult = faqsList.filter(
+          (list: any) => list.status == statusFilter
+        );
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+        if (filterResult.length == 0) {
+          return setShowNotFound(true);
+        }
+      }
+      setLatestFiltersResult(filterResult);
     }
   };
 
@@ -177,16 +315,135 @@ export default function Faq() {
 
   const handleStatusFiltering = (event: any) => {
     const selectedValue = event.target.value;
+    setStatusFilter(selectedValue);
+    setShowNotFound(false);
+
+    const filterFrom = faqsList;
+
+    // let filterResult: any = [];
+    let filterResult: any = [];
 
     if (selectedValue !== "all") {
-      const filterMemberResult = faqsList.filter(
+      console.log(selectedValue);
+
+      filterResult = filterFrom.filter(
         (list: any) => list.status == selectedValue
       );
-      setLatestFiltersResult(filterMemberResult);
+      console.log(filterResult);
+      if (startDateFilter && endDataFilter) {
+        filterResult = filterResult.filter(
+          (list: any) =>
+            new Date(list.registerDate) >= new Date(startDateFilter) &&
+            new Date(list.registerDate) <= new Date(endDataFilter)
+        );
+      } else if (startDateFilter) {
+        filterResult = filterResult.filter(
+          (list: any) =>
+            new Date(list.registerDate) >= new Date(startDateFilter)
+        );
+      }
+      if (searchQuery) {
+        filterResult = filterResult.filter((member: any) =>
+          member.title.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+      if (filterResult.length == 0) {
+        return setShowNotFound(true);
+      }
+      setLatestFiltersResult(filterResult);
     } else {
-      setLatestFiltersResult([]);
+      if (startDateFilter && endDataFilter) {
+        filterResult = faqsList.filter(
+          (list: any) =>
+            new Date(list.registerDate) >= new Date(startDateFilter) &&
+            new Date(list.registerDate) <= new Date(endDataFilter)
+        );
+        if (filterResult.length == 0 && !searchQuery) {
+          return setShowNotFound(true);
+        }
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+        if (filterResult.length == 0 && searchQuery) {
+          return setShowNotFound(true);
+        }
+      } else if (startDateFilter) {
+        console.log(startDateFilter);
+        console.log(searchQuery);
+        filterResult = faqsList.filter(
+          (list: any) =>
+            new Date(list.registerDate) >= new Date(startDateFilter)
+        );
+        if (filterResult.length == 0 && searchQuery) {
+          return setShowNotFound(true);
+        }
+        if (searchQuery) {
+          filterResult = filterResult.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+        if (filterResult.length == 0 && searchQuery) {
+          return setShowNotFound(true);
+        }
+        console.log(filterResult);
+      } else {
+        if (searchQuery) {
+          filterResult = faqsList.filter((member: any) =>
+            member.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          if (filterResult.length == 0 && searchQuery) {
+            return setShowNotFound(true);
+          }
+        }
+      }
+
+      setLatestFiltersResult(filterResult);
     }
-    setStatusFilter(selectedValue);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    setShowNotFound(false);
+
+    let filterResult: any = [];
+
+    filterResult = faqsList.filter((member: any) =>
+      member.title.toLowerCase().includes(value.toLowerCase())
+    );
+
+    if (filterResult.length == 0) {
+      return setShowNotFound(true);
+    }
+
+    if (statusFilter != "" && statusFilter != "all") {
+      filterResult = filterResult.filter(
+        (list: any) => list.status == statusFilter
+      );
+    }
+
+    if (filterResult.length == 0) {
+      return setShowNotFound(true);
+    }
+
+    if (startDateFilter && endDataFilter) {
+      filterResult = filterResult.filter(
+        (list: any) =>
+          new Date(list.registerDate) >= new Date(startDateFilter) &&
+          new Date(list.registerDate) <= new Date(endDataFilter)
+      );
+    } else if (startDateFilter) {
+      filterResult = filterResult.filter(
+        (list: any) => new Date(list.registerDate) >= new Date(startDateFilter)
+      );
+    }
+
+    if (filterResult.length == 0) {
+      return setShowNotFound(true);
+    }
+
+    setLatestFiltersResult(filterResult);
   };
 
   const columns = [
@@ -403,6 +660,12 @@ export default function Faq() {
             {isFetching ? (
               <div className="flex justify-center items-center h-[100%]">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500"></div>
+              </div>
+            ) : showNotFound ? (
+              <div className="flex justify-center items-center">
+                <h2 className="text-center font-semibold text-[26px] ">
+                  Not Found
+                </h2>
               </div>
             ) : (
               <Table

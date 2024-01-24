@@ -149,7 +149,7 @@ export default function PrivacyEditor({
         } catch (error: any) {
           setIsLoading(false);
 
-          toast.success(error.response.data.message, {
+          toast.error(error.response.data.message, {
             autoClose: 3500,
           });
           console.log(error);
@@ -172,6 +172,8 @@ export default function PrivacyEditor({
             }
           );
 
+          console.log(response);
+
           handleCancel();
           form.resetFields();
           setIsLoading(false);
@@ -183,7 +185,7 @@ export default function PrivacyEditor({
         } catch (error: any) {
           setIsLoading(false);
 
-          toast.success(error.response.data.message, {
+          toast.error(error.response.data.message, {
             autoClose: 3500,
           });
           console.log(error);
@@ -223,6 +225,9 @@ export default function PrivacyEditor({
           fetchDataLists!();
         } catch (error: any) {
           setIsLoading(false);
+          toast.error(error.response.data.message, {
+            autoClose: 3500,
+          });
 
           console.log(error);
         }
@@ -250,6 +255,9 @@ export default function PrivacyEditor({
           fetchDataLists!();
         } catch (error: any) {
           setIsLoading(false);
+          toast.error(error.response.data.message, {
+            autoClose: 3500,
+          });
 
           console.log(error);
         }
@@ -289,6 +297,9 @@ export default function PrivacyEditor({
           fetchDataLists!();
         } catch (error: any) {
           setIsLoading(false);
+          toast.error(error.response.data.message, {
+            autoClose: 3500,
+          });
 
           console.log(error);
         }
@@ -319,6 +330,9 @@ export default function PrivacyEditor({
           fetchDataLists!();
         } catch (error: any) {
           setIsLoading(false);
+          toast.error(error.response.data.message, {
+            autoClose: 3500,
+          });
 
           console.log(error);
         }
