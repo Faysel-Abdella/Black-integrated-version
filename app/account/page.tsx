@@ -37,6 +37,8 @@ export default function Account() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [buttonType, setButtonType] = useState("register");
+  const [changingState, setChangingState] = useState(false);
+
   const [adminsAllDataList, setAdminsAllDataList] = useState([]);
   const [adminsList, setAdminsList] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
@@ -91,6 +93,8 @@ export default function Account() {
   }, []);
 
   const showModal = () => {
+    setChangingState((prev: boolean) => !prev);
+
     setButtonType("register");
     setIsModalOpen(true);
   };
@@ -340,6 +344,7 @@ export default function Account() {
             onCancel={handleCancel}
             clickedAdminData={clickedAdminData}
             fetchAdminLists={fetchAdminLists}
+            changingState={changingState}
           />
         </div>
       </Modal>

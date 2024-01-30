@@ -9,6 +9,7 @@ interface AccountModalProps {
   buttonType: string;
   clickedFaqData: any;
   fetchFaqLists: () => void;
+  changingState?: boolean;
 }
 
 export default function AccountModal({
@@ -16,6 +17,7 @@ export default function AccountModal({
   buttonType,
   clickedFaqData,
   fetchFaqLists,
+  changingState,
 }: AccountModalProps) {
   const [form] = Form.useForm();
 
@@ -30,6 +32,12 @@ export default function AccountModal({
       form.resetFields();
     }
   }, [buttonType, clickedFaqData]);
+
+  useEffect(() => {
+    if (buttonType == "register") {
+      form.resetFields();
+    }
+  }, [changingState]);
 
   const handleAddFaq = async () => {
     const title = form.getFieldValue("title");

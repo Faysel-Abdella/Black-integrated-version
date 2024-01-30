@@ -1,17 +1,20 @@
 import { Form, Row, Button, Radio, Input, Col, Flex } from "antd";
 import { toast } from "react-toastify";
 import customFetch from "@/utils/customFetch";
+import { useEffect } from "react";
 
 interface MembershipProps {
   onCancel: () => void;
   fetchApprovalRequests: () => void;
   clickedRequestId: any;
+  changingState?: boolean;
 }
 
 export default function Membership({
   onCancel,
   fetchApprovalRequests,
   clickedRequestId,
+  changingState,
 }: MembershipProps) {
   const [form] = Form.useForm();
   const { TextArea } = Input;
@@ -22,6 +25,10 @@ export default function Membership({
   // PATCH request to '/api/v1/admins/blacks/reject/{id}
   // This API is for rejecting the registration of black consumers.
   // For more details, please refer to the Swagger documentation."
+
+  useEffect(() => {
+    form.resetFields();
+  }, [changingState]);
 
   const handleReject = async () => {
     const accessToken = localStorage.getItem("accessToken");

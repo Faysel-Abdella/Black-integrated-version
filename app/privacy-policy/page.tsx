@@ -18,6 +18,7 @@ type TableData = {
 export default function PrivacyPolicy() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [buttonType, setButtonType] = useState("");
+  const [changingState, setChangingState] = useState(false);
 
   const [privaciesList, setPrivaciesList] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
@@ -183,6 +184,7 @@ export default function PrivacyPolicy() {
               shape="round"
               className="min-w-[120px]"
               onClick={() => {
+                setChangingState((prev: boolean) => !prev);
                 setButtonType("register");
                 showModal();
               }}
@@ -237,6 +239,7 @@ export default function PrivacyPolicy() {
             handleCancel={handleCancel}
             fetchDataLists={fetchPrivacyLists}
             isFetching={isFetching}
+            changingState={changingState}
           />
         </div>
       </Modal>

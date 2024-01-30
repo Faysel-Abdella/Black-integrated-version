@@ -11,7 +11,7 @@ import {
   Select,
   DatePicker,
 } from "antd";
-import Editor from "./CKEditor";
+// import Editor from "./CKEditor";
 import dynamic from "next/dynamic";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
@@ -21,6 +21,19 @@ import { toast } from "react-toastify";
 
 import customFetch from "@/utils/customFetch";
 
+const Editor = dynamic(() => import("./CKEditor"), { ssr: false });
+
+type propsType = {
+  usedOnPage: string;
+  extraFilter?: boolean;
+  buttonType?: any;
+  clickedData?: any;
+  fetchDataLists?: () => void;
+  handleCancel: () => void;
+  isFetching?: boolean;
+  changingState?: boolean;
+};
+
 export default function PrivacyEditor({
   usedOnPage,
   extraFilter,
@@ -29,24 +42,16 @@ export default function PrivacyEditor({
   fetchDataLists,
   handleCancel,
   isFetching,
-}: {
-  usedOnPage: string;
-  extraFilter?: boolean;
-  buttonType?: any;
-  clickedData?: any;
-  fetchDataLists?: () => void;
-  handleCancel: () => void;
-  isFetching?: boolean;
-}) {
+  changingState,
+}: propsType) {
   const [form] = Form.useForm();
-  const Editor = dynamic(() => import("./CKEditor"), { ssr: false });
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
 
-  let editorText = "";
+  const [editorText, setEditorText] = useState("");
 
   const firstFilling = () => {
     if (buttonType! === "modification" && usedOnPage === "announcement") {
@@ -82,8 +87,10 @@ export default function PrivacyEditor({
       form.resetFields();
       setStartDate("");
       setEndDate("");
+      setEditorText("");
+      console.log("REGISTER");
     }
-  }, [clickedData, buttonType, extraFilter]);
+  }, [clickedData, buttonType, extraFilter, changingState]);
 
   useEffect(() => {
     firstFilling();
@@ -91,6 +98,7 @@ export default function PrivacyEditor({
       form.resetFields();
       setStartDate("");
       setEndDate("");
+      setEditorText("");
     }
   }, []);
 
@@ -103,7 +111,7 @@ export default function PrivacyEditor({
   };
 
   const handleEditorChange = (data: string) => {
-    editorText = data;
+    setEditorText(data);
   };
 
   const handleCorrection = async () => {
@@ -141,7 +149,7 @@ export default function PrivacyEditor({
           handleCancel();
           form.resetFields();
           setIsLoading(false);
-          editorText = "";
+          setEditorText("");
           setStartDate("");
           setEndDate("");
           toast.success("완료", { autoClose: 3500 });
@@ -177,7 +185,8 @@ export default function PrivacyEditor({
           handleCancel();
           form.resetFields();
           setIsLoading(false);
-          editorText = "";
+          setEditorText("");
+
           setStartDate("");
           setEndDate("");
           toast.success("완료", { autoClose: 3500 });
@@ -220,7 +229,8 @@ export default function PrivacyEditor({
           handleCancel();
           form.resetFields();
           setIsLoading(false);
-          editorText = "";
+          setEditorText("");
+
           toast.success("완료", { autoClose: 3500 });
           fetchDataLists!();
         } catch (error: any) {
@@ -250,7 +260,8 @@ export default function PrivacyEditor({
           handleCancel();
           form.resetFields();
           setIsLoading(false);
-          editorText = "";
+          setEditorText("");
+
           toast.success("완료", { autoClose: 3500 });
           fetchDataLists!();
         } catch (error: any) {
@@ -292,7 +303,8 @@ export default function PrivacyEditor({
           form.resetFields();
           setIsLoading(false);
 
-          editorText = "";
+          setEditorText("");
+
           toast.success("완료", { autoClose: 3500 });
           fetchDataLists!();
         } catch (error: any) {
@@ -325,7 +337,8 @@ export default function PrivacyEditor({
           form.resetFields();
           setIsLoading(false);
 
-          editorText = "";
+          setEditorText("");
+
           toast.success("완료", { autoClose: 3500 });
           fetchDataLists!();
         } catch (error: any) {

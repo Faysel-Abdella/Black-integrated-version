@@ -27,6 +27,7 @@ const Editor = ({ onChange, buttonType, clickedDataContent }: EditorProps) => {
 
   return (
     <CKEditor
+      key="editor"
       editor={ClassicEditor}
       data={editorData}
       onChange={handleEditorChange}

@@ -10,17 +10,19 @@ import {
   Space,
   AutoComplete,
 } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 type MembershipManagementModalProps = {
   fetchMemberLists?: () => void;
   closeModal?: () => void;
+  changingState?: boolean;
 };
 
 export default function BlockRegisterModal({
   fetchMemberLists,
   closeModal,
+  changingState,
 }: MembershipManagementModalProps) {
   const [form] = Form.useForm();
   const { TextArea } = Input;
@@ -28,6 +30,10 @@ export default function BlockRegisterModal({
   const [userID, setUserId] = useState(0);
 
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    form.resetFields();
+  }, [changingState]);
 
   const findThisUser = async (state: string) => {
     const loginID = form.getFieldValue("loginID");

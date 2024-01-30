@@ -35,6 +35,7 @@ export default function Announcement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [extraFilter, setExtraFilter] = useState(true);
   const [buttonType, setButtonType] = useState("");
+  const [changingState, setChangingState] = useState(false);
 
   const [noticesAllDataList, setNoticesAllDataList] = useState([]);
   const [noticesList, setNoticesList] = useState([]);
@@ -662,6 +663,7 @@ export default function Announcement() {
             shape="round"
             className="min-w-[120px]"
             onClick={() => {
+              setChangingState((prev: boolean) => !prev);
               setButtonType("register");
               showModal();
             }}
@@ -729,6 +731,7 @@ export default function Announcement() {
             fetchDataLists={fetchNoticesLists}
             handleCancel={handleCancel}
             isFetching={isFetching}
+            changingState={changingState}
           />
         </div>
       </Modal>

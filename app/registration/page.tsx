@@ -36,6 +36,8 @@ type TableData = {
 export default function Page() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("registration");
+  const [changingState, setChangingState] = useState(false);
+
   const [isForRegister, setIsForRegister] = useState(false);
   const [blacksAllDataList, setBlacksAllDataList] = useState([]);
   const [blacksList, setBlacksList] = useState([]);
@@ -742,6 +744,7 @@ export default function Page() {
               type="primary"
               shape="round"
               onClick={() => {
+                setChangingState((prev: boolean) => !prev);
                 setIsForRegister(true);
                 showModal("registration");
               }}
@@ -815,6 +818,7 @@ export default function Page() {
               clickedBlackListData={clickedBlackListData}
               fetchBlackLists={fetchBlackLists}
               isForRegister={isForRegister}
+              changingState={changingState}
             />
           ) : (
             <HistoryModal />

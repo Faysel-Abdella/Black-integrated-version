@@ -40,6 +40,7 @@ type TableData = {
 export default function Membership() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("user");
+
   const [membersAllDataList, setMembersAllDataList] = useState([]);
   const [membersList, setMembersList] = useState([]);
   const [isFetching, setIsFetching] = useState(false);

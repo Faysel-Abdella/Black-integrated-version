@@ -25,6 +25,8 @@ export default function Faq() {
 
   const [buttonType, setButtonType] = useState("");
 
+  const [changingState, setChangingState] = useState(false);
+
   const [faqsAllDataList, setFaqsAllDataList] = useState([]);
   const [faqsList, setFaqsList] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
@@ -640,6 +642,8 @@ export default function Faq() {
             shape="round"
             className="min-w-[120px]"
             onClick={() => {
+              setChangingState((prev: boolean) => !prev);
+
               setButtonType("register");
               showModal();
             }}
@@ -704,6 +708,7 @@ export default function Faq() {
             buttonType={buttonType}
             clickedFaqData={clickedFaqData}
             fetchFaqLists={fetchFaqLists}
+            changingState={changingState}
           />
         </div>
       </Modal>

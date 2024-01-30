@@ -22,6 +22,7 @@ interface MembershipProps {
   clickedBlackListData?: any;
   fetchBlackLists?: () => void;
   isForRegister?: boolean;
+  changingState?: boolean;
 }
 
 // ################ DONE But there is internal server error (Waiting for Jin to fix it)
@@ -35,6 +36,7 @@ export default function Membership({
   clickedBlackListData,
   fetchBlackLists,
   isForRegister,
+  changingState,
 }: MembershipProps) {
   const [form] = Form.useForm();
   const { TextArea } = Input;
@@ -92,7 +94,6 @@ export default function Membership({
       console.log(isForRegister);
       setFirstDamageType("먹튀");
     } else {
-      console.log(isForRegister);
       setFirstDamageType("");
       setSelectedFiles([]);
     }
@@ -119,6 +120,14 @@ export default function Membership({
       setSelectedFiles([]);
     }
   }, [clickedBlackListData, isForRegister]);
+
+  useEffect(() => {
+    if (isForRegister) {
+      form.resetFields();
+      setDamageDate("");
+      setSelectedFiles([]);
+    }
+  }, [changingState]);
 
   const handleSubmit = async () => {
     const accessToken = localStorage.getItem("accessToken");

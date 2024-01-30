@@ -9,12 +9,14 @@ type MembershipManagementModalProps = {
   clickedMemberId?: string;
   fetchMemberLists: () => void;
   closeModal: () => void;
+  changingState?: boolean;
 };
 
 export default function MembershipManagementModal(
   props: MembershipManagementModalProps
 ) {
-  const { clickedMemberId, fetchMemberLists, closeModal } = props;
+  const { clickedMemberId, fetchMemberLists, closeModal, changingState } =
+    props;
   const memberId = Number(clickedMemberId);
   const [form] = Form.useForm();
   const { TextArea } = Input;
@@ -30,7 +32,8 @@ export default function MembershipManagementModal(
 
   useEffect(() => {
     form.resetFields();
-  }, [clickedMemberId]);
+    console.log("HADLE");
+  }, [clickedMemberId, changingState]);
 
   useEffect(() => {
     form.resetFields();

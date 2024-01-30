@@ -9,6 +9,7 @@ interface AccountModalProps {
   buttonType: string;
   clickedAdminData?: any;
   fetchAdminLists?: () => void;
+  changingState?: boolean;
 }
 
 export default function AccountModal({
@@ -16,6 +17,7 @@ export default function AccountModal({
   buttonType,
   clickedAdminData,
   fetchAdminLists,
+  changingState,
 }: AccountModalProps) {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,6 +62,13 @@ export default function AccountModal({
       }
     }
   }, [clickedAdminData, buttonType, form]);
+
+  useEffect(() => {
+    if (buttonType == "register") {
+      form.resetFields();
+      setAllowedPermissions([]);
+    }
+  }, [changingState]);
 
   const handleSubmit = async () => {
     setIsLoading(true);

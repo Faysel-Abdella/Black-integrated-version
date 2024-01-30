@@ -22,6 +22,8 @@ type TableData = {
 export default function PasswordManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("activate");
+  const [changingState, setChangingState] = useState(false);
+
   const [approvalRequestsList, setApprovalRequestsList] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [clickedViewDetails, setClickedViewDetails] = useState<any>([]);
@@ -164,6 +166,8 @@ export default function PasswordManagement() {
               className="cursor-pointer !px-[25px]"
               onClick={() => {
                 handleViewDetails(record);
+
+                setChangingState((prev: boolean) => !prev);
 
                 showModal("deactivate");
               }}
@@ -315,6 +319,7 @@ export default function PasswordManagement() {
               onCancel={handleCancel}
               clickedRequestId={clickedViewDetails}
               fetchApprovalRequests={fetchApprovalRequests}
+              changingState={changingState}
             />
           )}
         </div>

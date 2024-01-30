@@ -36,6 +36,8 @@ type TableData = {
 export default function MembershipManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("clear");
+  const [changingState, setChangingState] = useState(false);
+
   const [membersAllDataList, setMembersAllDataList] = useState([]);
   const [membersList, setMembersList] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
@@ -162,6 +164,7 @@ export default function MembershipManagement() {
         return (
           <button
             onClick={() => {
+              setChangingState((prev: boolean) => !prev);
               clearMemberFromBan(record);
             }}
             className="rounded-full text-sm leading-[18px] bg-[#A3A6AB] px-[14px] py-[7px] text-white"
@@ -309,7 +312,10 @@ export default function MembershipManagement() {
                 type="primary"
                 shape="round"
                 className="min-w-[120px]"
-                onClick={() => showModal("register")}
+                onClick={() => {
+                  setChangingState((prev: boolean) => !prev);
+                  showModal("register");
+                }}
               >
                 등록
               </Button>
@@ -369,11 +375,13 @@ export default function MembershipManagement() {
                   clickedMemberId={clickedMemberId}
                   fetchMemberLists={fetchMemberLists}
                   closeModal={closeModal}
+                  changingState={changingState}
                 />
               ) : (
                 <BlockRegisterModal
                   fetchMemberLists={fetchMemberLists}
                   closeModal={closeModal}
+                  changingState={changingState}
                 />
               )}
             </div>
